@@ -8,6 +8,10 @@ function App() {
       return 12*feet;
    }
 
+   function setZoomSlider(newZoom:number) {
+      (document.getElementById("zoom-slider") as HTMLInputElement).value = String(newZoom);
+   }
+
    interface Trailer {
       interiorLength: number,
       kingpinDistanceFromNose: number,
@@ -46,8 +50,10 @@ function App() {
       White = 40,
    }
 
-   const pixelsPerDiagramInchWithoutZoom = 100;
-   const defaultZoom = 1.0
+   const defaultZoom = 2.5
+   const minZoom = 0.5
+   const maxZoom = 6.5
+   const zoomStep = 0.1
    const [zoom,setZoom] = useState(defaultZoom)
 
    const sampleTrailer:Trailer = {
@@ -97,14 +103,25 @@ function App() {
             <label htmlFor={"zoom"}>zoom</label>
             <hr/>
             <div>
-               <button>-</button>
-               <input id={"zoom-slider"} name={"zoom"} type={"range"} defaultValue={defaultZoom} min={0.1} max={5.0} step={0.1} onChange={e => setZoom(Number(e.currentTarget.value))}/>
-               <button>+</button>
+               <button onClick={() => {
+                  let newZoom;
+                  if (zoom-(5*zoomStep) >= minZoom) newZoom = zoom - (5*zoomStep);
+                  else newZoom = minZoom;
+                  setZoom(newZoom);
+                  setZoomSlider(newZoom);
+               }}>-</button>
+               <input id={"zoom-slider"} name={"zoom"} type={"range"} defaultValue={defaultZoom} min={minZoom} max={maxZoom} step={zoomStep} onChange={e => setZoom(Number(e.currentTarget.value))}/>
+               <button onClick={() => {
+                  let newZoom;
+                  if (zoom+(5*zoomStep) <= maxZoom) newZoom = zoom + (5*zoomStep);
+                  else newZoom = maxZoom;
+                  setZoom(newZoom);
+                  setZoomSlider(newZoom);
+               }}>+</button>
             </div>
-
             <button onClick={() => {
                setZoom(defaultZoom);
-               (document.getElementById("zoom-slider") as HTMLInputElement).value = String(defaultZoom);
+               setZoomSlider(defaultZoom);
             }}>reset</button>
          </div>
          <canvas id={"load-diagram"} width={toInches(8)*zoom} height={toInches(53)*zoom} style={{margin: "20px calc(50% - "+(O.Straight*zoom)+"px)"}}/>
