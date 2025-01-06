@@ -20,7 +20,9 @@ function App() {
       loadRows: Array<Row>,
    }
 
-   type Row = {_ctr_: Position} | {l___: Position|null, ___r: Position|null}
+   type Row = Single | Double
+   type Single = {_ctr_: Position}
+   type Double = {l___: Position|null, ___r: Position|null}
 
    interface Position {
       /* front edge distance in inches from the nose */
@@ -38,10 +40,21 @@ function App() {
       palWt: P,
    }
 
-   /* Orientation of pallet. Value is the corresponding length in inches */
-   enum O {
-      Straight = 48,
-      Sideways = 40,
+   /* Orientation of pallet. Values are the corresponding length and width in inches */
+   type O = Straight | Sideways
+   /* see https://stackoverflow.com/questions/41179474/use-object-literal-as-typescript-enum-values */
+   class Straight {
+      static readonly L = 48
+      static readonly W = 40
+      private constructor(private readonly key:String, public readonly value:any) {}
+      toString() {return this.key}
+   }
+   /* see https://stackoverflow.com/questions/41179474/use-object-literal-as-typescript-enum-values */
+   class Sideways {
+      static readonly L = 40
+      static readonly W = 48
+      private constructor(private readonly key:String, public readonly value:any) {}
+      toString() {return this.key}
    }
 
    /* Pallet color. Value is the corresponding weight in pounds */
@@ -62,22 +75,22 @@ function App() {
       tandemCenterDistanceFromNose: toInches(40),
       tandemSpreadWidth: toInches(5),
       loadRows: [
-         {l___: {depth: 0, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 0, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-         {l___: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-         {l___: {depth: 80, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 80, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-         {l___: {depth: 120, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 120, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+         {l___: {depth: 0, orien: Sideways, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 0, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+         {l___: {depth: 40, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 40, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+         {l___: {depth: 80, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 80, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+         {l___: {depth: 120, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 120, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
 
-         {l___: {depth: 160, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 160, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-         {l___: {depth: 200, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 200, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {l___: {depth: 240, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 240, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {l___: {depth: 280, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 280, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+         {l___: {depth: 160, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 160, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+         {l___: {depth: 200, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 200, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+         {l___: {depth: 240, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 240, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+         {l___: {depth: 280, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 280, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
 
-         {l___: {depth: 320, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 320, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {l___: {depth: 360, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 360, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {l___: {depth: 400, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 400, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {l___: {depth: 440, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 440, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+         {l___: {depth: 320, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 320, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+         {l___: {depth: 360, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 360, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+         {l___: {depth: 400, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 400, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+         {l___: {depth: 440, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 440, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
 
-         {l___: {depth: 480, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 480, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}}
+         {l___: {depth: 480, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 480, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}}
       ]
    }
 
@@ -92,23 +105,44 @@ function App() {
       ctx.strokeStyle = "black"
       ctx.lineWidth = 4
 
-      ctx.fillStyle = "blue"
-      ctx.beginPath()
-      ctx.rect(0,0,O.Straight*zoom,O.Sideways*zoom)
-      ctx.fill()
-      ctx.stroke()
-      ctx.fillStyle = "white"
-      ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways)*zoom)
-      ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways-fontPx)*zoom)
-      ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways-(2*fontPx))*zoom)
-      ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways-(3*fontPx))*zoom)
-      ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways-(4*fontPx))*zoom)
+      //ctx.fillStyle = "blue"
+      //ctx.beginPath()
+      //ctx.rect(0,0,O.Straight*zoom,O.Sideways*zoom)
+      //ctx.fill()
+      //ctx.stroke()
+      //ctx.fillStyle = "white"
+      //ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways)*zoom)
+      //ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways-fontPx)*zoom)
+      //ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways-(2*fontPx))*zoom)
+      //ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways-(3*fontPx))*zoom)
+      //ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways-(4*fontPx))*zoom)
+      //
+      //ctx.fillStyle = "blue"
+      //ctx.beginPath()
+      //ctx.rect(O.Straight*zoom,0,O.Straight*zoom,O.Sideways*zoom)
+      //ctx.fill()
+      //ctx.stroke()
 
-      ctx.fillStyle = "blue"
-      ctx.beginPath()
-      ctx.rect(O.Straight*zoom,0,O.Straight*zoom,O.Sideways*zoom)
-      ctx.fill()
-      ctx.stroke()
+      sampleTrailer.loadRows.forEach((row,i) => {
+         if ('l___' in row && '___r' in row) {
+            if (row.l___ !== null) {
+               const l:Position = row.l___
+               const depth = zoom * l.depth
+               const width = zoom * (l.orien instanceof Straight ? Straight.W : Sideways.W)
+               const length = zoom * (l.orien instanceof Straight ? Straight.L : Sideways.L)
+               ctx.fillStyle = l.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
+               ctx.beginPath()
+               ctx.rect(0,depth,width,length)
+               ctx.fill()
+               ctx.stroke()
+               ctx.fillStyle = "white"
+               l.stack.forEach((pal,j) => {
+                  const color = pal.palWt === P.Chep ? "c" : "w"
+                  ctx.fillText(pal.prdWt+color, width/2, depth + length - j*fontPx*zoom)
+               })
+            }
+         }
+      })
    }, [zoom])
 
    return (
@@ -139,7 +173,7 @@ function App() {
                setZoomSlider(defaultZoom);
             }}>reset</button>
          </div>
-         <canvas id={"load-diagram"} width={toInches(8)*zoom} height={toInches(53)*zoom} style={{margin: "20px calc(50% - "+(O.Straight*zoom)+"px)"}}/>
+         <canvas id={"load-diagram"} width={toInches(8)*zoom} height={toInches(53)*zoom} style={{margin: "20px calc(50% - "+(Straight.L*zoom)+"px)"}}/>
       </>
    )
 }
