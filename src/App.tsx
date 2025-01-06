@@ -84,19 +84,25 @@ function App() {
    useEffect(() => {
       let canvas:HTMLCanvasElement = document.getElementById("load-diagram")! as HTMLCanvasElement
       let ctx = canvas.getContext("2d")
-      const fontPx = 8;
+      const fontPx = 7.7;
 
-      ctx.font =  (fontPx*zoom)+"px sans-serif"
+      ctx.font =  "bold "+(fontPx*zoom)+"px monospace"
+      ctx.textAlign = "center"
+      ctx.textBaseline = "bottom"
       ctx.strokeStyle = "black"
       ctx.lineWidth = 4
 
-      ctx.beginPath()
       ctx.fillStyle = "blue"
+      ctx.beginPath()
       ctx.rect(0,0,O.Straight*zoom,O.Sideways*zoom)
       ctx.fill()
       ctx.stroke()
       ctx.fillStyle = "white"
-      ctx.fillText("test", 2*zoom, fontPx*zoom)
+      ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways)*zoom)
+      ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways-fontPx)*zoom)
+      ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways-(2*fontPx))*zoom)
+      ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways-(3*fontPx))*zoom)
+      ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways-(4*fontPx))*zoom)
 
       ctx.fillStyle = "blue"
       ctx.beginPath()
