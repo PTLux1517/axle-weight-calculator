@@ -75,7 +75,7 @@ function App() {
       tandemCenterDistanceFromNose: toInches(40),
       tandemSpreadWidth: toInches(5),
       loadRows: [
-         {l___: {depth: 0, orien: Sideways, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 0, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+         {l___: {depth: 0, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 0, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
          {l___: {depth: 40, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 40, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
          {l___: {depth: 80, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 80, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
          {l___: {depth: 120, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 120, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
@@ -90,7 +90,8 @@ function App() {
          {l___: {depth: 400, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 400, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
          {l___: {depth: 440, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 440, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
 
-         {l___: {depth: 480, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 480, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}}
+         {l___: {depth: 480, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 480, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+         {_ctr_: {depth: 520, orien: Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}}
       ]
    }
 
@@ -139,11 +140,61 @@ function App() {
                l.stack.forEach((pal,j) => {
                   const color = pal.palWt === P.Chep ? "c" : "w"
                   ctx.fillText(pal.prdWt+color, width/2, depth + length - j*fontPx*zoom)
+                  ctx.save()
+                  ctx.fillStyle = "black"
+                  ctx.translate(10*zoom, depth + length/2)
+                  ctx.rotate(-Math.PI/2)
+                  ctx.fillText("R"+(i+1), 0, 0)
+                  ctx.restore()
+               })
+            }
+            if (row.___r !== null) {
+               const r:Position = row.___r
+               const depth = zoom * r.depth
+               const width = zoom * (r.orien instanceof Straight ? Straight.W : Sideways.W)
+               const length = zoom * (r.orien instanceof Straight ? Straight.L : Sideways.L)
+               ctx.fillStyle = r.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
+               ctx.beginPath()
+               ctx.rect(zoom*toInches(8)-width,depth,width,length)
+               ctx.fill()
+               ctx.stroke()
+               ctx.fillStyle = "white"
+               r.stack.forEach((pal,j) => {
+                  const color = pal.palWt === P.Chep ? "c" : "w"
+                  ctx.fillText(pal.prdWt+color, zoom*toInches(8) - width/2, depth + length - j*fontPx*zoom)
+                  ctx.save()
+                  ctx.fillStyle = "black"
+                  ctx.translate(zoom*toInches(8) - 10*zoom, depth + length/2)
+                  ctx.rotate(Math.PI/2)
+                  ctx.fillText("R"+(i+1), 0, 0)
+                  ctx.restore()
                })
             }
          }
+         else if ('_ctr_' in row) {
+            const c:Position = row._ctr_
+            const depth = zoom * c.depth
+            const width = zoom * (c.orien instanceof Straight ? Straight.W : Sideways.W)
+            const length = zoom * (c.orien instanceof Straight ? Straight.L : Sideways.L)
+            ctx.fillStyle = c.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
+            ctx.beginPath()
+            ctx.rect(zoom*toInches(4) - width/2,depth,width,length)
+            ctx.fill()
+            ctx.stroke()
+            ctx.fillStyle = "white"
+            c.stack.forEach((pal,j) => {
+               const color = pal.palWt === P.Chep ? "c" : "w"
+               ctx.fillText(pal.prdWt+color, zoom*toInches(4), depth + length - j*fontPx*zoom)
+               ctx.save()
+               ctx.fillStyle = "black"
+               ctx.translate(10*zoom, depth + length/2)
+               ctx.rotate(-Math.PI/2)
+               ctx.fillText("R"+(i+1), 0, 0)
+               ctx.restore()
+            })
+         }
       })
-   }, [zoom])
+   }, [zoom, sampleTrailer])
 
    return (
       <>
