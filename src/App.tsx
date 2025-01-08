@@ -1,6 +1,13 @@
 import {useEffect, useState} from 'react'
 import './App.css'
 
+export class O {
+   static readonly Straight = new O('Straight',48,40)
+   static readonly Sideways = new O('Sideways',40,48)
+   private constructor(private readonly key:String, public readonly L:number, public readonly W:number) {}
+   toString() {return this.key}
+}
+
 
 function App() {
 
@@ -40,22 +47,23 @@ function App() {
       palWt: P,
    }
 
-   /* Orientation of pallet. Values are the corresponding length and width in inches */
-   type O = Straight | Sideways
-   /* see https://stackoverflow.com/questions/41179474/use-object-literal-as-typescript-enum-values */
-   class Straight {
-      static readonly L = 48
-      static readonly W = 40
-      private constructor(private readonly key:String, public readonly value:any) {}
-      toString() {return this.key}
-   }
-   /* see https://stackoverflow.com/questions/41179474/use-object-literal-as-typescript-enum-values */
-   class Sideways {
-      static readonly L = 40
-      static readonly W = 48
-      private constructor(private readonly key:String, public readonly value:any) {}
-      toString() {return this.key}
-   }
+   ///* Orientation of pallet. Values are the corresponding length and width in inches */
+   //type O = Straight | Sideways
+   ///* see https://stackoverflow.com/questions/41179474/use-object-literal-as-typescript-enum-values */
+   //class Straight {
+   //   static readonly L = new Straight('L',48)
+   //   static readonly W = new Straight('W',40)
+   //   private constructor(private readonly key:String, public readonly value:any) {}
+   //   toString() {return this.key}
+   //}
+   ///* see https://stackoverflow.com/questions/41179474/use-object-literal-as-typescript-enum-values */
+   //class Sideways {
+   //   static readonly L = new Sideways('L',40)
+   //   static readonly W = new Sideways('R',48)
+   //   private constructor(private readonly key:String, public readonly value:any) {}
+   //   toString() {return this.key}
+   //}
+
 
    /* Pallet color. Value is the corresponding weight in pounds */
    enum P {
@@ -75,30 +83,31 @@ function App() {
       tandemCenterDistanceFromNose: toInches(40),
       tandemSpreadWidth: toInches(5),
       loadRows: [
-         {l___: {depth: 0, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 0, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-         {l___: {depth: 40, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 40, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-         {l___: {depth: 80, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 80, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-         {l___: {depth: 120, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 120, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+         {l___: {depth: 0, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 0, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+         {l___: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+         {l___: {depth: 80, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 80, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+         {l___: {depth: 120, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 120, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
 
-         {l___: {depth: 160, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 160, orien: Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-         {l___: {depth: 200, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 200, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {l___: {depth: 240, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 240, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {l___: {depth: 280, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 280, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+         {l___: {depth: 160, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 160, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+         {l___: {depth: 200, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 200, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+         {l___: {depth: 240, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 240, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+         {l___: {depth: 280, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 280, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
 
-         {l___: {depth: 320, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 320, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {l___: {depth: 360, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 360, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {l___: {depth: 400, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 400, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {l___: {depth: 440, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 440, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+         {l___: {depth: 320, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 320, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+         {l___: {depth: 360, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 360, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+         {l___: {depth: 400, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 400, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+         {l___: {depth: 440, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 440, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
 
-         {l___: {depth: 480, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 480, orien: Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {_ctr_: {depth: 520, orien: Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}}
+         {l___: {depth: 480, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 480, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+         {_ctr_: {depth: 520, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}}
       ]
    }
 
    useEffect(() => {
       let canvas:HTMLCanvasElement = document.getElementById("load-diagram")! as HTMLCanvasElement
       let ctx = canvas.getContext("2d")
-      const fontPx = 7.7;
+      const fontPx = 7.7
+      const thirdLength = zoom * (sampleTrailer.tandemCenterDistanceFromNose/3)
 
       ctx.font =  "bold "+(fontPx*zoom)+"px monospace"
       ctx.textAlign = "center"
@@ -106,91 +115,88 @@ function App() {
       ctx.strokeStyle = "black"
       ctx.lineWidth = 4
 
-      //ctx.fillStyle = "blue"
-      //ctx.beginPath()
-      //ctx.rect(0,0,O.Straight*zoom,O.Sideways*zoom)
-      //ctx.fill()
-      //ctx.stroke()
-      //ctx.fillStyle = "white"
-      //ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways)*zoom)
-      //ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways-fontPx)*zoom)
-      //ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways-(2*fontPx))*zoom)
-      //ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways-(3*fontPx))*zoom)
-      //ctx.fillText("720c", (O.Straight/2)*zoom, (O.Sideways-(4*fontPx))*zoom)
-      //
-      //ctx.fillStyle = "blue"
-      //ctx.beginPath()
-      //ctx.rect(O.Straight*zoom,0,O.Straight*zoom,O.Sideways*zoom)
-      //ctx.fill()
-      //ctx.stroke()
-
       sampleTrailer.loadRows.forEach((row,i) => {
          if ('l___' in row && '___r' in row) {
             if (row.l___ !== null) {
                const l:Position = row.l___
                const depth = zoom * l.depth
-               const width = zoom * (l.orien instanceof Straight ? Straight.W : Sideways.W)
-               const length = zoom * (l.orien instanceof Straight ? Straight.L : Sideways.L)
+               const width = zoom * (String(l.orien) === String(O.Straight) ? O.Straight.W : O.Sideways.W)
+               const length = zoom * (String(l.orien) === String(O.Straight) ? O.Straight.L : O.Sideways.L)
+               /* draw pallet */
                ctx.fillStyle = l.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
                ctx.beginPath()
                ctx.rect(0,depth,width,length)
                ctx.fill()
                ctx.stroke()
+               /* draw row number */
+               ctx.save()
+               ctx.fillStyle = thirdLength <= depth && depth < 2*thirdLength ? "red" : "black"
+               ctx.translate(10*zoom, depth + length/2)
+               ctx.rotate(-Math.PI/2)
+               ctx.fillText("R"+(i+1), 0, 0)
+               ctx.restore()
+               /* draw (stacked) pallet weights */
                ctx.fillStyle = "white"
                l.stack.forEach((pal,j) => {
                   const color = pal.palWt === P.Chep ? "c" : "w"
                   ctx.fillText(pal.prdWt+color, width/2, depth + length - j*fontPx*zoom)
-                  ctx.save()
-                  ctx.fillStyle = "black"
-                  ctx.translate(10*zoom, depth + length/2)
-                  ctx.rotate(-Math.PI/2)
-                  ctx.fillText("R"+(i+1), 0, 0)
-                  ctx.restore()
                })
             }
             if (row.___r !== null) {
                const r:Position = row.___r
                const depth = zoom * r.depth
-               const width = zoom * (r.orien instanceof Straight ? Straight.W : Sideways.W)
-               const length = zoom * (r.orien instanceof Straight ? Straight.L : Sideways.L)
+               const width = zoom * (String(r.orien) === String(O.Straight) ? O.Straight.W : O.Sideways.W)
+               const length = zoom * (String(r.orien) === String(O.Straight) ? O.Straight.L : O.Sideways.L)
+               /* draw pallet */
                ctx.fillStyle = r.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
                ctx.beginPath()
                ctx.rect(zoom*toInches(8)-width,depth,width,length)
                ctx.fill()
                ctx.stroke()
+               /* draw row number */
+               ctx.save()
+               ctx.fillStyle = thirdLength <= depth && depth < 2*thirdLength ? "red" : "black"
+               ctx.translate(zoom*toInches(8) - 10*zoom, depth + length/2)
+               ctx.rotate(Math.PI/2)
+               ctx.fillText("R"+(i+1), 0, 0)
+               ctx.restore()
+               /* draw (stacked) pallet weights */
                ctx.fillStyle = "white"
                r.stack.forEach((pal,j) => {
                   const color = pal.palWt === P.Chep ? "c" : "w"
                   ctx.fillText(pal.prdWt+color, zoom*toInches(8) - width/2, depth + length - j*fontPx*zoom)
-                  ctx.save()
-                  ctx.fillStyle = "black"
-                  ctx.translate(zoom*toInches(8) - 10*zoom, depth + length/2)
-                  ctx.rotate(Math.PI/2)
-                  ctx.fillText("R"+(i+1), 0, 0)
-                  ctx.restore()
                })
             }
          }
          else if ('_ctr_' in row) {
             const c:Position = row._ctr_
             const depth = zoom * c.depth
-            const width = zoom * (c.orien instanceof Straight ? Straight.W : Sideways.W)
-            const length = zoom * (c.orien instanceof Straight ? Straight.L : Sideways.L)
+            const width = zoom * (String(c.orien) === String(O.Straight) ? O.Straight.W : O.Sideways.W)
+            const length = zoom * (String(c.orien) === String(O.Straight) ? O.Straight.L : O.Sideways.L)
+            /* draw pallet */
             ctx.fillStyle = c.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
             ctx.beginPath()
             ctx.rect(zoom*toInches(4) - width/2,depth,width,length)
             ctx.fill()
             ctx.stroke()
+            /* draw row number */
+            ctx.save()
+            ctx.fillStyle = thirdLength <= depth && depth < 2*thirdLength ? "red" : "black"
+            ctx.translate(10*zoom, depth + length/2)
+            ctx.rotate(-Math.PI/2)
+            ctx.fillText("R"+(i+1), 0, 0)
+            ctx.restore()
+            ctx.save()
+            ctx.fillStyle = "black"
+            ctx.translate(zoom*toInches(8) - 10*zoom, depth + length/2)
+            ctx.rotate(Math.PI/2)
+            ctx.fillText("R"+(i+1), 0, 0)
+            ctx.restore()
+            /* draw (stacked) pallet weights */
             ctx.fillStyle = "white"
             c.stack.forEach((pal,j) => {
                const color = pal.palWt === P.Chep ? "c" : "w"
                ctx.fillText(pal.prdWt+color, zoom*toInches(4), depth + length - j*fontPx*zoom)
-               ctx.save()
-               ctx.fillStyle = "black"
-               ctx.translate(10*zoom, depth + length/2)
-               ctx.rotate(-Math.PI/2)
-               ctx.fillText("R"+(i+1), 0, 0)
-               ctx.restore()
             })
          }
       })
@@ -224,7 +230,7 @@ function App() {
                setZoomSlider(defaultZoom);
             }}>reset</button>
          </div>
-         <canvas id={"load-diagram"} width={toInches(8)*zoom} height={toInches(53)*zoom} style={{margin: "20px calc(50% - "+(Straight.L*zoom)+"px)"}}/>
+         <canvas id={"load-diagram"} width={toInches(8)*zoom} height={toInches(53)*zoom} style={{margin: "20px calc(50% - "+(O.Straight.L*zoom)+"px)"}}/>
       </>
    )
 }
