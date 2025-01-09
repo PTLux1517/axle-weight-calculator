@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react'
 import './App.css'
 
+/* Orientation of pallet. Values are the corresponding length and width in inches; see https://stackoverflow.com/questions/41179474/use-object-literal-as-typescript-enum-values */
 export class O {
    static readonly Straight = new O('Straight',48,40)
    static readonly Sideways = new O('Sideways',40,48)
@@ -47,24 +48,6 @@ function App() {
       palWt: P,
    }
 
-   ///* Orientation of pallet. Values are the corresponding length and width in inches */
-   //type O = Straight | Sideways
-   ///* see https://stackoverflow.com/questions/41179474/use-object-literal-as-typescript-enum-values */
-   //class Straight {
-   //   static readonly L = new Straight('L',48)
-   //   static readonly W = new Straight('W',40)
-   //   private constructor(private readonly key:String, public readonly value:any) {}
-   //   toString() {return this.key}
-   //}
-   ///* see https://stackoverflow.com/questions/41179474/use-object-literal-as-typescript-enum-values */
-   //class Sideways {
-   //   static readonly L = new Sideways('L',40)
-   //   static readonly W = new Sideways('R',48)
-   //   private constructor(private readonly key:String, public readonly value:any) {}
-   //   toString() {return this.key}
-   //}
-
-
    /* Pallet color. Value is the corresponding weight in pounds */
    enum P {
       Chep = 60,
@@ -78,7 +61,7 @@ function App() {
    const [zoom,setZoom] = useState(defaultZoom)
 
    const sampleTrailer:Trailer = {
-      interiorLength: toInches(53),
+      interiorLength: toInches(51),
       kingpinDistanceFromNose: toInches(4),
       tandemCenterDistanceFromNose: toInches(40),
       tandemSpreadWidth: toInches(5),
@@ -99,9 +82,36 @@ function App() {
          {l___: {depth: 440, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 440, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
 
          {l___: {depth: 480, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 480, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {_ctr_: {depth: 520, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}}
+         {_ctr_: {depth: 520, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}]}},
+         {_ctr_: {depth: 560, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}]}}
       ]
    }
+
+   //const sampleTrailer:Trailer = {
+   //   interiorLength: toInches(51),
+   //   kingpinDistanceFromNose: toInches(4),
+   //   tandemCenterDistanceFromNose: toInches(40),
+   //   tandemSpreadWidth: toInches(5),
+   //   loadRows: [
+   //      {_ctr_: {depth: 48*0, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
+   //      {_ctr_: {depth: 48*1, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
+   //      {_ctr_: {depth: 48*2, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
+   //      {_ctr_: {depth: 48*3, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
+   //
+   //      {_ctr_: {depth: 48*4, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
+   //      {_ctr_: {depth: 48*5, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
+   //      {_ctr_: {depth: 48*6, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
+   //      {_ctr_: {depth: 48*7, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
+   //
+   //      {_ctr_: {depth: 48*8, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
+   //      {_ctr_: {depth: 48*9, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
+   //      {_ctr_: {depth: 48*10, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
+   //      {_ctr_: {depth: 48*11, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
+   //
+   //      {_ctr_: {depth: 48*11 + 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
+   //
+   //   ]
+   //}
 
    useEffect(() => {
       let canvas:HTMLCanvasElement = document.getElementById("load-diagram")! as HTMLCanvasElement
@@ -187,7 +197,7 @@ function App() {
             ctx.fillText("R"+(i+1), 0, 0)
             ctx.restore()
             ctx.save()
-            ctx.fillStyle = "black"
+            ctx.fillStyle = thirdLength <= depth && depth < 2*thirdLength ? "red" : "black"
             ctx.translate(zoom*toInches(8) - 10*zoom, depth + length/2)
             ctx.rotate(Math.PI/2)
             ctx.fillText("R"+(i+1), 0, 0)
@@ -230,7 +240,7 @@ function App() {
                setZoomSlider(defaultZoom);
             }}>reset</button>
          </div>
-         <canvas id={"load-diagram"} width={toInches(8)*zoom} height={toInches(53)*zoom} style={{margin: "20px calc(50% - "+(O.Straight.L*zoom)+"px)"}}/>
+         <canvas id={"load-diagram"} width={toInches(8)*zoom} height={sampleTrailer.interiorLength*zoom} style={{margin: "20px calc(50% - "+(O.Straight.L*zoom)+"px)"}}/>
       </>
    )
 }
