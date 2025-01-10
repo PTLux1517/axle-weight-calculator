@@ -67,7 +67,7 @@ function App() {
       tandemSpreadWidth: toInches(5),
       loadRows: [
          {l___: {depth: 0, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 0, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-         {l___: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+         {l___: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
          {l___: {depth: 80, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 80, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
          {l___: {depth: 120, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 120, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
 
@@ -125,6 +125,7 @@ function App() {
       ctx.strokeStyle = "black"
       ctx.lineWidth = 4
 
+      /* draw pallets */
       sampleTrailer.loadRows.forEach((row,i) => {
          if ('l___' in row && '___r' in row) {
             if (row.l___ !== null) {
@@ -210,6 +211,22 @@ function App() {
             })
          }
       })
+
+      /* draw kingpin */
+      ctx.strokeStyle = "dimgray"
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.arc(zoom*toInches(4),zoom*sampleTrailer.kingpinDistanceFromNose,zoom*2,0,2*Math.PI)
+      ctx.stroke()
+
+      /* draw axles */
+      const axleThickness = zoom * 5
+      const axleWidth = zoom * 18
+      const frontTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
+      const rearTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
+      ctx.strokeRect(zoom*39,frontTandAxlePos-(axleThickness/2),axleWidth,axleThickness)
+      ctx.strokeRect(zoom*39,rearTandAxlePos-(axleThickness/2),axleWidth,axleThickness)
+
    }, [zoom, sampleTrailer])
 
    return (
