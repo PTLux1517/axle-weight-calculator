@@ -1,8 +1,8 @@
 import {ChangeEvent,MouseEvent,useEffect,useState} from 'react'
 import './App.css'
-import {O,P,Side,Trailer,Position,Double,Single} from './types.ts'
-import {toFeet,toInches} from "./calculations.ts";
-import {maxLengthStraightTrailer,maxWeightCostcoTrailer} from "./sampleTrailers.ts";
+import {Double,O,P,Position,Side,Single,Trailer} from './types.ts'
+import {rotatePosition,toFeet,toInches} from "./calculations.ts";
+import {maxWeightCostcoTrailer} from "./sampleTrailers.ts";
 
 
 function App() {
@@ -27,7 +27,7 @@ function App() {
    function interiorLengthListener(e:ChangeEvent<HTMLInputElement>) {
       const newInteriorLength = toInches(Number(e.target?.value))
       setSampleTrailer(prev => {
-         let newTrailer:Trailer = {...prev}
+         let newTrailer:Trailer = {...prev} //shallow copy; works here but avoid use elsewhere
          newTrailer.interiorLength = newInteriorLength
          return newTrailer
       })
@@ -40,7 +40,7 @@ function App() {
    function kingpinPosListener(e:ChangeEvent<HTMLInputElement>) {
       const newKingpinPos = toInches(Number(e.target?.value))
       setSampleTrailer(prev => {
-         let newTrailer:Trailer = {...prev}
+         let newTrailer:Trailer = {...prev} //shallow copy; works here but avoid use elsewhere
          newTrailer.kingpinDistanceFromNose = newKingpinPos
          return newTrailer
       })
@@ -53,7 +53,7 @@ function App() {
    function tandemSpreadWidthListener(e:ChangeEvent<HTMLInputElement>) {
       const newAxleSpread = toInches(Number(e.target?.value))
       setSampleTrailer(prev => {
-         let newTrailer:Trailer = {...prev}
+         let newTrailer:Trailer = {...prev} //shallow copy; works here but avoid use elsewhere
          newTrailer.tandemSpreadWidth = newAxleSpread
          return newTrailer
       })
@@ -66,7 +66,7 @@ function App() {
    function tandemSliderListener(e:ChangeEvent<HTMLInputElement>) {
       const newAxlePos = toInches(Number(e.target?.value))
       setSampleTrailer(prev => {
-         let newTrailer:Trailer = {...prev}
+         let newTrailer:Trailer = {...prev} //shallow copy; works here but avoid use elsewhere
          newTrailer.tandemCenterDistanceFromNose = newAxlePos
          return newTrailer
       })
@@ -274,6 +274,7 @@ function App() {
             </div>
             <div id={"editor-container"} style={{gridRow: 2, gridColumn: 3}}>
                <h3>Edit Pallet/Load</h3>
+               <button onMouseDown={() => setSampleTrailer(prev => rotatePosition(prev,13,Side.L))}>rotate</button>
             </div>
          </main>
       </>

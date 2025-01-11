@@ -9,22 +9,24 @@ export function toFeet(inches:number):number {
    return Math.round(2*inches/12.0)/2;
 }
 
-function rotatePosition(prev:Trailer, rowNum:number, side:Side):Trailer {
-   let newTrailer:Trailer = {...prev}
+export function rotatePosition(prev:Trailer, rowNum:number, side:Side):Trailer {
+   let newTrailer:Trailer = JSON.parse(JSON.stringify(prev)) //deep copy
+   const i = rowNum - 1
    switch (side) {
       case Side.L: {
-         const orientation = String((prev.loadRows[rowNum] as Double).l___?.orien);
-         (newTrailer.loadRows[rowNum] as Double).l___!.orien = orientation === String(O.Straight) ? O.Sideways : O.Straight;
+         const orientation = String((prev.loadRows[i] as Double)?.l___?.orien);
+         console.log(orientation);
+         (newTrailer.loadRows[i] as Double).l___!.orien = orientation === String(O.Straight) ? O.Sideways : O.Straight;
          break;
       }
       case Side.C: {
-         const orientation = String((prev.loadRows[rowNum] as Single)._ctr_?.orien);
-         (newTrailer.loadRows[rowNum] as Single)._ctr_!.orien = orientation === String(O.Straight) ? O.Sideways : O.Straight;
+         const orientation = String((prev.loadRows[i] as Single)?._ctr_?.orien);
+         (newTrailer.loadRows[i] as Single)._ctr_!.orien = orientation === String(O.Straight) ? O.Sideways : O.Straight;
          break;
       }
       case Side.R: {
-         const orientation = String((prev.loadRows[rowNum] as Double).___r?.orien);
-         (newTrailer.loadRows[rowNum] as Double).___r!.orien = orientation === String(O.Straight) ? O.Sideways : O.Straight;
+         const orientation = String((prev.loadRows[i] as Double)?.___r?.orien);
+         (newTrailer.loadRows[i] as Double).___r!.orien = orientation === String(O.Straight) ? O.Sideways : O.Straight;
          break;
       }
    }
