@@ -1,30 +1,17 @@
-import {ChangeEvent,useEffect,useState} from 'react'
+import {ChangeEvent,MouseEvent,useEffect,useState} from 'react'
 import './App.css'
-
-/* Orientation of pallet. Values are the corresponding length and width in inches; see https://stackoverflow.com/questions/41179474/use-object-literal-as-typescript-enum-values */
-export class O {
-   static readonly Straight = new O('Straight',48,40)
-   static readonly Sideways = new O('Sideways',40,48)
-   private constructor(private readonly key:String, public readonly L:number, public readonly W:number) {}
-   toString() {return this.key}
-}
+import {O,P,Trailer,Position} from './types.ts'
+import {toFeet,toInches} from "./calculations.ts";
+import {maxLengthStraightTrailer,maxWeightCostcoTrailer} from "./sampleTrailers.ts";
 
 
 function App() {
-
-   function toInches(feet:number):number {
-      return 12*feet;
-   }
-
-   function toFeet(inches:number):number {
-      return Math.round(2*inches/12.0)/2;
-   }
 
    function setZoomSlider(newZoom:number) {
       (document.getElementById("zoom-slider") as HTMLInputElement).value = String(newZoom);
    }
 
-   function resetTrailerDimensionsListener(e:MouseEvent) {
+   function resetTrailerDimensionsListener(e:MouseEvent<HTMLButtonElement>) {
       setSampleTrailer(defaultTrailer);
       (document.getElementById("interior-length-in") as HTMLInputElement).value = String(defaultTrailer.interiorLength);
       (document.getElementById("interior-length-ft") as HTMLInputElement).value = String(toFeet(defaultTrailer.interiorLength));
@@ -91,104 +78,17 @@ function App() {
       rangeInput.value = String(toFeet(newAxlePos))
    }
 
-   interface Trailer {
-      interiorLength: number,
-      kingpinDistanceFromNose: number,
-      tandemCenterDistanceFromNose: number,
-      tandemSpreadWidth: number,
-      loadRows: Array<Row>,
-   }
-
-   type Row = Single | Double
-   type Single = {_ctr_: Position}
-   type Double = {l___: Position|null, ___r: Position|null}
-
-   interface Position {
-      /* front edge distance in inches from the nose */
-      depth: number,
-      /* orientation of pallet (stack) */
-      orien: O,
-      /* stack of arbitrary number of pallets. array index corresponds to position off the ground, i.e. bottom/single is 0, first stacked pallet is 1, and so on */
-      stack: Array<Pallet>,
-   }
-
-   interface Pallet {
-      /* product weight in pounds */
-      prdWt: number,
-      /* pallet weight in pounds */
-      palWt: P,
-   }
-
-   /* Pallet color. Value is the corresponding weight in pounds */
-   enum P {
-      Chep = 60,
-      White = 40,
-   }
-
    const defaultZoom = 1.5
    const minZoom = 0.5
    const maxZoom = 6.5
    const zoomStep = 0.1
    const [zoom,setZoom] = useState(defaultZoom)
 
-
-   const defaultTrailer:Trailer = {
-      interiorLength: toInches(51),
-      kingpinDistanceFromNose: toInches(4),
-      tandemCenterDistanceFromNose: toInches(40),
-      tandemSpreadWidth: toInches(5),
-      loadRows: [
-         {l___: {depth: 0, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 0, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-         {l___: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-         {l___: {depth: 80, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 80, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-         {l___: {depth: 120, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 120, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-
-         {l___: {depth: 160, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 160, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-         {l___: {depth: 200, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 200, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {l___: {depth: 240, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 240, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {l___: {depth: 280, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 280, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-
-         {l___: {depth: 320, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 320, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {l___: {depth: 360, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 360, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {l___: {depth: 400, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 400, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {l___: {depth: 440, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 440, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-
-         {l___: {depth: 480, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 480, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-         {_ctr_: {depth: 520, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}]}},
-         {_ctr_: {depth: 560, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}]}}
-      ]
-   }
-
+   const defaultTrailer:Trailer = maxWeightCostcoTrailer
    const [sampleTrailer, setSampleTrailer] = useState<Trailer>(defaultTrailer)
 
    const frontTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
    const rearTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
-
-   //const sampleTrailer:Trailer = {
-   //   interiorLength: toInches(51),
-   //   kingpinDistanceFromNose: toInches(4),
-   //   tandemCenterDistanceFromNose: toInches(40),
-   //   tandemSpreadWidth: toInches(5),
-   //   loadRows: [
-   //      {_ctr_: {depth: 48*0, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
-   //      {_ctr_: {depth: 48*1, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
-   //      {_ctr_: {depth: 48*2, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
-   //      {_ctr_: {depth: 48*3, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
-   //
-   //      {_ctr_: {depth: 48*4, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
-   //      {_ctr_: {depth: 48*5, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
-   //      {_ctr_: {depth: 48*6, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
-   //      {_ctr_: {depth: 48*7, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
-   //
-   //      {_ctr_: {depth: 48*8, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
-   //      {_ctr_: {depth: 48*9, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
-   //      {_ctr_: {depth: 48*10, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
-   //      {_ctr_: {depth: 48*11, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
-   //
-   //      {_ctr_: {depth: 48*11 + 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
-   //
-   //   ]
-   //}
 
    useEffect(() => {
       let canvas:HTMLCanvasElement = document.getElementById("load-diagram")! as HTMLCanvasElement

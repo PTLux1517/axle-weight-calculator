@@ -8,7 +8,7 @@
 main {
    width: 85vw;
    display: grid;
-   grid-template: auto auto / 1fr 2.2fr 1fr;
+   grid-template: auto auto / minmax(312px,1fr) 624px minmax(312px,1fr);
    grid-gap: 12px;
    > *:not(.no-border) {
       outline: 2px solid hsl(0,0%,20%);
@@ -25,7 +25,7 @@ main {
         align-self: start;
       }
       & input {
-         width: 40px;
+         width: 80%;
          height: 20px;
       }
       .divided {
