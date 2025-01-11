@@ -225,7 +225,7 @@ function App() {
             </div>
             {/* ----------------------------------------------------------------- COLUMN 2 ----------------------------------------------------------------- */}
             <div id={"zoom-container"} style={{gridRow: 1, gridColumn: 2}}>
-               <label id={"zoom-label"} htmlFor={"zoom"}>Zoom</label>
+               <label id={"zoom-label"} htmlFor={"zoom"}>Zoom Diagram</label>
                <hr/>
                <div>
                   <button onClick={() => {
@@ -249,7 +249,7 @@ function App() {
                   setZoomSlider(defaultZoom);
                }}>reset</button>
             </div>
-            <canvas id={"load-diagram"} className={"no-border"} width={toInches(8)*zoom} height={sampleTrailer.interiorLength*zoom} style={{margin: "0 calc(50% - "+(O.Straight.L*zoom)+"px)", gridRow: 2, gridColumn: 2}}/>
+            <canvas id={"load-diagram"} className={"no-border"} width={toInches(8)*zoom} height={sampleTrailer.interiorLength*zoom} style={{margin: "0 calc(50% - "+(toInches(4)*zoom)+"px)", gridRow: 2, gridColumn: 2}}/>
             {/* ----------------------------------------------------------------- COLUMN 3 ----------------------------------------------------------------- */}
             <div id={"trailer-dimensions-container"} style={{gridRow: 1, gridColumn: 3}}>
                <h3 style={{gridColumn: "1/4"}}>Trailer Dimensions</h3>
@@ -259,7 +259,7 @@ function App() {
                <label style={{gridColumn: 1}} className={"divided"} htmlFor={"interior-length-in"}>Interior Length</label>
                <input style={{gridColumn: 2}} type={"number"} id={"interior-length-in"} name={"interior-length-in"} disabled defaultValue={sampleTrailer.interiorLength}/>
                <input style={{gridColumn: 3}} type={"number"} id={"interior-length-ft"} name={"interior-length-ft"} step={0.5} min={48} max={53} defaultValue={toFeet(sampleTrailer.interiorLength)} onChange={interiorLengthListener}/>
-               <label style={{gridColumn: 1}} className={"divided"} htmlFor={"kingpin-distance-from-nose-in"}>Kingpin Distance From Nose</label>
+               <label style={{gridColumn: 1}} className={"divided"} htmlFor={"kingpin-distance-from-nose-in"}>Drive Axles Center Distance From Nose</label>
                <input style={{gridColumn: 2}} type={"number"} id={"kingpin-distance-from-nose-in"} name={"kingpin-distance-from-nose-in"} disabled defaultValue={sampleTrailer.kingpinDistanceFromNose}/>
                <input style={{gridColumn: 3}} type={"number"} id={"kingpin-distance-from-nose-ft"} name={"kingpin-distance-from-nose-ft"} step={0.5} min={1} max={8} defaultValue={toFeet(sampleTrailer.kingpinDistanceFromNose)} onChange={kingpinPosListener}/>
                <label style={{gridColumn: 1}} className={"divided"} htmlFor={"tandem-spread-width-in"}>Tandem Spread Width</label>
