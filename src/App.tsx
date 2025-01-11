@@ -274,7 +274,7 @@ function App() {
             </div>
             <div id={"editor-container"} style={{gridRow: 2, gridColumn: 3}}>
                <h3>Edit Pallet/Load</h3>
-               <button onMouseDown={() => setSampleTrailer(prev => rotatePosition(prev,13,Side.L))}>rotate</button>
+               <button onClick={() => setSampleTrailer(prev => rotatePosition(prev,3,Side.R))}>rotate</button>
             </div>
          </main>
       </>
