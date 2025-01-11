@@ -1,8 +1,50 @@
 #root {
-  max-width: 1280px;
+  /*max-width: 1280px;*/
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+}
+
+main {
+   width: 85vw;
+   display: grid;
+   grid-template: auto auto / 1fr 2.2fr 1fr;
+   grid-gap: 12px;
+   > *:not(.no-border) {
+      outline: 2px solid hsl(0,0%,20%);
+      border-radius: 16px;
+      padding: 8px;
+   }
+   #weights-container {
+      position: relative;
+      font-size: 1.4em;
+      & h3 {
+         color: hsl(0,0%,40%);
+         margin: 0;
+      }
+      > div {
+         position: absolute;
+         text-align: right;
+         right: 10px;
+      }
+   }
+   #zoom-container {
+      outline: 2px solid hsl(0,0%,20%);
+      border-radius: 16px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      & label {
+         color: hsl(0,0%,40%);
+         font-size: 1.4em;
+      }
+      #zoom-slider {
+         width: calc(100% - 4.8em - 41px);
+      }
+   }
+   #load-diagram {
+      border: 1px solid white;
+   }
 }
 
 hr {
@@ -10,27 +52,6 @@ hr {
    border: 1px solid hsl(0,0%,10%);
    margin-top: 5px;
    margin-bottom: 20px;
-}
-
-#zoom-div {
-   outline: 2px solid hsl(0,0%,20%);
-   border-radius: 16px;
-   padding: 8px;
-   display: flex;
-   flex-direction: column;
-   & label {
-      color: hsl(0,0%,40%);
-      font-size: 1.4em;
-   }
-   & #zoom-slider {
-      width: calc(100% - 4.8em - 41px);
-   }
-}
-
-
-
-canvas {
-   border: 1px solid white;
 }
 
 .card {

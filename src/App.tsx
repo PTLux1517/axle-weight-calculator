@@ -60,14 +60,14 @@ function App() {
    const zoomStep = 0.1
    const [zoom,setZoom] = useState(defaultZoom)
 
-   const sampleTrailer:Trailer = {
+   let sampleTrailer:Trailer = {
       interiorLength: toInches(51),
       kingpinDistanceFromNose: toInches(4),
       tandemCenterDistanceFromNose: toInches(40),
       tandemSpreadWidth: toInches(5),
       loadRows: [
          {l___: {depth: 0, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 0, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-         {l___: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+         {l___: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
          {l___: {depth: 80, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 80, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
          {l___: {depth: 120, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 120, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
 
@@ -86,6 +86,9 @@ function App() {
          {_ctr_: {depth: 560, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}]}}
       ]
    }
+
+   const frontTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
+   const rearTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
 
    //const sampleTrailer:Trailer = {
    //   interiorLength: toInches(51),
@@ -222,8 +225,6 @@ function App() {
       /* draw axles */
       const axleThickness = zoom * 5
       const axleWidth = zoom * 18
-      const frontTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
-      const rearTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
       ctx.strokeRect(zoom*39,frontTandAxlePos-(axleThickness/2),axleWidth,axleThickness)
       ctx.strokeRect(zoom*39,rearTandAxlePos-(axleThickness/2),axleWidth,axleThickness)
 
@@ -232,32 +233,49 @@ function App() {
    return (
       <>
          <h1>Axle Weight Calculator</h1>
-         <div id={"zoom-div"}>
-            <label htmlFor={"zoom"}>zoom</label>
-            <hr/>
-            <div>
-               <button onClick={() => {
-                  let newZoom;
-                  if (zoom-(5*zoomStep) >= minZoom) newZoom = zoom - (5*zoomStep);
-                  else newZoom = minZoom;
-                  setZoom(newZoom);
-                  setZoomSlider(newZoom);
-               }}>-</button>
-               <input id={"zoom-slider"} name={"zoom"} type={"range"} defaultValue={defaultZoom} min={minZoom} max={maxZoom} step={zoomStep} onChange={e => setZoom(Number(e.currentTarget.value))}/>
-               <button onClick={() => {
-                  let newZoom;
-                  if (zoom+(5*zoomStep) <= maxZoom) newZoom = zoom + (5*zoomStep);
-                  else newZoom = maxZoom;
-                  setZoom(newZoom);
-                  setZoomSlider(newZoom);
-               }}>+</button>
+         <main>
+            {/* ----------------------------------------------------------------- COLUMN 1 ----------------------------------------------------------------- */}
+            <div className={"no-border"} style={{gridRow: 1, gridColumn: 1}}>
+
             </div>
-            <button onClick={() => {
-               setZoom(defaultZoom);
-               setZoomSlider(defaultZoom);
-            }}>reset</button>
-         </div>
-         <canvas id={"load-diagram"} width={toInches(8)*zoom} height={sampleTrailer.interiorLength*zoom} style={{margin: "20px calc(50% - "+(O.Straight.L*zoom)+"px)"}}/>
+            <div id={"weights-container"} style={{gridRow: 2, gridColumn: 1}}>
+               <h3>Weights (lbs)</h3>
+               <div id={"drive-weight"} style={{top: zoom*sampleTrailer.kingpinDistanceFromNose - 35}}>Drive axles:<br/>{} / {}</div>
+               <div id={"front-tandem-weight"} style={{top: frontTandAxlePos - 35}}>Trailer axle:<br/>{} / {}</div>
+               <div id={"rear-tandem-weight"} style={{top: rearTandAxlePos - 35}}>Trailer axle:<br/>{} / {}</div>
+               <div id={"combined-weight"} style={{top: zoom*sampleTrailer.interiorLength - 70}}>Combined:<br/>{} / 80,000</div>
+            </div>
+            {/* ----------------------------------------------------------------- COLUMN 2 ----------------------------------------------------------------- */}
+            <div id={"zoom-container"} style={{gridRow: 1, gridColumn: 2}}>
+               <label htmlFor={"zoom"}>zoom</label>
+               <hr/>
+               <div>
+                  <button onClick={() => {
+                     let newZoom;
+                     if (zoom-(5*zoomStep) >= minZoom) newZoom = zoom - (5*zoomStep);
+                     else newZoom = minZoom;
+                     setZoom(newZoom);
+                     setZoomSlider(newZoom);
+                  }}>-</button>
+                  <input id={"zoom-slider"} name={"zoom"} type={"range"} defaultValue={defaultZoom} min={minZoom} max={maxZoom} step={zoomStep} onChange={e => setZoom(Number(e.currentTarget.value))}/>
+                  <button onClick={() => {
+                     let newZoom;
+                     if (zoom+(5*zoomStep) <= maxZoom) newZoom = zoom + (5*zoomStep);
+                     else newZoom = maxZoom;
+                     setZoom(newZoom);
+                     setZoomSlider(newZoom);
+                  }}>+</button>
+               </div>
+               <button onClick={() => {
+                  setZoom(defaultZoom);
+                  setZoomSlider(defaultZoom);
+               }}>reset</button>
+            </div>
+            <canvas id={"load-diagram"} className={"no-border"} width={toInches(8)*zoom} height={sampleTrailer.interiorLength*zoom} style={{margin: "0 calc(50% - "+(O.Straight.L*zoom)+"px)", gridRow: 2, gridColumn: 2}}/>
+            {/* ----------------------------------------------------------------- COLUMN 3 ----------------------------------------------------------------- */}
+            <div className={"no-border"} style={{gridRow: 1, gridColumn: 3}}></div>
+            <div className={"no-border"} style={{gridRow: 2, gridColumn: 3}}></div>
+         </main>
       </>
    )
 }
