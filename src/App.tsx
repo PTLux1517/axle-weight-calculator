@@ -24,6 +24,45 @@ function App() {
       (document.getElementById("zoom-slider") as HTMLInputElement).value = String(newZoom);
    }
 
+   function resetTrailerDimensionsListener(e:MouseEvent) {
+      setSampleTrailer(defaultTrailer);
+      (document.getElementById("interior-length-in") as HTMLInputElement).value = String(defaultTrailer.interiorLength);
+      (document.getElementById("interior-length-ft") as HTMLInputElement).value = String(toFeet(defaultTrailer.interiorLength));
+      (document.getElementById("kingpin-distance-from-nose-in") as HTMLInputElement).value = String(defaultTrailer.kingpinDistanceFromNose);
+      (document.getElementById("kingpin-distance-from-nose-ft") as HTMLInputElement).value = String(toFeet(defaultTrailer.kingpinDistanceFromNose));
+      (document.getElementById("tandem-spread-width-in") as HTMLInputElement).value = String(defaultTrailer.tandemSpreadWidth);
+      (document.getElementById("tandem-spread-width-ft") as HTMLInputElement).value = String(toFeet(defaultTrailer.tandemSpreadWidth));
+      (document.getElementById("tandem-center-distance-from-nose-in") as HTMLInputElement).value = String(defaultTrailer.tandemCenterDistanceFromNose);
+      (document.getElementById("tandem-center-distance-from-nose-ft") as HTMLInputElement).value = String(toFeet(defaultTrailer.tandemCenterDistanceFromNose));
+      (document.getElementById("tandem-slider") as HTMLInputElement).value = String(toFeet(defaultTrailer.tandemCenterDistanceFromNose));
+   }
+
+   function interiorLengthListener(e:ChangeEvent<HTMLInputElement>) {
+      const newInteriorLength = toInches(Number(e.target?.value))
+      setSampleTrailer(prev => {
+         let newTrailer:Trailer = {...prev}
+         newTrailer.interiorLength = newInteriorLength
+         return newTrailer
+      })
+      const numInputIn= document.getElementById("interior-length-in") as HTMLInputElement
+      const numInputFt = document.getElementById("interior-length-ft") as HTMLInputElement
+      numInputIn.value = String(newInteriorLength)
+      numInputFt.value = String(toFeet(newInteriorLength))
+   }
+
+   function kingpinPosListener(e:ChangeEvent<HTMLInputElement>) {
+      const newKingpinPos = toInches(Number(e.target?.value))
+      setSampleTrailer(prev => {
+         let newTrailer:Trailer = {...prev}
+         newTrailer.kingpinDistanceFromNose = newKingpinPos
+         return newTrailer
+      })
+      const numInputIn= document.getElementById("kingpin-distance-from-nose-in") as HTMLInputElement
+      const numInputFt = document.getElementById("kingpin-distance-from-nose-ft") as HTMLInputElement
+      numInputIn.value = String(newKingpinPos)
+      numInputFt.value = String(toFeet(newKingpinPos))
+   }
+
    function tandemSpreadWidthListener(e:ChangeEvent<HTMLInputElement>) {
       const newAxleSpread = toInches(Number(e.target?.value))
       setSampleTrailer(prev => {
@@ -91,7 +130,9 @@ function App() {
    const maxZoom = 6.5
    const zoomStep = 0.1
    const [zoom,setZoom] = useState(defaultZoom)
-   const [sampleTrailer, setSampleTrailer] = useState<Trailer>({
+
+
+   const defaultTrailer:Trailer = {
       interiorLength: toInches(51),
       kingpinDistanceFromNose: toInches(4),
       tandemCenterDistanceFromNose: toInches(40),
@@ -116,34 +157,9 @@ function App() {
          {_ctr_: {depth: 520, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}]}},
          {_ctr_: {depth: 560, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}]}}
       ]
-   })
+   }
 
-   //let sampleTrailer:Trailer = {
-   //   interiorLength: toInches(51),
-   //   kingpinDistanceFromNose: toInches(4),
-   //   tandemCenterDistanceFromNose: toInches(40),
-   //   tandemSpreadWidth: toInches(5),
-   //   loadRows: [
-   //      {l___: {depth: 0, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 0, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-   //      {l___: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-   //      {l___: {depth: 80, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 80, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-   //      {l___: {depth: 120, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 120, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-   //
-   //      {l___: {depth: 160, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 160, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
-   //      {l___: {depth: 200, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 200, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-   //      {l___: {depth: 240, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 240, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-   //      {l___: {depth: 280, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 280, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-   //
-   //      {l___: {depth: 320, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 320, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-   //      {l___: {depth: 360, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 360, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-   //      {l___: {depth: 400, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 400, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-   //      {l___: {depth: 440, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 440, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-   //
-   //      {l___: {depth: 480, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 480, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
-   //      {_ctr_: {depth: 520, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}]}},
-   //      {_ctr_: {depth: 560, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}]}}
-   //   ]
-   //}
+   const [sampleTrailer, setSampleTrailer] = useState<Trailer>(defaultTrailer)
 
    const frontTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
    const rearTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
@@ -337,14 +353,15 @@ function App() {
             {/* ----------------------------------------------------------------- COLUMN 3 ----------------------------------------------------------------- */}
             <div id={"trailer-dimensions-container"} style={{gridRow: 1, gridColumn: 3}}>
                <h3 style={{gridColumn: "1/4"}}>Trailer Dimensions</h3>
+               <button onClick={resetTrailerDimensionsListener}>reset</button>
                <div style={{gridColumn: 2}}>in</div>
                <div style={{gridColumn: 3}}>ft</div>
                <label style={{gridColumn: 1}} className={"divided"} htmlFor={"interior-length-in"}>Interior Length</label>
                <input style={{gridColumn: 2}} type={"number"} id={"interior-length-in"} name={"interior-length-in"} disabled defaultValue={sampleTrailer.interiorLength}/>
-               <input style={{gridColumn: 3}} type={"number"} id={"interior-length-ft"} name={"interior-length-ft"} step={0.5} min={48} max={53} defaultValue={toFeet(sampleTrailer.interiorLength)}/>
+               <input style={{gridColumn: 3}} type={"number"} id={"interior-length-ft"} name={"interior-length-ft"} step={0.5} min={48} max={53} defaultValue={toFeet(sampleTrailer.interiorLength)} onChange={interiorLengthListener}/>
                <label style={{gridColumn: 1}} className={"divided"} htmlFor={"kingpin-distance-from-nose-in"}>Kingpin Distance From Nose</label>
                <input style={{gridColumn: 2}} type={"number"} id={"kingpin-distance-from-nose-in"} name={"kingpin-distance-from-nose-in"} disabled defaultValue={sampleTrailer.kingpinDistanceFromNose}/>
-               <input style={{gridColumn: 3}} type={"number"} id={"kingpin-distance-from-nose-ft"} name={"kingpin-distance-from-nose-ft"} step={0.5} min={1} max={8} defaultValue={toFeet(sampleTrailer.kingpinDistanceFromNose)}/>
+               <input style={{gridColumn: 3}} type={"number"} id={"kingpin-distance-from-nose-ft"} name={"kingpin-distance-from-nose-ft"} step={0.5} min={1} max={8} defaultValue={toFeet(sampleTrailer.kingpinDistanceFromNose)} onChange={kingpinPosListener}/>
                <label style={{gridColumn: 1}} className={"divided"} htmlFor={"tandem-spread-width-in"}>Tandem Spread Width</label>
                <input style={{gridColumn: 2}} type={"number"} id={"tandem-spread-width-in"} name={"tandem-spread-width-in"} disabled defaultValue={sampleTrailer.tandemSpreadWidth}/>
                <input style={{gridColumn: 3}} type={"number"} id={"tandem-spread-width-ft"} name={"tandem-spread-width-ft"} step={0.5} min={3} max={20} defaultValue={toFeet(sampleTrailer.tandemSpreadWidth)} onChange={tandemSpreadWidthListener}/>
