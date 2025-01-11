@@ -15,13 +15,22 @@ main {
       border-radius: 16px;
       padding: 8px;
    }
-   #weights-container {
+   #trailer-dimensions-container {
+      display: grid;
+      grid-template-columns: 3fr 1fr 1fr;
+      align-items: center;
+      grid-gap: 5px;
+      & h3 {
+        align-self: start;
+      }
+      & input {
+         width: 40px;
+         height: 20px;
+      }
+   }
+   #loaded-weight-container {
       position: relative;
       font-size: 1.4em;
-      & h3 {
-         color: hsl(0,0%,40%);
-         margin: 0;
-      }
       > div {
          position: absolute;
          text-align: right;
@@ -34,10 +43,6 @@ main {
       padding: 8px;
       display: flex;
       flex-direction: column;
-      & label {
-         color: hsl(0,0%,40%);
-         font-size: 1.4em;
-      }
       #zoom-slider {
          width: calc(100% - 4.8em - 41px);
       }
@@ -54,10 +59,9 @@ hr {
    margin-bottom: 20px;
 }
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+h3, #zoom-label {
+   color: hsl(0,0%,40%);
+   margin: 0;
+   font-size: 20px;
+   font-weight: bold;
 }

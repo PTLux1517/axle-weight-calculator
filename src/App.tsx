@@ -16,6 +16,10 @@ function App() {
       return 12*feet;
    }
 
+   function toFeet(inches:number):number {
+      return Math.round(2*inches/12.0)/2;
+   }
+
    function setZoomSlider(newZoom:number) {
       (document.getElementById("zoom-slider") as HTMLInputElement).value = String(newZoom);
    }
@@ -235,11 +239,25 @@ function App() {
          <h1>Axle Weight Calculator</h1>
          <main>
             {/* ----------------------------------------------------------------- COLUMN 1 ----------------------------------------------------------------- */}
-            <div className={"no-border"} style={{gridRow: 1, gridColumn: 1}}>
-
+            <div id={"trailer-dimensions-container"} style={{gridRow: 1, gridColumn: 1}}>
+               <h3 style={{gridColumn: "1/4"}}>Trailer Dimensions</h3>
+               <div style={{gridColumn: 2}}>in</div>
+               <div style={{gridColumn: 3}}>ft</div>
+               <label style={{gridColumn: 1}} htmlFor={"interior-length-in"}>Interior Length</label>
+               <input style={{gridColumn: 2}} type={"number"} id={"interior-length-in"} name={"interior-length-in"} disabled/>
+               <input style={{gridColumn: 3}} type={"number"} id={"interior-length-ft"} name={"interior-length-ft"} step={0.5} min={48} max={53} defaultValue={toFeet(sampleTrailer.interiorLength)}/>
+               <label style={{gridColumn: 1}} htmlFor={"kingpin-distance-from-nose-in"}>Kingpin Distance From Nose</label>
+               <input style={{gridColumn: 2}} type={"number"} id={"kingpin-distance-from-nose-in"} name={"kingpin-distance-from-nose-in"} step={1} min={12} max={96} defaultValue={sampleTrailer.kingpinDistanceFromNose}/>
+               <input style={{gridColumn: 3}} type={"number"} id={"kingpin-distance-from-nose-ft"} name={"kingpin-distance-from-nose-ft"} disabled/>
+               <label style={{gridColumn: 1}} htmlFor={"tandem-spread-width-in"}>Tandem Spread Width</label>
+               <input style={{gridColumn: 2}} type={"number"} id={"tandem-spread-width-in"} name={"tandem-spread-width-in"} step={1} min={36} max={240} defaultValue={sampleTrailer.tandemSpreadWidth}/>
+               <input style={{gridColumn: 3}} type={"number"} id={"tandem-spread-width-ft"} name={"tandem-spread-width-ft"} disabled/>
+               <label style={{gridColumn: 1}} htmlFor={"tandem-center-distance-from-nose-in"}>Tandem Center Distance From Nose</label>
+               <input style={{gridColumn: 2}} type={"number"} id={"tandem-center-distance-from-nose-in"} name={"tandem-center-distance-from-nose-in"} disabled/>
+               <input style={{gridColumn: 3}} type={"number"} id={"tandem-center-distance-from-nose-ft"} name={"tandem-center-distance-from-nose-ft"} step={0.5} min={36} max={48} defaultValue={toFeet(sampleTrailer.tandemCenterDistanceFromNose)}/>
             </div>
-            <div id={"weights-container"} style={{gridRow: 2, gridColumn: 1}}>
-               <h3>Weights (lbs)</h3>
+            <div id={"loaded-weight-container"} style={{gridRow: 2, gridColumn: 1}}>
+               <h3>Loaded Weight (lbs)</h3>
                <div id={"drive-weight"} style={{top: zoom*sampleTrailer.kingpinDistanceFromNose - 35}}>Drive axles:<br/>{} / {}</div>
                <div id={"front-tandem-weight"} style={{top: frontTandAxlePos - 35}}>Trailer axle:<br/>{} / {}</div>
                <div id={"rear-tandem-weight"} style={{top: rearTandAxlePos - 35}}>Trailer axle:<br/>{} / {}</div>
@@ -247,7 +265,7 @@ function App() {
             </div>
             {/* ----------------------------------------------------------------- COLUMN 2 ----------------------------------------------------------------- */}
             <div id={"zoom-container"} style={{gridRow: 1, gridColumn: 2}}>
-               <label htmlFor={"zoom"}>zoom</label>
+               <label id={"zoom-label"} htmlFor={"zoom"}>Zoom</label>
                <hr/>
                <div>
                   <button onClick={() => {
@@ -273,8 +291,12 @@ function App() {
             </div>
             <canvas id={"load-diagram"} className={"no-border"} width={toInches(8)*zoom} height={sampleTrailer.interiorLength*zoom} style={{margin: "0 calc(50% - "+(O.Straight.L*zoom)+"px)", gridRow: 2, gridColumn: 2}}/>
             {/* ----------------------------------------------------------------- COLUMN 3 ----------------------------------------------------------------- */}
-            <div className={"no-border"} style={{gridRow: 1, gridColumn: 3}}></div>
-            <div className={"no-border"} style={{gridRow: 2, gridColumn: 3}}></div>
+            <div id={"unloaded-weight-container"} style={{gridRow: 1, gridColumn: 3}}>
+               <h3>Unloaded Weight (lbs)</h3>
+            </div>
+            <div id={"editor-container"} style={{gridRow: 2, gridColumn: 3}}>
+               <h3>Edit Pallet/Load</h3>
+            </div>
          </main>
       </>
    )
