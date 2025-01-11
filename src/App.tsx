@@ -1,6 +1,6 @@
 import {ChangeEvent,MouseEvent,useEffect,useState} from 'react'
 import './App.css'
-import {O,P,Trailer,Position} from './types.ts'
+import {O,P,Side,Trailer,Position,Double,Single} from './types.ts'
 import {toFeet,toInches} from "./calculations.ts";
 import {maxLengthStraightTrailer,maxWeightCostcoTrailer} from "./sampleTrailers.ts";
 
@@ -108,7 +108,8 @@ function App() {
 
       /* draw pallets */
       sampleTrailer.loadRows.forEach((row,i) => {
-         if ('l___' in row && '___r' in row) {
+         if (Side.L in row && Side.R in row) {
+            row = row as Double
             if (row.l___ !== null) {
                const l:Position = row.l___
                const depth = zoom * l.depth
@@ -160,7 +161,8 @@ function App() {
                })
             }
          }
-         else if ('_ctr_' in row) {
+         else if (Side.C in row) {
+            row = row as Single
             const c:Position = row._ctr_
             const depth = zoom * c.depth
             const width = zoom * (String(c.orien) === String(O.Straight) ? O.Straight.W : O.Sideways.W)

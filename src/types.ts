@@ -14,9 +14,15 @@ export interface Trailer {
    loadRows: Array<Row>,
 }
 
+export enum Side {
+   L = "l___",
+   C = "_ctr_",
+   R = "___r",
+}
 export type Row = Single | Double
-type Single = {_ctr_: Position}
-type Double = {l___: Position|null, ___r: Position|null}
+export type Single = {_ctr_: Position}
+export type Double = {l___: Position|null, ___r: Position|null}
+
 
 export interface Position {
    /* front edge distance in inches from the nose */
