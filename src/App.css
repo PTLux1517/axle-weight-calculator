@@ -19,6 +19,7 @@ main {
       display: grid;
       grid-template-columns: 3fr 1fr 1fr;
       align-items: center;
+      /*text baseline*/
       grid-gap: 5px;
       & h3 {
         align-self: start;
@@ -26,6 +27,15 @@ main {
       & input {
          width: 40px;
          height: 20px;
+      }
+      .divided {
+         border-bottom: 2px solid hsl(0,0%,10%);
+      }
+      [disabled] {
+         filter: brightness(50%);
+      }
+      #tandem-slider {
+         width: 100%;
       }
    }
    #loaded-weight-container {
@@ -43,6 +53,7 @@ main {
       padding: 8px;
       display: flex;
       flex-direction: column;
+      justify-content: end;
       #zoom-slider {
          width: calc(100% - 4.8em - 41px);
       }
@@ -54,7 +65,7 @@ main {
 
 hr {
    width: 90%;
-   border: 1px solid hsl(0,0%,10%);
+   border: 1.5px solid hsl(0,0%,10%);
    margin-top: 5px;
    margin-bottom: 20px;
 }

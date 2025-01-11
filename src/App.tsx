@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {ChangeEvent,useEffect,useState} from 'react'
 import './App.css'
 
 /* Orientation of pallet. Values are the corresponding length and width in inches; see https://stackoverflow.com/questions/41179474/use-object-literal-as-typescript-enum-values */
@@ -22,6 +22,34 @@ function App() {
 
    function setZoomSlider(newZoom:number) {
       (document.getElementById("zoom-slider") as HTMLInputElement).value = String(newZoom);
+   }
+
+   function tandemSpreadWidthListener(e:ChangeEvent<HTMLInputElement>) {
+      const newAxleSpread = toInches(Number(e.target?.value))
+      setSampleTrailer(prev => {
+         let newTrailer:Trailer = {...prev}
+         newTrailer.tandemSpreadWidth = newAxleSpread
+         return newTrailer
+      })
+      const numInputIn= document.getElementById("tandem-spread-width-in") as HTMLInputElement
+      const numInputFt = document.getElementById("tandem-spread-width-ft") as HTMLInputElement
+      numInputIn.value = String(newAxleSpread)
+      numInputFt.value = String(toFeet(newAxleSpread))
+   }
+
+   function tandemSliderListener(e:ChangeEvent<HTMLInputElement>) {
+      const newAxlePos = toInches(Number(e.target?.value))
+      setSampleTrailer(prev => {
+         let newTrailer:Trailer = {...prev}
+         newTrailer.tandemCenterDistanceFromNose = newAxlePos
+         return newTrailer
+      })
+      const numInputIn= document.getElementById("tandem-center-distance-from-nose-in") as HTMLInputElement
+      const numInputFt = document.getElementById("tandem-center-distance-from-nose-ft") as HTMLInputElement
+      const rangeInput = document.getElementById("tandem-slider") as HTMLInputElement
+      numInputIn.value = String(newAxlePos)
+      numInputFt.value = String(toFeet(newAxlePos))
+      rangeInput.value = String(toFeet(newAxlePos))
    }
 
    interface Trailer {
@@ -58,13 +86,12 @@ function App() {
       White = 40,
    }
 
-   const defaultZoom = 2.5
+   const defaultZoom = 1.5
    const minZoom = 0.5
    const maxZoom = 6.5
    const zoomStep = 0.1
    const [zoom,setZoom] = useState(defaultZoom)
-
-   let sampleTrailer:Trailer = {
+   const [sampleTrailer, setSampleTrailer] = useState<Trailer>({
       interiorLength: toInches(51),
       kingpinDistanceFromNose: toInches(4),
       tandemCenterDistanceFromNose: toInches(40),
@@ -89,7 +116,34 @@ function App() {
          {_ctr_: {depth: 520, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}]}},
          {_ctr_: {depth: 560, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}]}}
       ]
-   }
+   })
+
+   //let sampleTrailer:Trailer = {
+   //   interiorLength: toInches(51),
+   //   kingpinDistanceFromNose: toInches(4),
+   //   tandemCenterDistanceFromNose: toInches(40),
+   //   tandemSpreadWidth: toInches(5),
+   //   loadRows: [
+   //      {l___: {depth: 0, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 0, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+   //      {l___: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 40, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+   //      {l___: {depth: 80, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 80, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+   //      {l___: {depth: 120, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 120, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+   //
+   //      {l___: {depth: 160, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 160, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},
+   //      {l___: {depth: 200, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 200, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+   //      {l___: {depth: 240, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 240, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+   //      {l___: {depth: 280, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 280, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+   //
+   //      {l___: {depth: 320, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 320, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+   //      {l___: {depth: 360, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 360, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+   //      {l___: {depth: 400, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 400, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+   //      {l___: {depth: 440, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 440, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+   //
+   //      {l___: {depth: 480, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 480, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+   //      {_ctr_: {depth: 520, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}]}},
+   //      {_ctr_: {depth: 560, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.White}]}}
+   //   ]
+   //}
 
    const frontTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
    const rearTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
@@ -131,6 +185,10 @@ function App() {
       ctx.textBaseline = "bottom"
       ctx.strokeStyle = "black"
       ctx.lineWidth = 4
+
+      /* redraw trailer background */
+      ctx.fillStyle = "grey"
+      ctx.fillRect(0,0,zoom*toInches(8),zoom*sampleTrailer.interiorLength)
 
       /* draw pallets */
       sampleTrailer.loadRows.forEach((row,i) => {
@@ -239,22 +297,8 @@ function App() {
          <h1>Axle Weight Calculator</h1>
          <main>
             {/* ----------------------------------------------------------------- COLUMN 1 ----------------------------------------------------------------- */}
-            <div id={"trailer-dimensions-container"} style={{gridRow: 1, gridColumn: 1}}>
-               <h3 style={{gridColumn: "1/4"}}>Trailer Dimensions</h3>
-               <div style={{gridColumn: 2}}>in</div>
-               <div style={{gridColumn: 3}}>ft</div>
-               <label style={{gridColumn: 1}} htmlFor={"interior-length-in"}>Interior Length</label>
-               <input style={{gridColumn: 2}} type={"number"} id={"interior-length-in"} name={"interior-length-in"} disabled/>
-               <input style={{gridColumn: 3}} type={"number"} id={"interior-length-ft"} name={"interior-length-ft"} step={0.5} min={48} max={53} defaultValue={toFeet(sampleTrailer.interiorLength)}/>
-               <label style={{gridColumn: 1}} htmlFor={"kingpin-distance-from-nose-in"}>Kingpin Distance From Nose</label>
-               <input style={{gridColumn: 2}} type={"number"} id={"kingpin-distance-from-nose-in"} name={"kingpin-distance-from-nose-in"} step={1} min={12} max={96} defaultValue={sampleTrailer.kingpinDistanceFromNose}/>
-               <input style={{gridColumn: 3}} type={"number"} id={"kingpin-distance-from-nose-ft"} name={"kingpin-distance-from-nose-ft"} disabled/>
-               <label style={{gridColumn: 1}} htmlFor={"tandem-spread-width-in"}>Tandem Spread Width</label>
-               <input style={{gridColumn: 2}} type={"number"} id={"tandem-spread-width-in"} name={"tandem-spread-width-in"} step={1} min={36} max={240} defaultValue={sampleTrailer.tandemSpreadWidth}/>
-               <input style={{gridColumn: 3}} type={"number"} id={"tandem-spread-width-ft"} name={"tandem-spread-width-ft"} disabled/>
-               <label style={{gridColumn: 1}} htmlFor={"tandem-center-distance-from-nose-in"}>Tandem Center Distance From Nose</label>
-               <input style={{gridColumn: 2}} type={"number"} id={"tandem-center-distance-from-nose-in"} name={"tandem-center-distance-from-nose-in"} disabled/>
-               <input style={{gridColumn: 3}} type={"number"} id={"tandem-center-distance-from-nose-ft"} name={"tandem-center-distance-from-nose-ft"} step={0.5} min={36} max={48} defaultValue={toFeet(sampleTrailer.tandemCenterDistanceFromNose)}/>
+            <div id={"unloaded-weight-container"} style={{gridRow: 1, gridColumn: 1}}>
+               <h3>Unloaded Weight (lbs)</h3>
             </div>
             <div id={"loaded-weight-container"} style={{gridRow: 2, gridColumn: 1}}>
                <h3>Loaded Weight (lbs)</h3>
@@ -291,8 +335,23 @@ function App() {
             </div>
             <canvas id={"load-diagram"} className={"no-border"} width={toInches(8)*zoom} height={sampleTrailer.interiorLength*zoom} style={{margin: "0 calc(50% - "+(O.Straight.L*zoom)+"px)", gridRow: 2, gridColumn: 2}}/>
             {/* ----------------------------------------------------------------- COLUMN 3 ----------------------------------------------------------------- */}
-            <div id={"unloaded-weight-container"} style={{gridRow: 1, gridColumn: 3}}>
-               <h3>Unloaded Weight (lbs)</h3>
+            <div id={"trailer-dimensions-container"} style={{gridRow: 1, gridColumn: 3}}>
+               <h3 style={{gridColumn: "1/4"}}>Trailer Dimensions</h3>
+               <div style={{gridColumn: 2}}>in</div>
+               <div style={{gridColumn: 3}}>ft</div>
+               <label style={{gridColumn: 1}} className={"divided"} htmlFor={"interior-length-in"}>Interior Length</label>
+               <input style={{gridColumn: 2}} type={"number"} id={"interior-length-in"} name={"interior-length-in"} disabled defaultValue={sampleTrailer.interiorLength}/>
+               <input style={{gridColumn: 3}} type={"number"} id={"interior-length-ft"} name={"interior-length-ft"} step={0.5} min={48} max={53} defaultValue={toFeet(sampleTrailer.interiorLength)}/>
+               <label style={{gridColumn: 1}} className={"divided"} htmlFor={"kingpin-distance-from-nose-in"}>Kingpin Distance From Nose</label>
+               <input style={{gridColumn: 2}} type={"number"} id={"kingpin-distance-from-nose-in"} name={"kingpin-distance-from-nose-in"} disabled defaultValue={sampleTrailer.kingpinDistanceFromNose}/>
+               <input style={{gridColumn: 3}} type={"number"} id={"kingpin-distance-from-nose-ft"} name={"kingpin-distance-from-nose-ft"} step={0.5} min={1} max={8} defaultValue={toFeet(sampleTrailer.kingpinDistanceFromNose)}/>
+               <label style={{gridColumn: 1}} className={"divided"} htmlFor={"tandem-spread-width-in"}>Tandem Spread Width</label>
+               <input style={{gridColumn: 2}} type={"number"} id={"tandem-spread-width-in"} name={"tandem-spread-width-in"} disabled defaultValue={sampleTrailer.tandemSpreadWidth}/>
+               <input style={{gridColumn: 3}} type={"number"} id={"tandem-spread-width-ft"} name={"tandem-spread-width-ft"} step={0.5} min={3} max={20} defaultValue={toFeet(sampleTrailer.tandemSpreadWidth)} onChange={tandemSpreadWidthListener}/>
+               <label style={{gridColumn: 1}} htmlFor={"tandem-center-distance-from-nose-in"}>Tandem Center Distance From Nose</label>
+               <input style={{gridColumn: 2}} type={"number"} id={"tandem-center-distance-from-nose-in"} name={"tandem-center-distance-from-nose-in"} disabled defaultValue={sampleTrailer.tandemCenterDistanceFromNose}/>
+               <input style={{gridColumn: 3}} type={"number"} id={"tandem-center-distance-from-nose-ft"} name={"tandem-center-distance-from-nose-ft"} step={0.5} min={36} max={48} defaultValue={toFeet(sampleTrailer.tandemCenterDistanceFromNose)} onChange={tandemSliderListener}/>
+               <input style={{gridColumn: "1/4"}} type={"range"} id={"tandem-slider"} step={0.5} min={36} max={48} defaultValue={toFeet(sampleTrailer.tandemCenterDistanceFromNose)} onChange={tandemSliderListener}/>
             </div>
             <div id={"editor-container"} style={{gridRow: 2, gridColumn: 3}}>
                <h3>Edit Pallet/Load</h3>
