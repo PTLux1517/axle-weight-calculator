@@ -23,17 +23,17 @@ function App() {
 
    function resetTrailerDimensionsListener(e:MouseEvent<HTMLButtonElement>) {
       setSampleTrailer(defaultTrailer);
-      setStateRestriction(State.CA);
+      setStateRestriction(defaultState);
       (document.getElementById("interior-length-in") as HTMLInputElement).value = String(defaultTrailer.interiorLength);
       (document.getElementById("interior-length-ft") as HTMLInputElement).value = String(toFeet(defaultTrailer.interiorLength));
       (document.getElementById("kingpin-distance-from-nose-in") as HTMLInputElement).value = String(defaultTrailer.kingpinDistanceFromNose);
       (document.getElementById("kingpin-distance-from-nose-ft") as HTMLInputElement).value = String(toFeet(defaultTrailer.kingpinDistanceFromNose));
       (document.getElementById("tandem-spread-width-in") as HTMLInputElement).value = String(defaultTrailer.tandemSpreadWidth);
       (document.getElementById("tandem-spread-width-ft") as HTMLInputElement).value = String(toFeet(defaultTrailer.tandemSpreadWidth));
-      (document.getElementById("tandem-center-distance-from-nose-in") as HTMLInputElement).value = String(tandemCenterDistanceFromNoseToStateRefDistance(defaultTrailer, State.CA));
-      (document.getElementById("tandem-center-distance-from-nose-ft") as HTMLInputElement).value = String(toFeet(tandemCenterDistanceFromNoseToStateRefDistance(defaultTrailer, State.CA)));
-      (document.getElementById("tandem-slider") as HTMLInputElement).value = String(toFeet(tandemCenterDistanceFromNoseToStateRefDistance(defaultTrailer, State.CA)));
-      (document.getElementById("destination-state") as HTMLInputElement).value = (document.getElementById("opt-"+State.CA) as HTMLOptionElement).value;
+      (document.getElementById("tandem-center-distance-from-nose-in") as HTMLInputElement).value = String(tandemCenterDistanceFromNoseToStateRefDistance(defaultTrailer, defaultState));
+      (document.getElementById("tandem-center-distance-from-nose-ft") as HTMLInputElement).value = String(toFeet(tandemCenterDistanceFromNoseToStateRefDistance(defaultTrailer, defaultState)));
+      (document.getElementById("tandem-slider") as HTMLInputElement).value = String(toFeet(tandemCenterDistanceFromNoseToStateRefDistance(defaultTrailer, defaultState)));
+      (document.getElementById("destination-state") as HTMLInputElement).value = (document.getElementById("opt-"+defaultState) as HTMLOptionElement).value;
    }
 
    function interiorLengthListener(e:ChangeEvent<HTMLInputElement>) {
@@ -139,9 +139,10 @@ function App() {
    const [selectedPosition2, setSelectedPosition2] = useState<PositionWithMeta|null>(null)
 
    const defaultTrailer:Trailer&Load = maxWeightCostcoTrailer
+   const defaultState:State = State.CA
    const [sampleTrailer, setSampleTrailer] = useState<Trailer&Load>(defaultTrailer)
-   const [stateRestriction, setStateRestriction] = useState<State|null>(State.CA)
-   const [maxSlide, setMaxSlide] = useState(getStateTandemMaxLength(State.CA))
+   const [stateRestriction, setStateRestriction] = useState<State|null>(defaultState)
+   const [maxSlide, setMaxSlide] = useState(getStateTandemMaxLength(defaultState))
 
    const frontTandAxleRenderPos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
    const rearTandAxleRenderPos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
@@ -351,7 +352,7 @@ function App() {
                <select style={{gridColumn: "1/4"}} id={"destination-state"} onChange={destinationStateListener}>{
                   [<option>No restrictions</option>].concat(slideAxleRestrictedStates.map(e => e===SlideAxleRestrictionsDivider.str
                      ? <option disabled>{SlideAxleRestrictionsDivider.str}</option>
-                     : <option selected={e.state===State.CA} id={"opt-"+e.state}>{(e.state+" ").padEnd(15,"-")+"> "+e.kingpinToTandemMaxLength+"' "+e.measurementReference}</option>
+                     : <option selected={e.state===defaultState} id={"opt-"+e.state}>{(e.state+" ").padEnd(15,"-")+"> "+e.kingpinToTandemMaxLength+"' "+e.measurementReference}</option>
                   ))
                }</select>
                <a style={{gridColumn: "1/4"}} href={"https://www.bigtruckguide.com/kingpin-to-rear-axle/"} target={"_blank"}>slide axle restrictions source</a>
