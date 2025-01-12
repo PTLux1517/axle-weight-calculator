@@ -80,7 +80,7 @@ function App() {
       if (input===undefined) return;
       const inputInches = toInches(Number(input))
       const newRearAxlePos = stateRefDistanceToAxleDistanceFromNose("R", sampleTrailer, inputInches, stateRestriction)
-      const newTandCenterPos = newRearAxlePos + sampleTrailer.tandemSpreadWidth/2
+      const newTandCenterPos = newRearAxlePos - sampleTrailer.tandemSpreadWidth/2
       setSampleTrailer(prev => {
          let newTrailer:Trailer&Load = {...prev} //shallow copy; works here but avoid use elsewhere
          newTrailer.tandemCenterDistanceFromNose = newTandCenterPos

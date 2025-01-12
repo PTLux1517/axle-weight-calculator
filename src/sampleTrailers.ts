@@ -1,14 +1,15 @@
-import {Load,O,P,Trailer} from './types.ts';
+import {Load,O,P,SlideAxleNoRestrictionMaxLength,Trailer} from './types.ts';
 import {toFeet,toInches} from "./calculations.ts";
 
-export const minTandCenterSlideLengthFromNose = toInches(39)
-export const maxTandCenterSlideLengthFromNose = toInches(48)
+/* measurements according to https://tprimelogistics.com/wp-content/uploads/2019/04/53-air-ride-roll-door-1.jpg */
+export const minTandCenterSlideLengthFromNose = toInches(53) - 169
+export const maxTandCenterSlideLengthFromNose = toInches(53) - 78 //intentionally 1" off to match SlideAxleNoRestrictionMaxLength = 46.5 type definition
 
 export const defaultTrailerEmpty:Trailer = {
    interiorLength: toInches(51.5),
    kingpinDistanceFromNose: toInches(3),
-   tandemCenterDistanceFromNose: toInches(40.5),
-   tandemSpreadWidth: toInches(5),
+   tandemCenterDistanceFromNose: toInches(41),
+   tandemSpreadWidth: toInches(4),
 }
 
 export const minSlideTrailer:Trailer = {

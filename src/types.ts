@@ -54,7 +54,7 @@ export enum P {
    White = 40,
 }
 
-export type SlideAxleNoRestrictionMaxLength = 48
+export type SlideAxleNoRestrictionMaxLength = 46.5
 export type SlideAxleRestrictionMaxLength = 40|41|43|45.5
 
 export interface SlideAxleRestriction {

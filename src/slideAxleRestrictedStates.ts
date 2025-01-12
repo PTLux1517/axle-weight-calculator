@@ -1,4 +1,6 @@
 import {AxleReferencePoint,SlideAxleNoRestrictionMaxLength,SlideAxleRestriction,State} from "./types.ts";
+import {maxSlideTrailer} from "./sampleTrailers.ts";
+import {toFeet} from "./calculations.ts";
 
 
 export enum SlideAxleRestrictionsDivider {str = "-------------------------------------"}
@@ -35,7 +37,7 @@ export const slideAxleRestrictedStates:Array<SlideAxleRestriction|SlideAxleRestr
    {state: State.ME, kingpinToTandemMaxLength: 45.5, measurementReference: AxleReferencePoint.Rear},
 ];
 
-export const unrestrictedLength:SlideAxleNoRestrictionMaxLength = 48
+export const unrestrictedLength:SlideAxleNoRestrictionMaxLength = toFeet(maxSlideTrailer.tandemCenterDistanceFromNose) as SlideAxleNoRestrictionMaxLength
 export const unrestrictedReference:AxleReferencePoint = AxleReferencePoint.Ctr
 
 export const slideAxleUnrestrictedStates:Array<SlideAxleRestriction> = [
