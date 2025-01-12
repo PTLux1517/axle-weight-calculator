@@ -31,6 +31,11 @@ export interface Position {
    orien: O,
    /* stack of arbitrary number of pallets. array index corresponds to position off the ground, i.e. bottom/single is 0, first stacked pallet is 1, and so on */
    stack: Array<Pallet>,
+
+}
+export interface PositionWithMeta extends Position {
+   row: number,
+   side: Side,
 }
 
 export interface Pallet {

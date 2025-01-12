@@ -1,8 +1,8 @@
 import {ChangeEvent,MouseEvent,useEffect,useState} from 'react'
 import './App.css'
-import {Double,O,P,Position,Side,Single,Trailer} from './types.ts'
+import {Double,O,P,Position,PositionWithMeta,Side,Single,Trailer} from './types.ts'
 import {rotatePosition,toFeet,toInches} from "./calculations.ts";
-import {maxLengthStraightTrailer,maxWeightCostcoTrailer} from "./sampleTrailers.ts";
+import {maxWeightCostcoTrailer} from "./sampleTrailers.ts";
 
 
 function App() {
@@ -78,11 +78,41 @@ function App() {
       rangeInput.value = String(toFeet(newAxlePos))
    }
 
+   function canvasClickListener(e: MouseEvent) {
+      const rect = (e.target as HTMLCanvasElement).getBoundingClientRect()
+      const x = Math.round((e.clientX - rect.left)/zoom)
+      const y = Math.round((e.clientY - rect.top)/zoom)
+      //console.log("("+x+","+y+")")
+      const side:Side = x <= toInches(4) ? Side.L : Side.R;
+      sampleTrailer.loadRows.forEach((row, i) => {
+         if (row.hasOwnProperty(Side.L) && row.hasOwnProperty(Side.R)) {
+            row = row as Double
+            if (side===Side.L && row.l___!==null && row.l___.depth<=y && y<(row.l___.depth + row.l___.orien.L)) {
+               if (selectedPosition1===null) setSelectedPosition1({row: (i+1), side: Side.L, ...row.l___})
+               else if (selectedPosition2===null) setSelectedPosition2({row: (i+1), side: Side.L, ...row.l___})
+            }
+            if (side===Side.R && row.___r !== null && row.___r.depth<=y && y<(row.___r.depth + row.___r.orien.L)) {
+               if (selectedPosition1===null) setSelectedPosition1({row: (i+1), side: Side.R, ...row.___r})
+               else if (selectedPosition2===null) setSelectedPosition2({row: (i+1), side: Side.R, ...row.___r})
+            }
+         }
+         else if (row.hasOwnProperty(Side.C)) {
+            row = row as Single
+            if (row._ctr_.depth<= y && y<(row._ctr_.depth + row._ctr_.orien.L)) {
+               if (selectedPosition1===null) setSelectedPosition1({row: (i+1), side: Side.C, ...row._ctr_})
+               else if (selectedPosition2===null) setSelectedPosition2({row: (i+1), side: Side.C, ...row._ctr_})
+            }
+         }
+      });
+   }
+
    const defaultZoom = 1.5
    const minZoom = 0.5
    const maxZoom = 6.5
    const zoomStep = 0.1
    const [zoom,setZoom] = useState(defaultZoom)
+   const [selectedPosition1, setSelectedPosition1] = useState<PositionWithMeta|null>(null)
+   const [selectedPosition2, setSelectedPosition2] = useState<PositionWithMeta|null>(null)
 
    const defaultTrailer:Trailer = maxWeightCostcoTrailer
    const [sampleTrailer, setSampleTrailer] = useState<Trailer>(defaultTrailer)
@@ -251,7 +281,7 @@ function App() {
                   setZoomSlider(defaultZoom);
                }}>reset</button>
             </div>
-            <canvas id={"load-diagram"} className={"no-border"} width={toInches(8)*zoom} height={sampleTrailer.interiorLength*zoom} style={{margin: "0 calc(50% - "+(toInches(4)*zoom)+"px)", gridRow: 2, gridColumn: 2}}/>
+            <canvas id={"load-diagram"} className={"no-border"} width={toInches(8)*zoom} height={sampleTrailer.interiorLength*zoom} style={{margin: "0 calc(50% - "+(toInches(4)*zoom)+"px)", gridRow: 2, gridColumn: 2}} onMouseUp={canvasClickListener}/>
             {/* ----------------------------------------------------------------- COLUMN 3 ----------------------------------------------------------------- */}
             <div id={"trailer-dimensions-container"} style={{gridRow: 1, gridColumn: 3}}>
                <h3 style={{gridColumn: "1/4"}}>Trailer Dimensions</h3>
@@ -274,7 +304,19 @@ function App() {
             </div>
             <div id={"editor-container"} style={{gridRow: 2, gridColumn: 3}}>
                <h3>Edit Pallet/Load</h3>
-               <button onClick={() => setSampleTrailer(prev => rotatePosition(prev,3,Side.R))}>rotate</button>
+               <div id={"selected-position-1"}>
+                  <h3>Selected Position 1</h3>
+                  {selectedPosition1 && <>
+                     <div style={{whiteSpace: "pre", textAlign: "left", fontSize: "smaller"}}>{JSON.stringify(selectedPosition1,null,2)}</div>
+                     <button onClick={() => setSampleTrailer(prev => rotatePosition(prev,3,Side.R))}>rotate</button>
+                  </>}
+               </div>
+               <div id={"selected-position-2"}>
+                  <h3>Selected Position 2</h3>
+                  {selectedPosition2 && <>
+                     <div style={{whiteSpace: "pre", textAlign: "left", fontSize: "smaller"}}>{JSON.stringify(selectedPosition2,null,2)}</div>
+                  </>}
+               </div>
             </div>
          </main>
       </>
