@@ -37,6 +37,9 @@ main {
       #tandem-slider {
          width: 100%;
       }
+      #destination-state {
+         font-family: monospace;
+      }
    }
    #loaded-weight-container {
       position: relative;

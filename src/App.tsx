@@ -1,8 +1,9 @@
 import {ChangeEvent,MouseEvent,useEffect,useState} from 'react'
 import './App.css'
-import {Double,O,P,Position,PositionWithMeta,Side,Single,Trailer} from './types.ts'
+import {Double,O,P,Position,PositionWithMeta,Side,Single,SlideAxleRestriction,State,Trailer} from './types.ts'
 import {rotatePosition,toFeet,toInches} from "./calculations.ts";
-import {maxLengthStraightTrailer,maxWeightCostcoTrailer} from "./sampleTrailers.ts";
+import {maxWeightCostcoTrailer} from "./sampleTrailers.ts";
+import {slideAxleRestrictedStates,SlideAxleRestrictionsDivider,unrestrictedLength} from "./slideAxleRestrictedStates.ts";
 
 
 function App() {
@@ -78,6 +79,20 @@ function App() {
       rangeInput.value = String(toFeet(newAxlePos))
    }
 
+   function destinationStateListener(e:ChangeEvent<HTMLSelectElement>) {
+      const raw = e.target.value
+      setStateRestriction(raw.length===0
+         ? null
+         : raw.slice(0,raw.indexOf(" ")) as State
+      )
+   }
+
+   function getStateTandemMaxLength(state:State):number {
+      return (slideAxleRestrictedStates.find(e => (
+         e.hasOwnProperty("state") && (e as SlideAxleRestriction).state===state
+      )) as SlideAxleRestriction).kingpinToTandemMaxLength
+   }
+
    function canvasClickListener(e: MouseEvent) {
       const rect = (e.target as HTMLCanvasElement).getBoundingClientRect()
       const x = Math.round((e.clientX - rect.left)/zoom)
@@ -116,12 +131,32 @@ function App() {
 
    const defaultTrailer:Trailer = maxWeightCostcoTrailer
    const [sampleTrailer, setSampleTrailer] = useState<Trailer>(defaultTrailer)
+   const [stateRestriction, setStateRestriction] = useState<State|null>(State.CA)
+   const [maxSlide, setMaxSlide] = useState(getStateTandemMaxLength(State.CA))
 
    const frontTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
    const rearTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
 
    //const frontTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
    //const rearTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
+
+   useEffect(() => {
+      const newMaxSlide = stateRestriction===null ? unrestrictedLength : getStateTandemMaxLength(stateRestriction)
+      setMaxSlide(newMaxSlide)
+      const numInputIn= document.getElementById("tandem-center-distance-from-nose-in") as HTMLInputElement
+      const numInputFt = document.getElementById("tandem-center-distance-from-nose-ft") as HTMLInputElement
+      const rangeInput = document.getElementById("tandem-slider") as HTMLInputElement
+      if (Number(numInputFt.value) > newMaxSlide) {
+         numInputIn.value = String(toInches(newMaxSlide))
+         numInputFt.value = String(newMaxSlide)
+         rangeInput.value = String(newMaxSlide)
+         setSampleTrailer(prev => {
+            let newTrailer:Trailer = {...prev} //shallow copy; works here but avoid use elsewhere
+            newTrailer.tandemCenterDistanceFromNose = toInches(newMaxSlide)
+            return newTrailer
+         })
+      }
+   },[stateRestriction]);
 
    useEffect(() => {
       let canvas:HTMLCanvasElement = document.getElementById("load-diagram")! as HTMLCanvasElement
@@ -302,8 +337,14 @@ function App() {
                <input style={{gridColumn: 3}} type={"number"} id={"tandem-spread-width-ft"} name={"tandem-spread-width-ft"} step={0.5} min={3} max={20} defaultValue={toFeet(sampleTrailer.tandemSpreadWidth)} onChange={tandemSpreadWidthListener}/>
                <label style={{gridColumn: 1}} htmlFor={"tandem-center-distance-from-nose-in"}>Rear Axle Distance From Kingpin</label>
                <input style={{gridColumn: 2}} type={"number"} id={"tandem-center-distance-from-nose-in"} name={"tandem-center-distance-from-nose-in"} disabled defaultValue={sampleTrailer.tandemCenterDistanceFromNose}/>
-               <input style={{gridColumn: 3}} type={"number"} id={"tandem-center-distance-from-nose-ft"} name={"tandem-center-distance-from-nose-ft"} step={0.5} min={36} max={48} defaultValue={toFeet(sampleTrailer.tandemCenterDistanceFromNose)} onChange={tandemSliderListener}/>
-               <input style={{gridColumn: "1/4"}} type={"range"} id={"tandem-slider"} step={0.5} min={36} max={48} defaultValue={toFeet(sampleTrailer.tandemCenterDistanceFromNose)} onChange={tandemSliderListener}/>
+               <input style={{gridColumn: 3}} type={"number"} id={"tandem-center-distance-from-nose-ft"} name={"tandem-center-distance-from-nose-ft"} step={0.5} min={36} max={maxSlide} defaultValue={toFeet(sampleTrailer.tandemCenterDistanceFromNose)} onChange={tandemSliderListener}/>
+               <input style={{gridColumn: "1/4"}} type={"range"} id={"tandem-slider"} step={0.5} min={36} max={maxSlide} defaultValue={toFeet(sampleTrailer.tandemCenterDistanceFromNose)} onChange={tandemSliderListener}/>
+               <select style={{gridColumn: "1/4"}} id={"destination-state"} onChange={destinationStateListener}>{
+                  [<option/>].concat(slideAxleRestrictedStates.map(e => e===SlideAxleRestrictionsDivider.str
+                     ? <option disabled>{SlideAxleRestrictionsDivider.str}</option>
+                     : <option selected={e.state===State.CA}>{(e.state+" ").padEnd(15,"-")+"> "+e.kingpinToTandemMaxLength+"' "+e.measurementReference}</option>
+                  ))
+               }</select>
             </div>
             <div id={"editor-container"} style={{gridRow: 2, gridColumn: 3}}>
                <h3>Edit Pallet/Load</h3>

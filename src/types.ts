@@ -51,9 +51,11 @@ export enum P {
    White = 40,
 }
 
+export type SlideAxleNoRestrictionMaxLength = 48
+
 export interface SlideAxleRestriction {
    state: State,
-   kingpinToTandemMaxLength: 40|41|43|45.5,
+   kingpinToTandemMaxLength: 40|41|43|45.5|SlideAxleNoRestrictionMaxLength,
    measurementReference: "to tandem center"|"to rear axle",
 }
 
@@ -87,26 +89,26 @@ export enum State {
    MT = "Montana",
    NE = "Nebraska",
    NV = "Nevada",
-   NH = "New Hampshire",
-   NJ = "New Jersey",
-   NM = "New Mexico",
-   NY = "New York",
-   NC = "North Carolina",
-   ND = "North Dakota",
+   NH = "New_Hampshire",
+   NJ = "New_Jersey",
+   NM = "New_Mexico",
+   NY = "New_York",
+   NC = "North_Carolina",
+   ND = "North_Dakota",
    OH = "Ohio",
    OK = "Oklahoma",
    OR = "Oregon",
    PA = "Pennsylvania",
-   RI = "Rhode Island",
-   SC = "South Carolina",
-   SD = "South Dakota",
+   RI = "Rhode_Island",
+   SC = "South_Carolina",
+   SD = "South_Dakota",
    TN = "Tennessee",
    TX = "Texas",
    UT = "Utah",
    VT = "Vermont",
    VA = "Virginia",
    WA = "Washington",
-   WV = "West Virginia",
+   WV = "West_Virginia",
    WI = "Wisconsin",
    WY = "Wyoming",
 }
