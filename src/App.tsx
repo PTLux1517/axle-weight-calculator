@@ -120,6 +120,9 @@ function App() {
    const frontTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
    const rearTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
 
+   //const frontTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
+   //const rearTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
+
    useEffect(() => {
       let canvas:HTMLCanvasElement = document.getElementById("load-diagram")! as HTMLCanvasElement
       let ctx = canvas.getContext("2d")
@@ -291,13 +294,13 @@ function App() {
                <label style={{gridColumn: 1}} className={"divided"} htmlFor={"interior-length-in"}>Interior Length</label>
                <input style={{gridColumn: 2}} type={"number"} id={"interior-length-in"} name={"interior-length-in"} disabled defaultValue={sampleTrailer.interiorLength}/>
                <input style={{gridColumn: 3}} type={"number"} id={"interior-length-ft"} name={"interior-length-ft"} step={0.5} min={48} max={53} defaultValue={toFeet(sampleTrailer.interiorLength)} onChange={interiorLengthListener}/>
-               <label style={{gridColumn: 1}} className={"divided"} htmlFor={"kingpin-distance-from-nose-in"}>Drive Axles Center Distance From Nose</label>
+               <label style={{gridColumn: 1}} className={"divided"} htmlFor={"kingpin-distance-from-nose-in"}>Kingpin Distance From Nose</label>
                <input style={{gridColumn: 2}} type={"number"} id={"kingpin-distance-from-nose-in"} name={"kingpin-distance-from-nose-in"} disabled defaultValue={sampleTrailer.kingpinDistanceFromNose}/>
                <input style={{gridColumn: 3}} type={"number"} id={"kingpin-distance-from-nose-ft"} name={"kingpin-distance-from-nose-ft"} step={0.5} min={1} max={8} defaultValue={toFeet(sampleTrailer.kingpinDistanceFromNose)} onChange={kingpinPosListener}/>
                <label style={{gridColumn: 1}} className={"divided"} htmlFor={"tandem-spread-width-in"}>Tandem Spread Width</label>
                <input style={{gridColumn: 2}} type={"number"} id={"tandem-spread-width-in"} name={"tandem-spread-width-in"} disabled defaultValue={sampleTrailer.tandemSpreadWidth}/>
                <input style={{gridColumn: 3}} type={"number"} id={"tandem-spread-width-ft"} name={"tandem-spread-width-ft"} step={0.5} min={3} max={20} defaultValue={toFeet(sampleTrailer.tandemSpreadWidth)} onChange={tandemSpreadWidthListener}/>
-               <label style={{gridColumn: 1}} htmlFor={"tandem-center-distance-from-nose-in"}>Tandem Center Distance From Nose</label>
+               <label style={{gridColumn: 1}} htmlFor={"tandem-center-distance-from-nose-in"}>Rear Axle Distance From Kingpin</label>
                <input style={{gridColumn: 2}} type={"number"} id={"tandem-center-distance-from-nose-in"} name={"tandem-center-distance-from-nose-in"} disabled defaultValue={sampleTrailer.tandemCenterDistanceFromNose}/>
                <input style={{gridColumn: 3}} type={"number"} id={"tandem-center-distance-from-nose-ft"} name={"tandem-center-distance-from-nose-ft"} step={0.5} min={36} max={48} defaultValue={toFeet(sampleTrailer.tandemCenterDistanceFromNose)} onChange={tandemSliderListener}/>
                <input style={{gridColumn: "1/4"}} type={"range"} id={"tandem-slider"} step={0.5} min={36} max={48} defaultValue={toFeet(sampleTrailer.tandemCenterDistanceFromNose)} onChange={tandemSliderListener}/>
@@ -305,8 +308,8 @@ function App() {
             <div id={"editor-container"} style={{gridRow: 2, gridColumn: 3}}>
                <h3>Edit Pallet/Load</h3>
                <div id={"selected-position-1"}>
-                  <h3>Selected Position 1</h3>
                   {selectedPosition1 && <>
+                     <h3>Selected Position 1</h3>
                      <div style={{whiteSpace: "pre", textAlign: "left", fontSize: "smaller"}}>{JSON.stringify(selectedPosition1,null,2)}</div>
                      <button onClick={() => {
                         setSampleTrailer(prev => rotatePosition(prev, selectedPosition1!.row, selectedPosition1!.side))
@@ -315,8 +318,9 @@ function App() {
                   </>}
                </div>
                <div id={"selected-position-2"}>
-                  <h3>Selected Position 2</h3>
                   {selectedPosition2 && <>
+                     <hr/>
+                     <h3>Selected Position 2</h3>
                      <div style={{whiteSpace: "pre", textAlign: "left", fontSize: "smaller"}}>{JSON.stringify(selectedPosition2,null,2)}</div>
                      <button onClick={() => {
                         setSampleTrailer(prev => rotatePosition(prev, selectedPosition2!.row, selectedPosition2!.side))
