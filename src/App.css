@@ -34,8 +34,17 @@ main {
       [disabled] {
          filter: brightness(50%);
       }
-      #tandem-slider {
-         width: 100%;
+      #tandem-slider-container {
+         line-height: 25px;
+         height: 25px;
+         & span {
+            position: relative;
+            bottom: 5px;
+         }
+         #tandem-slider {
+            width: 80%;
+            margin: 0 10px;
+         }
       }
       #destination-state {
          font-family: monospace;

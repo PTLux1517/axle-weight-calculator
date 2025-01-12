@@ -3,7 +3,7 @@ import './App.css'
 import {Double,O,P,Position,PositionWithMeta,Side,Single,SlideAxleRestriction,State,Trailer} from './types.ts'
 import {rotatePosition,toFeet,toInches} from "./calculations.ts";
 import {maxWeightCostcoTrailer} from "./sampleTrailers.ts";
-import {slideAxleRestrictedStates,SlideAxleRestrictionsDivider,unrestrictedLength} from "./slideAxleRestrictedStates.ts";
+import {slideAxleRestrictedStates,SlideAxleRestrictionsDivider,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
 
 
 function App() {
@@ -81,7 +81,7 @@ function App() {
 
    function destinationStateListener(e:ChangeEvent<HTMLSelectElement>) {
       const raw = e.target.value
-      setStateRestriction(raw.length===0
+      setStateRestriction(raw==="No restrictions"
          ? null
          : raw.slice(0,raw.indexOf(" ")) as State
       )
@@ -91,6 +91,19 @@ function App() {
       return (slideAxleRestrictedStates.find(e => (
          e.hasOwnProperty("state") && (e as SlideAxleRestriction).state===state
       )) as SlideAxleRestriction).kingpinToTandemMaxLength
+   }
+
+   function getStateTandemMeasurementReference(state:State):String {
+      return (slideAxleRestrictedStates.find(e => (
+         e.hasOwnProperty("state") && (e as SlideAxleRestriction).state===state
+      )) as SlideAxleRestriction).measurementReference
+   }
+
+   function toTitleCase(str:String):String {
+      return str.toLowerCase()
+         .split(" ")
+         .map(s => s.charAt(0).toUpperCase() + s.substring(1))
+         .join(" ")
    }
 
    function canvasClickListener(e: MouseEvent) {
@@ -335,12 +348,12 @@ function App() {
                <label style={{gridColumn: 1}} className={"divided"} htmlFor={"tandem-spread-width-in"}>Tandem Spread Width</label>
                <input style={{gridColumn: 2}} type={"number"} id={"tandem-spread-width-in"} name={"tandem-spread-width-in"} disabled defaultValue={sampleTrailer.tandemSpreadWidth}/>
                <input style={{gridColumn: 3}} type={"number"} id={"tandem-spread-width-ft"} name={"tandem-spread-width-ft"} step={0.5} min={3} max={20} defaultValue={toFeet(sampleTrailer.tandemSpreadWidth)} onChange={tandemSpreadWidthListener}/>
-               <label style={{gridColumn: 1}} htmlFor={"tandem-center-distance-from-nose-in"}>Rear Axle Distance From Kingpin</label>
+               <label style={{gridColumn: 1}} htmlFor={"tandem-center-distance-from-nose-in"}>{stateRestriction===null ? toTitleCase(unrestrictedReference.slice(2)) : toTitleCase(getStateTandemMeasurementReference(stateRestriction).slice(2))} Distance From Kingpin</label>
                <input style={{gridColumn: 2}} type={"number"} id={"tandem-center-distance-from-nose-in"} name={"tandem-center-distance-from-nose-in"} disabled defaultValue={sampleTrailer.tandemCenterDistanceFromNose}/>
                <input style={{gridColumn: 3}} type={"number"} id={"tandem-center-distance-from-nose-ft"} name={"tandem-center-distance-from-nose-ft"} step={0.5} min={36} max={maxSlide} defaultValue={toFeet(sampleTrailer.tandemCenterDistanceFromNose)} onChange={tandemSliderListener}/>
-               <input style={{gridColumn: "1/4"}} type={"range"} id={"tandem-slider"} step={0.5} min={36} max={maxSlide} defaultValue={toFeet(sampleTrailer.tandemCenterDistanceFromNose)} onChange={tandemSliderListener}/>
+               <div style={{gridColumn: "1/4"}} id={"tandem-slider-container"}><span>N</span><input type={"range"} id={"tandem-slider"} step={0.5} min={36} max={maxSlide} defaultValue={toFeet(sampleTrailer.tandemCenterDistanceFromNose)} onChange={tandemSliderListener}/><span>T</span></div>
                <select style={{gridColumn: "1/4"}} id={"destination-state"} onChange={destinationStateListener}>{
-                  [<option/>].concat(slideAxleRestrictedStates.map(e => e===SlideAxleRestrictionsDivider.str
+                  [<option>No restrictions</option>].concat(slideAxleRestrictedStates.map(e => e===SlideAxleRestrictionsDivider.str
                      ? <option disabled>{SlideAxleRestrictionsDivider.str}</option>
                      : <option selected={e.state===State.CA}>{(e.state+" ").padEnd(15,"-")+"> "+e.kingpinToTandemMaxLength+"' "+e.measurementReference}</option>
                   ))

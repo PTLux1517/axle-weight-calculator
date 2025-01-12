@@ -3,6 +3,7 @@ import {SlideAxleNoRestrictionMaxLength,SlideAxleRestriction,State} from "./type
 export enum SlideAxleRestrictionsDivider {str = "-------------------------------------"}
 
 export const slideAxleRestrictedStates:Array<SlideAxleRestriction|SlideAxleRestrictionsDivider> = [
+   SlideAxleRestrictionsDivider.str,
    {state: State.CA, kingpinToTandemMaxLength: 40, measurementReference: "to rear axle"},
    SlideAxleRestrictionsDivider.str,
    {state: State.RI, kingpinToTandemMaxLength: 41, measurementReference: "to rear axle"},
