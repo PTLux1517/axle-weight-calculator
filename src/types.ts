@@ -2,8 +2,8 @@
 export class O {
    static readonly Straight = new O('Straight',48,40)
    static readonly Sideways = new O('Sideways',40,48)
-   private constructor(private readonly key:String, public readonly L:number, public readonly W:number) {}
-   toString() {return this.key}
+   private constructor(public readonly text:String, public readonly L:number, public readonly W:number) {}
+   toString() {return this.text}
 }
 
 export interface Trailer {

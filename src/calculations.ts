@@ -14,19 +14,21 @@ export function rotatePosition(prev:Trailer, rowNum:number, side:Side):Trailer {
    const i = rowNum - 1
    switch (side) {
       case Side.L: {
-         const orientation = String((prev.loadRows[i] as Double)?.l___?.orien);
-         console.log(orientation);
-         (newTrailer.loadRows[i] as Double).l___!.orien = orientation === String(O.Straight) ? O.Sideways : O.Straight;
+         const orientation = (prev.loadRows[i] as Double)?.l___?.orien?.text;
+         if (orientation===undefined) return prev;
+         (newTrailer.loadRows[i] as Double).l___!.orien = orientation === O.Straight.text ? O.Sideways : O.Straight;
          break;
       }
       case Side.C: {
-         const orientation = String((prev.loadRows[i] as Single)?._ctr_?.orien);
-         (newTrailer.loadRows[i] as Single)._ctr_!.orien = orientation === String(O.Straight) ? O.Sideways : O.Straight;
+         const orientation = (prev.loadRows[i] as Single)?._ctr_?.orien?.text;
+         if (orientation===undefined) return prev;
+         (newTrailer.loadRows[i] as Single)._ctr_!.orien = orientation === O.Straight.text ? O.Sideways : O.Straight;
          break;
       }
       case Side.R: {
-         const orientation = String((prev.loadRows[i] as Double)?.___r?.orien);
-         (newTrailer.loadRows[i] as Double).___r!.orien = orientation === String(O.Straight) ? O.Sideways : O.Straight;
+         const orientation = (prev.loadRows[i] as Double)?.___r?.orien?.text;
+         if (orientation===undefined) return prev;
+         (newTrailer.loadRows[i] as Double).___r!.orien = orientation === O.Straight.text ? O.Sideways : O.Straight;
          break;
       }
    }
@@ -39,7 +41,7 @@ function recalcDepths(trailer:Trailer) {
    let rDepth = 0
    let prevWasSingle = false
    trailer.loadRows.forEach((row,i) => {
-      if (Side.L in row && Side.R in row) {
+      if (row.hasOwnProperty(Side.L) && row.hasOwnProperty(Side.R)) {
          row = row as Double
          if (row.l___ !== null) {
             if (i === 0)
@@ -57,7 +59,7 @@ function recalcDepths(trailer:Trailer) {
          }
          prevWasSingle = false //must be last in condition block
       }
-      else if (Side.C in row) {
+      else if (row.hasOwnProperty(Side.C)) {
          row = row as Single
          const biggerDepth = Math.max(lDepth,rDepth)
          if (i === 0)

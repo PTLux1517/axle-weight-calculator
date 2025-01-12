@@ -2,7 +2,7 @@ import {ChangeEvent,MouseEvent,useEffect,useState} from 'react'
 import './App.css'
 import {Double,O,P,Position,Side,Single,Trailer} from './types.ts'
 import {rotatePosition,toFeet,toInches} from "./calculations.ts";
-import {maxWeightCostcoTrailer} from "./sampleTrailers.ts";
+import {maxLengthStraightTrailer,maxWeightCostcoTrailer} from "./sampleTrailers.ts";
 
 
 function App() {
@@ -108,13 +108,13 @@ function App() {
 
       /* draw pallets */
       sampleTrailer.loadRows.forEach((row,i) => {
-         if (Side.L in row && Side.R in row) {
+         if (row.hasOwnProperty(Side.L) && row.hasOwnProperty(Side.R)) {
             row = row as Double
             if (row.l___ !== null) {
                const l:Position = row.l___
                const depth = zoom * l.depth
-               const width = zoom * (String(l.orien) === String(O.Straight) ? O.Straight.W : O.Sideways.W)
-               const length = zoom * (String(l.orien) === String(O.Straight) ? O.Straight.L : O.Sideways.L)
+               const width = zoom * (l.orien.text === O.Straight.text ? O.Straight.W : O.Sideways.W)
+               const length = zoom * (l.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
                /* draw pallet */
                ctx.fillStyle = l.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
                ctx.beginPath()
@@ -138,8 +138,8 @@ function App() {
             if (row.___r !== null) {
                const r:Position = row.___r
                const depth = zoom * r.depth
-               const width = zoom * (String(r.orien) === String(O.Straight) ? O.Straight.W : O.Sideways.W)
-               const length = zoom * (String(r.orien) === String(O.Straight) ? O.Straight.L : O.Sideways.L)
+               const width = zoom * (r.orien.text === O.Straight.text ? O.Straight.W : O.Sideways.W)
+               const length = zoom * (r.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
                /* draw pallet */
                ctx.fillStyle = r.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
                ctx.beginPath()
@@ -161,12 +161,12 @@ function App() {
                })
             }
          }
-         else if (Side.C in row) {
+         else if (row.hasOwnProperty(Side.C)) {
             row = row as Single
             const c:Position = row._ctr_
             const depth = zoom * c.depth
-            const width = zoom * (String(c.orien) === String(O.Straight) ? O.Straight.W : O.Sideways.W)
-            const length = zoom * (String(c.orien) === String(O.Straight) ? O.Straight.L : O.Sideways.L)
+            const width = zoom * (c.orien.text === O.Straight.text ? O.Straight.W : O.Sideways.W)
+            const length = zoom * (c.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
             /* draw pallet */
             ctx.fillStyle = c.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
             ctx.beginPath()
@@ -193,7 +193,7 @@ function App() {
                ctx.fillText(pal.prdWt+color, zoom*toInches(4), depth + length - j*fontPx*zoom)
             })
          }
-      })
+      });
 
       /* draw kingpin */
       ctx.strokeStyle = "dimgray"
