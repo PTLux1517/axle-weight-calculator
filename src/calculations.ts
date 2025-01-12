@@ -46,7 +46,7 @@ export function tandemCenterDistanceFromNoseToStateRefDistance(trailer:Trailer, 
    const refPoint = getStateTandemMeasurementReference(state)
    switch (refPoint) {
       case AxleReferencePoint.Ctr: return trailer.tandemCenterDistanceFromNose - trailer.kingpinDistanceFromNose
-      case AxleReferencePoint.Rear: return trailer.tandemCenterDistanceFromNose + trailer.tandemSpreadWidth/2 - trailer.kingpinDistanceFromNose
+      case AxleReferencePoint.Rear: return trailer.tandemCenterDistanceFromNose - trailer.kingpinDistanceFromNose + trailer.tandemSpreadWidth/2
    }
 }
 

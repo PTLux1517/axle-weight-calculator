@@ -1,11 +1,24 @@
 import {Load,O,P,Trailer} from './types.ts';
 import {toFeet,toInches} from "./calculations.ts";
 
+export const minTandCenterSlideLengthFromNose = toInches(39)
+export const maxTandCenterSlideLengthFromNose = toInches(48)
+
 export const defaultTrailerEmpty:Trailer = {
    interiorLength: toInches(51.5),
    kingpinDistanceFromNose: toInches(3),
    tandemCenterDistanceFromNose: toInches(40.5),
    tandemSpreadWidth: toInches(5),
+}
+
+export const minSlideTrailer:Trailer = {
+   ...defaultTrailerEmpty,
+   tandemCenterDistanceFromNose: minTandCenterSlideLengthFromNose,
+}
+
+export const maxSlideTrailer:Trailer = {
+   ...defaultTrailerEmpty,
+   tandemCenterDistanceFromNose: maxTandCenterSlideLengthFromNose,
 }
 
 export const maxLengthStraightTrailer:Trailer&Load = {

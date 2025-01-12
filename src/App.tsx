@@ -11,7 +11,7 @@ import {
    toInches,
    toTitleCase
 } from "./calculations.ts";
-import {maxWeightCostcoTrailer} from "./sampleTrailers.ts";
+import {maxSlideTrailer,maxWeightCostcoTrailer,minSlideTrailer} from "./sampleTrailers.ts";
 import {slideAxleRestrictedStates,SlideAxleRestrictionsDivider,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
 
 
@@ -347,8 +347,8 @@ function App() {
                <input style={{gridColumn: 3}} type={"number"} id={"tandem-spread-width-ft"} name={"tandem-spread-width-ft"} step={0.5} min={3} max={20} defaultValue={toFeet(sampleTrailer.tandemSpreadWidth)} onChange={tandemSpreadWidthListener}/>
                <label style={{gridColumn: 1}} htmlFor={"tandem-center-distance-from-nose-in"}>{stateRestriction===null ? toTitleCase(unrestrictedReference.slice(2)) : toTitleCase(getStateTandemMeasurementReference(stateRestriction).slice(2))} Distance From Kingpin</label>
                <input style={{gridColumn: 2}} type={"number"} id={"tandem-center-distance-from-nose-in"} name={"tandem-center-distance-from-nose-in"} disabled defaultValue={tandemCenterDistanceFromNoseToStateRefDistance(sampleTrailer,stateRestriction)}/>
-               <input style={{gridColumn: 3}} type={"number"} id={"tandem-center-distance-from-nose-ft"} name={"tandem-center-distance-from-nose-ft"} step={0.5} min={36} max={maxSlide} defaultValue={toFeet(tandemCenterDistanceFromNoseToStateRefDistance(sampleTrailer,stateRestriction))} onChange={tandemSliderListener}/>
-               <div style={{gridColumn: "1/4"}} id={"tandem-slider-container"}><span>N</span><input type={"range"} id={"tandem-slider"} step={0.5} min={36} max={maxSlide} defaultValue={toFeet(tandemCenterDistanceFromNoseToStateRefDistance(sampleTrailer,stateRestriction))} onChange={tandemSliderListener}/><span>T</span></div>
+               <input style={{gridColumn: 3}} type={"number"} id={"tandem-center-distance-from-nose-ft"} name={"tandem-center-distance-from-nose-ft"} step={0.5} min={toFeet(tandemCenterDistanceFromNoseToStateRefDistance(minSlideTrailer,stateRestriction))} max={maxSlide} defaultValue={toFeet(tandemCenterDistanceFromNoseToStateRefDistance(sampleTrailer,stateRestriction))} onChange={tandemSliderListener}/>
+               <div style={{gridColumn: "1/4"}} id={"tandem-slider-container"}><span>N</span><input type={"range"} id={"tandem-slider"} step={0.5} min={toFeet(tandemCenterDistanceFromNoseToStateRefDistance(minSlideTrailer,stateRestriction))} max={maxSlide} defaultValue={toFeet(tandemCenterDistanceFromNoseToStateRefDistance(sampleTrailer,stateRestriction))} onChange={tandemSliderListener}/><span>T</span></div>
                <select style={{gridColumn: "1/4"}} id={"destination-state"} onChange={destinationStateListener}>{
                   [<option>No restrictions</option>].concat(slideAxleRestrictedStates.map(e => e===SlideAxleRestrictionsDivider.str
                      ? <option disabled>{SlideAxleRestrictionsDivider.str}</option>
