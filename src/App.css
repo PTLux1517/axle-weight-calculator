@@ -49,6 +49,9 @@ main {
       #destination-state {
          font-family: monospace;
       }
+      & a {
+         font-size: x-small;
+      }
    }
    #loaded-weight-container {
       position: relative;

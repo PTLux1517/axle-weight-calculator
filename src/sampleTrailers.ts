@@ -1,15 +1,14 @@
-import {O,P,Trailer} from './types.ts';
+import {Load,O,P,Trailer} from './types.ts';
 import {toFeet,toInches} from "./calculations.ts";
 
 export const defaultTrailerEmpty:Trailer = {
-   interiorLength: toInches(51),
-   kingpinDistanceFromNose: toInches(4),
-   tandemCenterDistanceFromNose: toInches(40),
+   interiorLength: toInches(51.5),
+   kingpinDistanceFromNose: toInches(3),
+   tandemCenterDistanceFromNose: toInches(40.5),
    tandemSpreadWidth: toInches(5),
-   loadRows: []
 }
 
-export const maxLengthStraightTrailer:Trailer = {
+export const maxLengthStraightTrailer:Trailer&Load = {
    ...defaultTrailerEmpty,
    loadRows: [
       {_ctr_: {depth: 48*0, orien: O.Straight, stack: [{prdWt: 720, palWt: P.White}, {prdWt: 720, palWt: P.Chep}]}},
@@ -31,7 +30,7 @@ export const maxLengthStraightTrailer:Trailer = {
    ]
 }
 
-export const maxWeightCostcoTrailer:Trailer = {
+export const maxWeightCostcoTrailer:Trailer&Load = {
    ...defaultTrailerEmpty,
    loadRows: [
       {l___: {depth: 0, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 0, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep}, {prdWt: 720, palWt: P.Chep}]}},

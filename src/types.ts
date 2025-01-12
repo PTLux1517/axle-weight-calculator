@@ -11,6 +11,9 @@ export interface Trailer {
    kingpinDistanceFromNose: number,
    tandemCenterDistanceFromNose: number,
    tandemSpreadWidth: number,
+}
+
+export interface Load {
    loadRows: Array<Row>,
 }
 
@@ -52,11 +55,12 @@ export enum P {
 }
 
 export type SlideAxleNoRestrictionMaxLength = 48
+export type SlideAxleRestrictionMaxLength = 40|41|43|45.5
 
 export interface SlideAxleRestriction {
    state: State,
-   kingpinToTandemMaxLength: 40|41|43|45.5|SlideAxleNoRestrictionMaxLength,
-   measurementReference: "to tandem center"|"to rear axle",
+   kingpinToTandemMaxLength: SlideAxleRestrictionMaxLength|SlideAxleNoRestrictionMaxLength,
+   measurementReference: AxleReferencePoint,
 }
 
 /* State abbreviation */
@@ -113,3 +117,7 @@ export enum State {
    WY = "Wyoming",
 }
 
+export enum AxleReferencePoint {
+   Ctr = "to tandem center",
+   Rear = "to rear axle",
+}

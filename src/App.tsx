@@ -1,7 +1,16 @@
 import {ChangeEvent,MouseEvent,useEffect,useState} from 'react'
 import './App.css'
-import {Double,O,P,Position,PositionWithMeta,Side,Single,SlideAxleRestriction,State,Trailer} from './types.ts'
-import {rotatePosition,toFeet,toInches} from "./calculations.ts";
+import {Double,Load,O,P,Position,PositionWithMeta,Side,Single,State,Trailer} from './types.ts'
+import {
+   getStateTandemMaxLength,
+   getStateTandemMeasurementReference,
+   rotatePosition,
+   stateRefDistanceToAxleDistanceFromNose,
+   tandemCenterDistanceFromNoseToStateRefDistance,
+   toFeet,
+   toInches,
+   toTitleCase
+} from "./calculations.ts";
 import {maxWeightCostcoTrailer} from "./sampleTrailers.ts";
 import {slideAxleRestrictedStates,SlideAxleRestrictionsDivider,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
 
@@ -14,21 +23,23 @@ function App() {
 
    function resetTrailerDimensionsListener(e:MouseEvent<HTMLButtonElement>) {
       setSampleTrailer(defaultTrailer);
+      setStateRestriction(State.CA);
       (document.getElementById("interior-length-in") as HTMLInputElement).value = String(defaultTrailer.interiorLength);
       (document.getElementById("interior-length-ft") as HTMLInputElement).value = String(toFeet(defaultTrailer.interiorLength));
       (document.getElementById("kingpin-distance-from-nose-in") as HTMLInputElement).value = String(defaultTrailer.kingpinDistanceFromNose);
       (document.getElementById("kingpin-distance-from-nose-ft") as HTMLInputElement).value = String(toFeet(defaultTrailer.kingpinDistanceFromNose));
       (document.getElementById("tandem-spread-width-in") as HTMLInputElement).value = String(defaultTrailer.tandemSpreadWidth);
       (document.getElementById("tandem-spread-width-ft") as HTMLInputElement).value = String(toFeet(defaultTrailer.tandemSpreadWidth));
-      (document.getElementById("tandem-center-distance-from-nose-in") as HTMLInputElement).value = String(defaultTrailer.tandemCenterDistanceFromNose);
-      (document.getElementById("tandem-center-distance-from-nose-ft") as HTMLInputElement).value = String(toFeet(defaultTrailer.tandemCenterDistanceFromNose));
-      (document.getElementById("tandem-slider") as HTMLInputElement).value = String(toFeet(defaultTrailer.tandemCenterDistanceFromNose));
+      (document.getElementById("tandem-center-distance-from-nose-in") as HTMLInputElement).value = String(tandemCenterDistanceFromNoseToStateRefDistance(defaultTrailer, State.CA));
+      (document.getElementById("tandem-center-distance-from-nose-ft") as HTMLInputElement).value = String(toFeet(tandemCenterDistanceFromNoseToStateRefDistance(defaultTrailer, State.CA)));
+      (document.getElementById("tandem-slider") as HTMLInputElement).value = String(toFeet(tandemCenterDistanceFromNoseToStateRefDistance(defaultTrailer, State.CA)));
+      (document.getElementById("destination-state") as HTMLInputElement).value = (document.getElementById("opt-"+State.CA) as HTMLOptionElement).value;
    }
 
    function interiorLengthListener(e:ChangeEvent<HTMLInputElement>) {
       const newInteriorLength = toInches(Number(e.target?.value))
       setSampleTrailer(prev => {
-         let newTrailer:Trailer = {...prev} //shallow copy; works here but avoid use elsewhere
+         let newTrailer:Trailer&Load = {...prev} //shallow copy; works here but avoid use elsewhere
          newTrailer.interiorLength = newInteriorLength
          return newTrailer
       })
@@ -41,7 +52,7 @@ function App() {
    function kingpinPosListener(e:ChangeEvent<HTMLInputElement>) {
       const newKingpinPos = toInches(Number(e.target?.value))
       setSampleTrailer(prev => {
-         let newTrailer:Trailer = {...prev} //shallow copy; works here but avoid use elsewhere
+         let newTrailer:Trailer&Load = {...prev} //shallow copy; works here but avoid use elsewhere
          newTrailer.kingpinDistanceFromNose = newKingpinPos
          return newTrailer
       })
@@ -54,7 +65,7 @@ function App() {
    function tandemSpreadWidthListener(e:ChangeEvent<HTMLInputElement>) {
       const newAxleSpread = toInches(Number(e.target?.value))
       setSampleTrailer(prev => {
-         let newTrailer:Trailer = {...prev} //shallow copy; works here but avoid use elsewhere
+         let newTrailer:Trailer&Load = {...prev} //shallow copy; works here but avoid use elsewhere
          newTrailer.tandemSpreadWidth = newAxleSpread
          return newTrailer
       })
@@ -65,18 +76,22 @@ function App() {
    }
 
    function tandemSliderListener(e:ChangeEvent<HTMLInputElement>) {
-      const newAxlePos = toInches(Number(e.target?.value))
+      const input = e.target?.value
+      if (input===undefined) return;
+      const inputInches = toInches(Number(input))
+      const newRearAxlePos = stateRefDistanceToAxleDistanceFromNose("R", sampleTrailer, inputInches, stateRestriction)
+      const newTandCenterPos = newRearAxlePos + sampleTrailer.tandemSpreadWidth/2
       setSampleTrailer(prev => {
-         let newTrailer:Trailer = {...prev} //shallow copy; works here but avoid use elsewhere
-         newTrailer.tandemCenterDistanceFromNose = newAxlePos
+         let newTrailer:Trailer&Load = {...prev} //shallow copy; works here but avoid use elsewhere
+         newTrailer.tandemCenterDistanceFromNose = newTandCenterPos
          return newTrailer
       })
       const numInputIn= document.getElementById("tandem-center-distance-from-nose-in") as HTMLInputElement
       const numInputFt = document.getElementById("tandem-center-distance-from-nose-ft") as HTMLInputElement
       const rangeInput = document.getElementById("tandem-slider") as HTMLInputElement
-      numInputIn.value = String(newAxlePos)
-      numInputFt.value = String(toFeet(newAxlePos))
-      rangeInput.value = String(toFeet(newAxlePos))
+      numInputIn.value = String(inputInches)
+      numInputFt.value = String(toFeet(inputInches))
+      rangeInput.value = String(toFeet(inputInches))
    }
 
    function destinationStateListener(e:ChangeEvent<HTMLSelectElement>) {
@@ -85,25 +100,6 @@ function App() {
          ? null
          : raw.slice(0,raw.indexOf(" ")) as State
       )
-   }
-
-   function getStateTandemMaxLength(state:State):number {
-      return (slideAxleRestrictedStates.find(e => (
-         e.hasOwnProperty("state") && (e as SlideAxleRestriction).state===state
-      )) as SlideAxleRestriction).kingpinToTandemMaxLength
-   }
-
-   function getStateTandemMeasurementReference(state:State):String {
-      return (slideAxleRestrictedStates.find(e => (
-         e.hasOwnProperty("state") && (e as SlideAxleRestriction).state===state
-      )) as SlideAxleRestriction).measurementReference
-   }
-
-   function toTitleCase(str:String):String {
-      return str.toLowerCase()
-         .split(" ")
-         .map(s => s.charAt(0).toUpperCase() + s.substring(1))
-         .join(" ")
    }
 
    function canvasClickListener(e: MouseEvent) {
@@ -142,13 +138,13 @@ function App() {
    const [selectedPosition1, setSelectedPosition1] = useState<PositionWithMeta|null>(null)
    const [selectedPosition2, setSelectedPosition2] = useState<PositionWithMeta|null>(null)
 
-   const defaultTrailer:Trailer = maxWeightCostcoTrailer
-   const [sampleTrailer, setSampleTrailer] = useState<Trailer>(defaultTrailer)
+   const defaultTrailer:Trailer&Load = maxWeightCostcoTrailer
+   const [sampleTrailer, setSampleTrailer] = useState<Trailer&Load>(defaultTrailer)
    const [stateRestriction, setStateRestriction] = useState<State|null>(State.CA)
    const [maxSlide, setMaxSlide] = useState(getStateTandemMaxLength(State.CA))
 
-   const frontTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
-   const rearTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
+   const frontTandAxleRenderPos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
+   const rearTandAxleRenderPos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
 
    //const frontTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
    //const rearTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
@@ -164,7 +160,7 @@ function App() {
          numInputFt.value = String(newMaxSlide)
          rangeInput.value = String(newMaxSlide)
          setSampleTrailer(prev => {
-            let newTrailer:Trailer = {...prev} //shallow copy; works here but avoid use elsewhere
+            let newTrailer:Trailer&Load = {...prev} //shallow copy; works here but avoid use elsewhere
             newTrailer.tandemCenterDistanceFromNose = toInches(newMaxSlide)
             return newTrailer
          })
@@ -286,8 +282,8 @@ function App() {
       /* draw axles */
       const axleThickness = zoom * 5
       const axleWidth = zoom * 18
-      ctx.strokeRect(zoom*39,frontTandAxlePos-(axleThickness/2),axleWidth,axleThickness)
-      ctx.strokeRect(zoom*39,rearTandAxlePos-(axleThickness/2),axleWidth,axleThickness)
+      ctx.strokeRect(zoom*39,frontTandAxleRenderPos-(axleThickness/2),axleWidth,axleThickness)
+      ctx.strokeRect(zoom*39,rearTandAxleRenderPos-(axleThickness/2),axleWidth,axleThickness)
 
    }, [zoom, sampleTrailer])
 
@@ -302,8 +298,8 @@ function App() {
             <div id={"loaded-weight-container"} style={{gridRow: 2, gridColumn: 1}}>
                <h3>Loaded Weight (lbs)</h3>
                <div id={"drive-weight"} style={{top: zoom*sampleTrailer.kingpinDistanceFromNose - 35}}>Drive axles:<br/>{} / {}</div>
-               <div id={"front-tandem-weight"} style={{top: frontTandAxlePos - 35}}>Trailer axle:<br/>{} / {}</div>
-               <div id={"rear-tandem-weight"} style={{top: rearTandAxlePos - 35}}>Trailer axle:<br/>{} / {}</div>
+               <div id={"front-tandem-weight"} style={{top: frontTandAxleRenderPos - 35}}>Trailer axle:<br/>{} / {}</div>
+               <div id={"rear-tandem-weight"} style={{top: rearTandAxleRenderPos - 35}}>Trailer axle:<br/>{} / {}</div>
                <div id={"combined-weight"} style={{top: zoom*sampleTrailer.interiorLength - 70}}>Combined:<br/>{} / 80,000</div>
             </div>
             {/* ----------------------------------------------------------------- COLUMN 2 ----------------------------------------------------------------- */}
@@ -349,15 +345,16 @@ function App() {
                <input style={{gridColumn: 2}} type={"number"} id={"tandem-spread-width-in"} name={"tandem-spread-width-in"} disabled defaultValue={sampleTrailer.tandemSpreadWidth}/>
                <input style={{gridColumn: 3}} type={"number"} id={"tandem-spread-width-ft"} name={"tandem-spread-width-ft"} step={0.5} min={3} max={20} defaultValue={toFeet(sampleTrailer.tandemSpreadWidth)} onChange={tandemSpreadWidthListener}/>
                <label style={{gridColumn: 1}} htmlFor={"tandem-center-distance-from-nose-in"}>{stateRestriction===null ? toTitleCase(unrestrictedReference.slice(2)) : toTitleCase(getStateTandemMeasurementReference(stateRestriction).slice(2))} Distance From Kingpin</label>
-               <input style={{gridColumn: 2}} type={"number"} id={"tandem-center-distance-from-nose-in"} name={"tandem-center-distance-from-nose-in"} disabled defaultValue={sampleTrailer.tandemCenterDistanceFromNose}/>
-               <input style={{gridColumn: 3}} type={"number"} id={"tandem-center-distance-from-nose-ft"} name={"tandem-center-distance-from-nose-ft"} step={0.5} min={36} max={maxSlide} defaultValue={toFeet(sampleTrailer.tandemCenterDistanceFromNose)} onChange={tandemSliderListener}/>
-               <div style={{gridColumn: "1/4"}} id={"tandem-slider-container"}><span>N</span><input type={"range"} id={"tandem-slider"} step={0.5} min={36} max={maxSlide} defaultValue={toFeet(sampleTrailer.tandemCenterDistanceFromNose)} onChange={tandemSliderListener}/><span>T</span></div>
+               <input style={{gridColumn: 2}} type={"number"} id={"tandem-center-distance-from-nose-in"} name={"tandem-center-distance-from-nose-in"} disabled defaultValue={tandemCenterDistanceFromNoseToStateRefDistance(sampleTrailer,stateRestriction)}/>
+               <input style={{gridColumn: 3}} type={"number"} id={"tandem-center-distance-from-nose-ft"} name={"tandem-center-distance-from-nose-ft"} step={0.5} min={36} max={maxSlide} defaultValue={toFeet(tandemCenterDistanceFromNoseToStateRefDistance(sampleTrailer,stateRestriction))} onChange={tandemSliderListener}/>
+               <div style={{gridColumn: "1/4"}} id={"tandem-slider-container"}><span>N</span><input type={"range"} id={"tandem-slider"} step={0.5} min={36} max={maxSlide} defaultValue={toFeet(tandemCenterDistanceFromNoseToStateRefDistance(sampleTrailer,stateRestriction))} onChange={tandemSliderListener}/><span>T</span></div>
                <select style={{gridColumn: "1/4"}} id={"destination-state"} onChange={destinationStateListener}>{
                   [<option>No restrictions</option>].concat(slideAxleRestrictedStates.map(e => e===SlideAxleRestrictionsDivider.str
                      ? <option disabled>{SlideAxleRestrictionsDivider.str}</option>
-                     : <option selected={e.state===State.CA}>{(e.state+" ").padEnd(15,"-")+"> "+e.kingpinToTandemMaxLength+"' "+e.measurementReference}</option>
+                     : <option selected={e.state===State.CA} id={"opt-"+e.state}>{(e.state+" ").padEnd(15,"-")+"> "+e.kingpinToTandemMaxLength+"' "+e.measurementReference}</option>
                   ))
                }</select>
+               <a style={{gridColumn: "1/4"}} href={"https://www.bigtruckguide.com/kingpin-to-rear-axle/"} target={"_blank"}>slide axle restrictions source</a>
             </div>
             <div id={"editor-container"} style={{gridRow: 2, gridColumn: 3}}>
                <h3>Edit Pallet/Load</h3>

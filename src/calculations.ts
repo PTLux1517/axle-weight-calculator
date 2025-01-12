@@ -1,4 +1,16 @@
-import {Double,O,Side,Single,Trailer} from "./types.ts";
+import {
+   AxleReferencePoint,
+   Double,Load,
+   O,
+   Side,
+   Single,
+   SlideAxleNoRestrictionMaxLength,
+   SlideAxleRestriction,
+   SlideAxleRestrictionMaxLength,
+   State,
+   Trailer
+} from "./types.ts";
+import {slideAxleRestrictedStates,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
 
 
 export function toInches(feet:number):number {
@@ -9,8 +21,54 @@ export function toFeet(inches:number):number {
    return Math.round(2*inches/12.0)/2;
 }
 
-export function rotatePosition(prev:Trailer, rowNum:number, side:Side):Trailer {
-   let newTrailer:Trailer = JSON.parse(JSON.stringify(prev)) //deep copy
+export function getStateTandemMaxLength(state:State|null):(SlideAxleRestrictionMaxLength|SlideAxleNoRestrictionMaxLength) {
+   if (state===null) return unrestrictedLength;
+   else return (slideAxleRestrictedStates.find(e => (
+      e.hasOwnProperty("state") && (e as SlideAxleRestriction).state===state
+   )) as SlideAxleRestriction).kingpinToTandemMaxLength
+}
+
+export function getStateTandemMeasurementReference(state:State|null):AxleReferencePoint {
+   if (state===null) return unrestrictedReference;
+   else return (slideAxleRestrictedStates.find(e => (
+      e.hasOwnProperty("state") && (e as SlideAxleRestriction).state===state
+   )) as SlideAxleRestriction).measurementReference
+}
+
+export function toTitleCase(str:String):String {
+   return str.toLowerCase()
+   .split(" ")
+   .map(s => s.charAt(0).toUpperCase() + s.substring(1))
+   .join(" ")
+}
+
+export function tandemCenterDistanceFromNoseToStateRefDistance(trailer:Trailer, state:State|null):number {
+   const refPoint = getStateTandemMeasurementReference(state)
+   switch (refPoint) {
+      case AxleReferencePoint.Ctr: return trailer.tandemCenterDistanceFromNose - trailer.kingpinDistanceFromNose
+      case AxleReferencePoint.Rear: return trailer.tandemCenterDistanceFromNose + trailer.tandemSpreadWidth/2 - trailer.kingpinDistanceFromNose
+   }
+}
+
+export function stateRefDistanceToAxleDistanceFromNose(axle:"F"|"R", trailer:Trailer, inputLengthInches:number, state:State|null):number {
+   if (isNaN(inputLengthInches)) {inputLengthInches = toInches(40); alert("Distance From Kingpin input passed value of NaN to stateRefDistanceToAxleDistanceFromNose() function. Defaulting to 40'.");}
+   const refPoint = getStateTandemMeasurementReference(state)
+   switch (refPoint) {
+      case AxleReferencePoint.Ctr:
+         return trailer.kingpinDistanceFromNose + inputLengthInches + (() => {switch (axle) {
+            case "F": return -trailer.tandemSpreadWidth/2;
+            case "R": return trailer.tandemSpreadWidth/2;
+         }})()
+      case AxleReferencePoint.Rear:
+         return trailer.kingpinDistanceFromNose + inputLengthInches + (() => {switch (axle) {
+            case "F": return -trailer.tandemSpreadWidth;
+            case "R": return 0;
+         }})()
+   }
+}
+
+export function rotatePosition(prev:Trailer&Load, rowNum:number, side:Side):Trailer&Load {
+   let newTrailer:Trailer&Load = JSON.parse(JSON.stringify(prev)) //deep copy
    const i = rowNum - 1
    switch (side) {
       case Side.L: {
@@ -45,7 +103,7 @@ export function rotatePosition(prev:Trailer, rowNum:number, side:Side):Trailer {
    return newTrailer
 }
 
-function recalcDepths(trailer:Trailer) {
+function recalcDepths(trailer:Trailer&Load) {
    let lDepth = 0
    let rDepth = 0
    let prevWasSingle = false
