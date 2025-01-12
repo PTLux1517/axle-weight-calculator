@@ -2,7 +2,7 @@ import {ChangeEvent,MouseEvent,useEffect,useState} from 'react'
 import './App.css'
 import {Double,O,P,Position,PositionWithMeta,Side,Single,Trailer} from './types.ts'
 import {rotatePosition,toFeet,toInches} from "./calculations.ts";
-import {maxWeightCostcoTrailer} from "./sampleTrailers.ts";
+import {maxLengthStraightTrailer,maxWeightCostcoTrailer} from "./sampleTrailers.ts";
 
 
 function App() {
@@ -308,13 +308,20 @@ function App() {
                   <h3>Selected Position 1</h3>
                   {selectedPosition1 && <>
                      <div style={{whiteSpace: "pre", textAlign: "left", fontSize: "smaller"}}>{JSON.stringify(selectedPosition1,null,2)}</div>
-                     <button onClick={() => setSampleTrailer(prev => rotatePosition(prev,3,Side.R))}>rotate</button>
+                     <button onClick={() => {
+                        setSampleTrailer(prev => rotatePosition(prev, selectedPosition1!.row, selectedPosition1!.side))
+                        setSelectedPosition1(null)
+                     }}>rotate</button>
                   </>}
                </div>
                <div id={"selected-position-2"}>
                   <h3>Selected Position 2</h3>
                   {selectedPosition2 && <>
                      <div style={{whiteSpace: "pre", textAlign: "left", fontSize: "smaller"}}>{JSON.stringify(selectedPosition2,null,2)}</div>
+                     <button onClick={() => {
+                        setSampleTrailer(prev => rotatePosition(prev, selectedPosition2!.row, selectedPosition2!.side))
+                        setSelectedPosition2(null)
+                     }}>rotate</button>
                   </>}
                </div>
             </div>

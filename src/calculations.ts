@@ -15,19 +15,28 @@ export function rotatePosition(prev:Trailer, rowNum:number, side:Side):Trailer {
    switch (side) {
       case Side.L: {
          const orientation = (prev.loadRows[i] as Double)?.l___?.orien?.text;
-         if (orientation===undefined) return prev;
+         if (orientation===undefined) {
+            alert("rotate position called with wrong side argument")
+            return prev
+         }
          (newTrailer.loadRows[i] as Double).l___!.orien = orientation === O.Straight.text ? O.Sideways : O.Straight;
          break;
       }
       case Side.C: {
          const orientation = (prev.loadRows[i] as Single)?._ctr_?.orien?.text;
-         if (orientation===undefined) return prev;
+         if (orientation===undefined) {
+            alert("rotate position called with wrong side argument")
+            return prev
+         }
          (newTrailer.loadRows[i] as Single)._ctr_!.orien = orientation === O.Straight.text ? O.Sideways : O.Straight;
          break;
       }
       case Side.R: {
          const orientation = (prev.loadRows[i] as Double)?.___r?.orien?.text;
-         if (orientation===undefined) return prev;
+         if (orientation===undefined) {
+            alert("rotate position called with wrong side argument")
+            return prev
+         }
          (newTrailer.loadRows[i] as Double).___r!.orien = orientation === O.Straight.text ? O.Sideways : O.Straight;
          break;
       }
