@@ -1,6 +1,6 @@
 import {ChangeEvent,MouseEvent,useEffect,useState} from 'react'
 import './App.css'
-import {Double,Load,O,P,Position,PositionWithMeta,Side,Single,State,Trailer} from './types.ts'
+import {AxleReferencePoint,Double,Load,O,P,Position,PositionWithMeta,Side,Single,State,Trailer} from './types.ts'
 import {
    getStateTandemMaxLength,
    getStateTandemMeasurementReference,
@@ -11,7 +11,7 @@ import {
    toInches,
    toTitleCase
 } from "./calculations.ts";
-import {maxSlideTrailer,maxWeightCostcoTrailer,minSlideTrailer} from "./sampleTrailers.ts";
+import {maxWeightCostcoTrailer,minSlideTrailer,minTandCenterSlideLengthFromNose} from "./sampleTrailers.ts";
 import {slideAxleRestrictedStates,SlideAxleRestrictionsDivider,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
 
 
@@ -67,6 +67,30 @@ function App() {
       setSampleTrailer(prev => {
          let newTrailer:Trailer&Load = {...prev} //shallow copy; works here but avoid use elsewhere
          newTrailer.tandemSpreadWidth = newAxleSpread
+         let tandemCenterRepositioned = false
+         let difference = minTandCenterSlideLengthFromNose - newTrailer.tandemCenterDistanceFromNose
+         if (difference > 0) {
+            newTrailer.tandemCenterDistanceFromNose += Math.ceil(difference/6.0)*6
+            tandemCenterRepositioned = true
+         }
+         let newRefPos = tandemCenterDistanceFromNoseToStateRefDistance(newTrailer,stateRestriction)
+         const stateMax = toInches(getStateTandemMaxLength(stateRestriction))
+         difference = newRefPos - stateMax
+         if (difference > 0) { //rear axle too far back
+            newTrailer.tandemCenterDistanceFromNose -= Math.ceil(difference/6.0)*6
+            tandemCenterRepositioned = true
+         }
+         if (getStateTandemMeasurementReference(stateRestriction)===AxleReferencePoint.Rear) {
+            const numInputIn= document.getElementById("tandem-center-distance-from-nose-in") as HTMLInputElement
+            const numInputFt = document.getElementById("tandem-center-distance-from-nose-ft") as HTMLInputElement
+            const rangeInput = document.getElementById("tandem-slider") as HTMLInputElement
+            if (tandemCenterRepositioned) {
+               newRefPos = tandemCenterDistanceFromNoseToStateRefDistance(newTrailer,stateRestriction)
+            }
+            numInputIn.value = String(newRefPos)
+            numInputFt.value = String(toFeet(newRefPos))
+            rangeInput.value = String(toFeet(newRefPos))
+         }
          return newTrailer
       })
       const numInputIn= document.getElementById("tandem-spread-width-in") as HTMLInputElement
@@ -344,7 +368,7 @@ function App() {
                <input style={{gridColumn: 3}} type={"number"} id={"kingpin-distance-from-nose-ft"} name={"kingpin-distance-from-nose-ft"} step={0.5} min={1} max={8} defaultValue={toFeet(sampleTrailer.kingpinDistanceFromNose)} onChange={kingpinPosListener}/>
                <label style={{gridColumn: 1}} className={"divided"} htmlFor={"tandem-spread-width-in"}>Tandem Spread Width</label>
                <input style={{gridColumn: 2}} type={"number"} id={"tandem-spread-width-in"} name={"tandem-spread-width-in"} disabled defaultValue={sampleTrailer.tandemSpreadWidth}/>
-               <input style={{gridColumn: 3}} type={"number"} id={"tandem-spread-width-ft"} name={"tandem-spread-width-ft"} step={0.5} min={3} max={20} defaultValue={toFeet(sampleTrailer.tandemSpreadWidth)} onChange={tandemSpreadWidthListener}/>
+               <input style={{gridColumn: 3}} type={"number"} id={"tandem-spread-width-ft"} name={"tandem-spread-width-ft"} step={0.5} min={3} max={12} defaultValue={toFeet(sampleTrailer.tandemSpreadWidth)} onChange={tandemSpreadWidthListener}/>
                <label style={{gridColumn: 1}} htmlFor={"tandem-center-distance-from-nose-in"}>{stateRestriction===null ? toTitleCase(unrestrictedReference.slice(2)) : toTitleCase(getStateTandemMeasurementReference(stateRestriction).slice(2))} Distance From Kingpin</label>
                <input style={{gridColumn: 2}} type={"number"} id={"tandem-center-distance-from-nose-in"} name={"tandem-center-distance-from-nose-in"} disabled defaultValue={tandemCenterDistanceFromNoseToStateRefDistance(sampleTrailer,stateRestriction)}/>
                <input style={{gridColumn: 3}} type={"number"} id={"tandem-center-distance-from-nose-ft"} name={"tandem-center-distance-from-nose-ft"} step={0.5} min={toFeet(tandemCenterDistanceFromNoseToStateRefDistance(minSlideTrailer,stateRestriction))} max={maxSlide} defaultValue={toFeet(tandemCenterDistanceFromNoseToStateRefDistance(sampleTrailer,stateRestriction))} onChange={tandemSliderListener}/>

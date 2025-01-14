@@ -21,6 +21,7 @@ export function toFeet(inches:number):number {
    return Math.round(2*inches/12.0)/2;
 }
 
+/* feet */
 export function getStateTandemMaxLength(state:State|null):(SlideAxleRestrictionMaxLength|SlideAxleNoRestrictionMaxLength) {
    if (state===null) return unrestrictedLength;
    else return (slideAxleRestrictedStates.find(e => (
@@ -42,6 +43,7 @@ export function toTitleCase(str:String):String {
    .join(" ")
 }
 
+/* inches */
 export function tandemCenterDistanceFromNoseToStateRefDistance(trailer:Trailer, state:State|null):number {
    const refPoint = getStateTandemMeasurementReference(state)
    switch (refPoint) {
@@ -50,6 +52,7 @@ export function tandemCenterDistanceFromNoseToStateRefDistance(trailer:Trailer, 
    }
 }
 
+/* inches */
 export function stateRefDistanceToAxleDistanceFromNose(axle:"F"|"R", trailer:Trailer, inputLengthInches:number, state:State|null):number {
    if (isNaN(inputLengthInches)) {inputLengthInches = toInches(40); alert("Distance From Kingpin input passed value of NaN to stateRefDistanceToAxleDistanceFromNose() function. Defaulting to 40'.");}
    const refPoint = getStateTandemMeasurementReference(state)
