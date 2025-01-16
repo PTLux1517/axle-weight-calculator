@@ -1,4 +1,4 @@
-import {ChangeEvent,MouseEvent,useEffect,useState} from 'react'
+import {ChangeEvent,MouseEvent,useEffect,useReducer,useState} from 'react'
 import './App.css'
 import {AxleReferencePoint,Double,Load,O,P,Position,PositionWithMeta,Side,Single,State,Trailer} from './types.ts'
 import {
@@ -120,10 +120,23 @@ function App() {
 
    function destinationStateListener(e:ChangeEvent<HTMLSelectElement>) {
       const raw = e.target.value
-      setStateRestriction(raw==="No restrictions"
+      const newState = raw==="No restrictions"
          ? null
          : raw.slice(0,raw.indexOf(" ")) as State
-      )
+      const newMaxSlide = newState===null ? unrestrictedLength : getStateTandemMaxLength(newState)
+      setStateRestriction(newState)
+      setMaxSlide(newMaxSlide)
+      setSampleTrailer(prev => {
+         let newTrailer:Trailer&Load = {...prev} //shallow copy; works here but avoid use elsewhere
+         newTrailer.tandemCenterDistanceFromNose = stateRefDistanceToAxleDistanceFromNose("R",newTrailer,toInches(newMaxSlide),newState) - newTrailer.tandemSpreadWidth/2
+         return newTrailer
+      })
+      const numInputIn= document.getElementById("tandem-center-distance-from-nose-in") as HTMLInputElement
+      const numInputFt = document.getElementById("tandem-center-distance-from-nose-ft") as HTMLInputElement
+      const rangeInput = document.getElementById("tandem-slider") as HTMLInputElement
+      numInputIn.value = String(toInches(newMaxSlide))
+      numInputFt.value = String(newMaxSlide)
+      setTimeout(() => rangeInput.value = String(newMaxSlide),10)
    }
 
    function canvasClickListener(e: MouseEvent) {
@@ -154,6 +167,7 @@ function App() {
       });
    }
 
+   //const forceUpdate = useReducer(x => x+1, 0, () => 0)[1]
    const defaultZoom = 1.5
    const minZoom = 0.5
    const maxZoom = 6.5
@@ -170,27 +184,6 @@ function App() {
 
    const frontTandAxleRenderPos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
    const rearTandAxleRenderPos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
-
-   //const frontTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
-   //const rearTandAxlePos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
-
-   useEffect(() => {
-      const newMaxSlide = stateRestriction===null ? unrestrictedLength : getStateTandemMaxLength(stateRestriction)
-      setMaxSlide(newMaxSlide)
-      const numInputIn= document.getElementById("tandem-center-distance-from-nose-in") as HTMLInputElement
-      const numInputFt = document.getElementById("tandem-center-distance-from-nose-ft") as HTMLInputElement
-      const rangeInput = document.getElementById("tandem-slider") as HTMLInputElement
-      if (Number(numInputFt.value) > newMaxSlide) {
-         numInputIn.value = String(toInches(newMaxSlide))
-         numInputFt.value = String(newMaxSlide)
-         rangeInput.value = String(newMaxSlide)
-         setSampleTrailer(prev => {
-            let newTrailer:Trailer&Load = {...prev} //shallow copy; works here but avoid use elsewhere
-            newTrailer.tandemCenterDistanceFromNose = toInches(newMaxSlide)
-            return newTrailer
-         })
-      }
-   },[stateRestriction]);
 
    useEffect(() => {
       let canvas:HTMLCanvasElement = document.getElementById("load-diagram")! as HTMLCanvasElement

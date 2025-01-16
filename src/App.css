@@ -21,6 +21,7 @@ main {
       align-items: center;
       /*text baseline*/
       grid-gap: 5px;
+      font-size: smaller;
       & h3 {
         align-self: start;
       }
