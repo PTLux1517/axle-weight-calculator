@@ -51,15 +51,20 @@ function App() {
 
    function kingpinPosListener(e:ChangeEvent<HTMLInputElement>) {
       const newKingpinPos = toInches(Number(e.target?.value))
-      setSampleTrailer(prev => {
-         let newTrailer:Trailer&Load = {...prev} //shallow copy; works here but avoid use elsewhere
-         newTrailer.kingpinDistanceFromNose = newKingpinPos
-         return newTrailer
-      })
+      let newTrailer:Trailer&Load = {...sampleTrailer} //shallow copy; works here but avoid use elsewhere
+      newTrailer.kingpinDistanceFromNose = newKingpinPos
+      const newRefPos = tandemCenterDistanceFromNoseToStateRefDistance(newTrailer,stateRestriction)
+      setSampleTrailer(newTrailer)
       const numInputIn= document.getElementById("kingpin-distance-from-nose-in") as HTMLInputElement
       const numInputFt = document.getElementById("kingpin-distance-from-nose-ft") as HTMLInputElement
+      const tandNumInputIn= document.getElementById("tandem-center-distance-from-nose-in") as HTMLInputElement
+      const tandNumInputFt = document.getElementById("tandem-center-distance-from-nose-ft") as HTMLInputElement
+      const rangeInput = document.getElementById("tandem-slider") as HTMLInputElement
       numInputIn.value = String(newKingpinPos)
       numInputFt.value = String(toFeet(newKingpinPos))
+      tandNumInputIn.value = String(newRefPos)
+      tandNumInputFt.value = String(toFeet(newRefPos))
+      rangeInput.value = String(toFeet(newRefPos))
    }
 
    function tandemSpreadWidthListener(e:ChangeEvent<HTMLInputElement>) {
@@ -358,7 +363,7 @@ function App() {
                <input style={{gridColumn: 3}} type={"number"} id={"interior-length-ft"} name={"interior-length-ft"} step={0.5} min={48} max={53} defaultValue={toFeet(sampleTrailer.interiorLength)} onChange={interiorLengthListener}/>
                <label style={{gridColumn: 1}} className={"divided"} htmlFor={"kingpin-distance-from-nose-in"}>Kingpin Distance From Nose</label>
                <input style={{gridColumn: 2}} type={"number"} id={"kingpin-distance-from-nose-in"} name={"kingpin-distance-from-nose-in"} disabled defaultValue={sampleTrailer.kingpinDistanceFromNose}/>
-               <input style={{gridColumn: 3}} type={"number"} id={"kingpin-distance-from-nose-ft"} name={"kingpin-distance-from-nose-ft"} step={0.5} min={1} max={8} defaultValue={toFeet(sampleTrailer.kingpinDistanceFromNose)} onChange={kingpinPosListener}/>
+               <input style={{gridColumn: 3}} type={"number"} id={"kingpin-distance-from-nose-ft"} name={"kingpin-distance-from-nose-ft"} step={0.5} min={2} max={4} defaultValue={toFeet(sampleTrailer.kingpinDistanceFromNose)} onChange={kingpinPosListener}/>
                <label style={{gridColumn: 1}} className={"divided"} htmlFor={"tandem-spread-width-in"}>Tandem Spread Width</label>
                <input style={{gridColumn: 2}} type={"number"} id={"tandem-spread-width-in"} name={"tandem-spread-width-in"} disabled defaultValue={sampleTrailer.tandemSpreadWidth}/>
                <input style={{gridColumn: 3}} type={"number"} id={"tandem-spread-width-ft"} name={"tandem-spread-width-ft"} step={0.5} min={3} max={12} defaultValue={toFeet(sampleTrailer.tandemSpreadWidth)} onChange={tandemSpreadWidthListener}/>
