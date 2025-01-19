@@ -12,7 +12,7 @@ import {
    toInches,totalGrossWt,totalLoadWt,
    toTitleCase
 } from "./calculations.ts";
-import {maxWeightCostcoTrailer,minSlideTrailer,minTandCenterSlideLengthFromNose} from "./sampleTrailers.ts";
+import {maxLengthStraightTrailer,minSlideTrailer,minTandCenterSlideLengthFromNose} from "./sampleTrailers.ts";
 import {slideAxleRestrictedStates,SlideAxleRestrictionsDivider,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
 
 
@@ -184,7 +184,7 @@ function App() {
    const [selectedPosition1, setSelectedPosition1] = useState<PositionWithMeta|null>(null)
    const [selectedPosition2, setSelectedPosition2] = useState<PositionWithMeta|null>(null)
 
-   const defaultTrailer:Trailer&Load = maxWeightCostcoTrailer
+   const defaultTrailer:Trailer&Load = maxLengthStraightTrailer
    const defaultState:State = State.CA
    const defaultRearAxleType:RearAxleTypeCapacity = RearAxleTypeCapacity.Tandem
    const defaultUnloadedWeights:AxleWeights = {

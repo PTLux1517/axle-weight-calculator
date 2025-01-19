@@ -162,6 +162,11 @@ export function calcAxleWeights(trailer:Trailer&Load, unloaded:AxleWeights, rear
          const posWt = pos.stack.map(pal => pal.prdWt + pal.palWt).reduce((acc,wt) => acc + wt, 0)
          if (COM2KP <= 0) { //position is in front of kingpin: weight contribution is 100% to drives
             loaded.drives += posWt
+            const percentBeyondKingpin = (trailer.kingpinDistanceFromNose-COM)/span
+            const additionalWeight = posWt * percentBeyondKingpin
+            loaded.drives += additionalWeight
+            loaded.fTandem -= additionalWeight/2
+            loaded.rTandem -= additionalWeight/2
          }
          else if (rearAxleType===RearAxleTypeCapacity.Tandem) {
             if (COM2TC < 0) { //position is between kingpin and tandem center (non-inclusive): weight contribution is interpolated between drives and tandems
@@ -175,6 +180,11 @@ export function calcAxleWeights(trailer:Trailer&Load, unloaded:AxleWeights, rear
             else { //position is on or beyond tandem center: weight contribution is 100% to tandems
                loaded.fTandem += posWt/2
                loaded.rTandem += posWt/2
+               const percentBeyondTandems = (COM-trailer.tandemCenterDistanceFromNose)/span
+               const additionalWeight = posWt * percentBeyondTandems
+               loaded.fTandem += additionalWeight/2
+               loaded.rTandem += additionalWeight/2
+               loaded.drives -= additionalWeight
             }
          }
          else if (rearAxleType===RearAxleTypeCapacity.Spread) {
