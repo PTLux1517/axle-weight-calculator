@@ -8,11 +8,23 @@ on:
       - 'README.md'
       - '.gitignore'
 
+# Sets the GITHUB_TOKEN permissions to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
     timeout-minutes: 5
     steps:
       - name: Checkout repo
@@ -21,53 +33,16 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+      - name: Install dependencies
+        run: bun install || { echo "dependencies installation failed"; exit 1; }
       - name: Build
-        run: |
-          echo "#####################"
-          echo "Preparing environment"
-          echo "#####################"
-          echo
-          echo "#######################"
-          echo "Installing dependencies"
-          echo "#######################"
-          bun install || { echo "dependencies installation failed"; exit 1; }
-          echo
-          echo "######################################"
-          echo "Environment preparation was successful"
-          echo "######################################"
-          echo
-          echo "--------------------------------------"
-          echo
-          echo "###############################"
-          echo "Building axle-weight-calculator"
-          echo "###############################"
-          echo
-          echo "###############"
-          echo "Running bun"
-          echo "###############"
-          bun run build || { echo "build failed"; exit 1; }
-          echo
-          echo "####################"
-          echo "Build was successful"
-          echo "####################"
-          exit 0
-      - name: Push build to gh-pages branch
-        run: |
-          git config --global user.name $user_name
-          git config --global user.email $user_email
-          git remote set-url origin https://${github_token}@github.com/${repository}
-          bun run deploy
-        env:
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-          github_token: ${{ secrets.GH_PAGES_TOKEN }}
-          repository: 'PTLux1517/axle-weight-calculator'
-      - name: Deploy gh-pages branch #see api docs here: https://docs.github.com/en/rest/pages/pages?apiVersion=2022-11-28#create-a-github-pages-site
-        run: |
-          curl -L \
-          -X POST \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer ${{ secrets.GH_PAGES_TOKEN }}" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          https://api.github.com/repos/PTLux1517/axle-weight-calculator/pages \
-          -d '{"source":{"branch":"gh-pages"}}'
+        run: bun run build || { echo "build failed"; exit 1; }
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
