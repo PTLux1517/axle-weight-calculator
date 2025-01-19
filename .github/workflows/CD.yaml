@@ -30,7 +30,7 @@ jobs:
           echo "#######################"
           echo "Installing dependencies"
           echo "#######################"
-          bun install || { echo "Install dependencies failed"; exit 1; }
+          bun install || { echo "dependencies installation failed"; exit 1; }
           echo
           echo "######################################"
           echo "Environment preparation was successful"
@@ -45,7 +45,7 @@ jobs:
           echo "###############"
           echo "Running bun"
           echo "###############"
-          bun run build || { echo "Webpack failed"; exit 1; }
+          bun run build || { echo "build failed"; exit 1; }
           echo
           echo "####################"
           echo "Build was successful"

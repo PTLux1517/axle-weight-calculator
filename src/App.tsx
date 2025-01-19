@@ -22,7 +22,7 @@ function App() {
       (document.getElementById("zoom-slider") as HTMLInputElement).value = String(newZoom);
    }
 
-   function resetTrailerDimensionsListener(e:MouseEvent<HTMLButtonElement>) {
+   function resetTrailerDimensionsListener() {
       setSampleTrailer(defaultTrailer);
       setStateRestriction(defaultState);
       setRearAxleTypeCapacity(defaultRearAxleType);
@@ -213,6 +213,8 @@ function App() {
       const fontPx = 7.7
       const thirdLength = zoom * (sampleTrailer.tandemCenterDistanceFromNose/3)
 
+      if (ctx===null) return;
+
       ctx.font =  "bold "+(fontPx*zoom)+"px monospace"
       ctx.textAlign = "center"
       ctx.textBaseline = "bottom"
@@ -334,6 +336,9 @@ function App() {
             {/* ----------------------------------------------------------------- COLUMN 1 ----------------------------------------------------------------- */}
             <div id={"unloaded-weight-container"} style={{gridRow: 1, gridColumn: 1}}>
                <h3>Unloaded Weight (lbs)</h3>
+               <button onClick={() => {
+                  setUnloaded(defaultUnloadedWeights)
+               }}>reset</button>
                <div>Real World Examples:</div>
                <ul>
                   <li><a href={"https://www.thetruckersreport.com/truckingindustryforum/attachments/b9a6ca71-b803-4b06-8dd5-b43491aeb7ee-jpeg.389972/"} target={"_blank"}>unloaded weigh ticket</a></li>

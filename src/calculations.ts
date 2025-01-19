@@ -178,7 +178,8 @@ export function calcAxleWeights(trailer:Trailer&Load, unloaded:AxleWeights, rear
             }
          }
          else if (rearAxleType===RearAxleTypeCapacity.Spread) {
-
+            console.log(COM2FT)
+            console.log(COM2RT)
          }
       })
    })

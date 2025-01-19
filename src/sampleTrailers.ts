@@ -1,5 +1,5 @@
-import {Load,O,P,SlideAxleNoRestrictionMaxLength,Trailer} from './types.ts';
-import {toFeet,toInches} from "./calculations.ts";
+import {Load,O,P,Trailer} from './types.ts';
+import {toInches} from "./calculations.ts";
 
 /* measurements according to https://tprimelogistics.com/wp-content/uploads/2019/04/53-air-ride-roll-door-1.jpg */
 export const minTandCenterSlideLengthFromNose = toInches(53) - 169
