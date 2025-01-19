@@ -1,7 +1,9 @@
 import {
-   AxleReferencePoint,
-   Double,Load,
+   AxleReferencePoint,AxleWeights,
+   Double,
+   Load,
    O,
+   RearAxleTypeCapacity,
    Side,
    Single,
    SlideAxleNoRestrictionMaxLength,
@@ -141,4 +143,52 @@ function recalcDepths(trailer:Trailer&Load) {
          prevWasSingle = true //must be last in condition block
       }
    });
+}
+
+export function calcAxleWeights(trailer:Trailer&Load, unloaded:AxleWeights, rearAxleType:RearAxleTypeCapacity):AxleWeights {
+   let loaded:AxleWeights = {...unloaded}
+   trailer.loadRows.forEach(row => {
+      Object.values(row).forEach(pos => {
+         if (pos===null) return;
+         /* COM: center of mass distance from nose | COM2KP: com to kingpin | COM2TC: com to tandem center | COM2FT: com to front tandem | COM2RT: com to rear tandem */
+         const COM = pos.depth + pos.orien.L/2.0,
+               COM2KP = COM - trailer.kingpinDistanceFromNose,
+               COM2TC = COM - trailer.tandemCenterDistanceFromNose,
+               COM2FT = COM2TC - trailer.tandemSpreadWidth/2,
+               COM2RT = COM2TC + trailer.tandemSpreadWidth/2;
+         let span = rearAxleType===RearAxleTypeCapacity.Tandem
+            ? trailer.tandemCenterDistanceFromNose-trailer.kingpinDistanceFromNose
+            : (trailer.tandemCenterDistanceFromNose - trailer.tandemSpreadWidth/2) - trailer.kingpinDistanceFromNose
+         const posWt = pos.stack.map(pal => pal.prdWt + pal.palWt).reduce((acc,wt) => acc + wt, 0)
+         if (COM2KP <= 0) { //position is in front of kingpin: weight contribution is 100% to drives
+            loaded.drives += posWt
+         }
+         else if (rearAxleType===RearAxleTypeCapacity.Tandem) {
+            if (COM2TC < 0) { //position is between kingpin and tandem center (non-inclusive): weight contribution is interpolated between drives and tandems
+               const percentRearward = (COM-trailer.kingpinDistanceFromNose)/span
+               const noseContribution = posWt * (1-percentRearward)
+               const tailContribution = posWt - noseContribution
+               loaded.drives += noseContribution
+               loaded.fTandem += tailContribution/2
+               loaded.rTandem += tailContribution/2
+            }
+            else { //position is on or beyond tandem center: weight contribution is 100% to tandems
+               loaded.fTandem += posWt/2
+               loaded.rTandem += posWt/2
+            }
+         }
+         else if (rearAxleType===RearAxleTypeCapacity.Spread) {
+
+         }
+      })
+   })
+   return loaded
+}
+
+export function totalGrossWt(loaded:AxleWeights):number {
+   return loaded.steers + loaded.drives + loaded.fTandem + loaded.rTandem
+}
+
+export function totalLoadWt(loaded:AxleWeights, unloaded:AxleWeights):number {
+   return totalGrossWt(loaded) - totalGrossWt(unloaded)
 }

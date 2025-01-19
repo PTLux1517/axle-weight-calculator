@@ -6,6 +6,13 @@ export class O {
    toString() {return this.text}
 }
 
+export interface AxleWeights {
+   steers: number,
+   drives: number,
+   fTandem: number,
+   rTandem: number,
+}
+
 export interface Trailer {
    interiorLength: number,
    kingpinDistanceFromNose: number,
@@ -120,4 +127,9 @@ export enum State {
 export enum AxleReferencePoint {
    Ctr = "to tandem center",
    Rear = "to rear axle",
+}
+
+export enum RearAxleTypeCapacity {
+   Tandem = 17000,
+   Spread = 20000,
 }

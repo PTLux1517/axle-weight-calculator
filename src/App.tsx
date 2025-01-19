@@ -1,14 +1,15 @@
-import {ChangeEvent,MouseEvent,useEffect,useReducer,useState} from 'react'
+import {ChangeEvent,MouseEvent,useEffect,useState} from 'react'
 import './App.css'
-import {AxleReferencePoint,Double,Load,O,P,Position,PositionWithMeta,Side,Single,State,Trailer} from './types.ts'
+import {AxleReferencePoint,AxleWeights,Double,Load,O,P,Position,PositionWithMeta,RearAxleTypeCapacity,Side,Single,State,Trailer} from './types.ts'
 import {
+   calcAxleWeights,
    getStateTandemMaxLength,
    getStateTandemMeasurementReference,
    rotatePosition,
    stateRefDistanceToAxleDistanceFromNose,
    tandemCenterDistanceFromNoseToStateRefDistance,
    toFeet,
-   toInches,
+   toInches,totalGrossWt,totalLoadWt,
    toTitleCase
 } from "./calculations.ts";
 import {maxWeightCostcoTrailer,minSlideTrailer,minTandCenterSlideLengthFromNose} from "./sampleTrailers.ts";
@@ -24,6 +25,7 @@ function App() {
    function resetTrailerDimensionsListener(e:MouseEvent<HTMLButtonElement>) {
       setSampleTrailer(defaultTrailer);
       setStateRestriction(defaultState);
+      setRearAxleTypeCapacity(defaultRearAxleType);
       (document.getElementById("interior-length-in") as HTMLInputElement).value = String(defaultTrailer.interiorLength);
       (document.getElementById("interior-length-ft") as HTMLInputElement).value = String(toFeet(defaultTrailer.interiorLength));
       (document.getElementById("kingpin-distance-from-nose-in") as HTMLInputElement).value = String(defaultTrailer.kingpinDistanceFromNose);
@@ -102,6 +104,7 @@ function App() {
       const numInputFt = document.getElementById("tandem-spread-width-ft") as HTMLInputElement
       numInputIn.value = String(newAxleSpread)
       numInputFt.value = String(toFeet(newAxleSpread))
+      setRearAxleTypeCapacity(newAxleSpread > 96 ? RearAxleTypeCapacity.Spread : RearAxleTypeCapacity.Tandem)
    }
 
    function tandemSliderListener(e:ChangeEvent<HTMLInputElement>) {
@@ -183,9 +186,23 @@ function App() {
 
    const defaultTrailer:Trailer&Load = maxWeightCostcoTrailer
    const defaultState:State = State.CA
+   const defaultRearAxleType:RearAxleTypeCapacity = RearAxleTypeCapacity.Tandem
+   const defaultUnloadedWeights:AxleWeights = {
+      steers: 12000,
+      drives: 15000,
+      fTandem: 5000,
+      rTandem: 5000,
+   }
    const [sampleTrailer, setSampleTrailer] = useState<Trailer&Load>(defaultTrailer)
    const [stateRestriction, setStateRestriction] = useState<State|null>(defaultState)
    const [maxSlide, setMaxSlide] = useState(getStateTandemMaxLength(defaultState))
+   const [rearAxleTypeCapacity, setRearAxleTypeCapacity] = useState<RearAxleTypeCapacity>(defaultRearAxleType)
+   const [unloaded, setUnloaded] = useState<AxleWeights>(defaultUnloadedWeights)
+   const [loaded, setLoaded] = useState<AxleWeights|null>(null)
+
+   useEffect(() => {
+      setLoaded(calcAxleWeights(sampleTrailer,unloaded,rearAxleTypeCapacity))
+   },[sampleTrailer]);
 
    const frontTandAxleRenderPos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
    const rearTandAxleRenderPos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
@@ -317,13 +334,22 @@ function App() {
             {/* ----------------------------------------------------------------- COLUMN 1 ----------------------------------------------------------------- */}
             <div id={"unloaded-weight-container"} style={{gridRow: 1, gridColumn: 1}}>
                <h3>Unloaded Weight (lbs)</h3>
+               <div>Real World Examples:</div>
+               <ul>
+                  <li><a href={"https://www.thetruckersreport.com/truckingindustryforum/attachments/b9a6ca71-b803-4b06-8dd5-b43491aeb7ee-jpeg.389972/"} target={"_blank"}>unloaded weigh ticket</a></li>
+                  <li><a href={"https://www.reddit.com/r/Truckers/comments/oipyl5/what_are_the_average_axle_weights_of_an_empty/"} target={"_blank"}>discussion forum</a></li>
+               </ul>
             </div>
             <div id={"loaded-weight-container"} style={{gridRow: 2, gridColumn: 1}}>
                <h3>Loaded Weight (lbs)</h3>
-               <div id={"drive-weight"} style={{top: zoom*sampleTrailer.kingpinDistanceFromNose - 35}}>Drive axles:<br/>{} / {}</div>
-               <div id={"front-tandem-weight"} style={{top: frontTandAxleRenderPos - 35}}>Trailer axle:<br/>{} / {}</div>
-               <div id={"rear-tandem-weight"} style={{top: rearTandAxleRenderPos - 35}}>Trailer axle:<br/>{} / {}</div>
-               <div id={"combined-weight"} style={{top: zoom*sampleTrailer.interiorLength - 70}}>Combined:<br/>{} / 80,000</div>
+               <div id={"drive-weight"} style={{top: zoom*sampleTrailer.kingpinDistanceFromNose + 15}}>Drive axles:<br/>
+                  {Math.ceil(loaded ? loaded.drives : unloaded.drives).toLocaleString()} / {Number(34000).toLocaleString()}</div>
+               <div id={"front-tandem-weight"} style={{top: frontTandAxleRenderPos + 8 - (6/zoom)}}>Trailer axle:<br/>
+                  {Math.ceil(loaded ? loaded.fTandem : unloaded.fTandem).toLocaleString()} / {rearAxleTypeCapacity.toLocaleString()}</div>
+               <div id={"rear-tandem-weight"} style={{top: rearTandAxleRenderPos + 8 + (6/zoom)}}>Trailer axle:<br/>
+                  {Math.ceil(loaded ? loaded.rTandem : unloaded.rTandem).toLocaleString()} / {rearAxleTypeCapacity.toLocaleString()}</div>
+               <div id={"combined-weight"} style={{top: zoom*sampleTrailer.interiorLength - 10}}>Combined:<br/>
+                  {Math.ceil(loaded ? totalGrossWt(loaded) : totalGrossWt(unloaded)).toLocaleString()} / {Number(80000).toLocaleString()}</div>
             </div>
             {/* ----------------------------------------------------------------- COLUMN 2 ----------------------------------------------------------------- */}
             <div id={"zoom-container"} style={{gridRow: 1, gridColumn: 2}}>
@@ -366,7 +392,7 @@ function App() {
                <input style={{gridColumn: 3}} type={"number"} id={"kingpin-distance-from-nose-ft"} name={"kingpin-distance-from-nose-ft"} step={0.5} min={2} max={4} defaultValue={toFeet(sampleTrailer.kingpinDistanceFromNose)} onChange={kingpinPosListener}/>
                <label style={{gridColumn: 1}} className={"divided"} htmlFor={"tandem-spread-width-in"}>Tandem Spread Width</label>
                <input style={{gridColumn: 2}} type={"number"} id={"tandem-spread-width-in"} name={"tandem-spread-width-in"} disabled defaultValue={sampleTrailer.tandemSpreadWidth}/>
-               <input style={{gridColumn: 3}} type={"number"} id={"tandem-spread-width-ft"} name={"tandem-spread-width-ft"} step={0.5} min={3} max={12} defaultValue={toFeet(sampleTrailer.tandemSpreadWidth)} onChange={tandemSpreadWidthListener}/>
+               <input style={{gridColumn: 3}} type={"number"} id={"tandem-spread-width-ft"} name={"tandem-spread-width-ft"} step={0.5} min={3.5} max={12} defaultValue={toFeet(sampleTrailer.tandemSpreadWidth)} onChange={tandemSpreadWidthListener}/>
                <label style={{gridColumn: 1}} htmlFor={"tandem-center-distance-from-nose-in"}>{stateRestriction===null ? toTitleCase(unrestrictedReference.slice(2)) : toTitleCase(getStateTandemMeasurementReference(stateRestriction).slice(2))} Distance From Kingpin</label>
                <input style={{gridColumn: 2}} type={"number"} id={"tandem-center-distance-from-nose-in"} name={"tandem-center-distance-from-nose-in"} disabled defaultValue={tandemCenterDistanceFromNoseToStateRefDistance(sampleTrailer,stateRestriction)}/>
                <input style={{gridColumn: 3}} type={"number"} id={"tandem-center-distance-from-nose-ft"} name={"tandem-center-distance-from-nose-ft"} step={0.5} min={toFeet(tandemCenterDistanceFromNoseToStateRefDistance(minSlideTrailer,stateRestriction))} max={maxSlide} defaultValue={toFeet(tandemCenterDistanceFromNoseToStateRefDistance(sampleTrailer,stateRestriction))} onChange={tandemSliderListener}/>
@@ -381,6 +407,7 @@ function App() {
             </div>
             <div id={"editor-container"} style={{gridRow: 2, gridColumn: 3}}>
                <h3>Edit Pallet/Load</h3>
+               {loaded && <div>Order Weight: {Math.ceil(totalLoadWt(loaded,unloaded)).toLocaleString()}</div>}
                <div id={"selected-position-1"}>
                   {selectedPosition1 && <>
                      <h3>Selected Position 1</h3>
@@ -389,6 +416,9 @@ function App() {
                         setSampleTrailer(prev => rotatePosition(prev, selectedPosition1!.row, selectedPosition1!.side))
                         setSelectedPosition1(null)
                      }}>rotate</button>
+                     <button onClick={() => {
+                        setSelectedPosition1(null)
+                     }}>deselect</button>
                   </>}
                </div>
                <div id={"selected-position-2"}>
@@ -400,6 +430,9 @@ function App() {
                         setSampleTrailer(prev => rotatePosition(prev, selectedPosition2!.row, selectedPosition2!.side))
                         setSelectedPosition2(null)
                      }}>rotate</button>
+                     <button onClick={() => {
+                        setSelectedPosition2(null)
+                     }}>deselect</button>
                   </>}
                </div>
             </div>

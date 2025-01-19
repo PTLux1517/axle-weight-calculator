@@ -56,11 +56,16 @@ main {
    }
    #loaded-weight-container {
       position: relative;
-      font-size: 1.4em;
+      font-size: 1em;
       > div {
          position: absolute;
-         text-align: right;
-         right: 10px;
+         &:not(#combined-weight) {
+            text-align: right;
+            right: 10px;
+         }
+      }
+      #combined-weight {
+         text-align: left;
       }
    }
    #zoom-container {
@@ -76,6 +81,7 @@ main {
    }
    #load-diagram {
       border: 1px solid white;
+      margin-top: 40px !important;
    }
 }
 
