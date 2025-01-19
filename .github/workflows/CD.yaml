@@ -9,21 +9,6 @@ on:
       - '.gitignore'
 
 jobs:
-  cleanup:
-    runs-on: ubuntu-latest
-    permissions: write-all
-    steps:
-      - name: Delete gh-pages branch
-        uses: dawidd6/action-delete-branch@v3
-        with:
-          github_token: ${{ secrets.GH_PAGES_TOKEN }}
-          branches: gh-pages
-      - name: Delete previous deployment
-        uses: strumwolf/delete-deployment-environment@v2
-        with:
-          token: ${{ secrets.GH_PAGES_TOKEN }}
-          environment: github-pages
-          onlyRemoveDeployments: true
   deploy:
     needs: cleanup
     runs-on: ubuntu-latest
