@@ -114,19 +114,21 @@ function recalcDepths(trailer:Trailer&Load) {
    let prevWasSingle = false
    trailer.loadRows.forEach((row,i) => {
       if (row.hasOwnProperty(Side.L) && row.hasOwnProperty(Side.R)) {
+         const lastIterLDepth = lDepth
+         const lastIterRDepth = rDepth
          row = row as Double
          if (row.l___ !== null) {
             if (i === 0)
                row.l___.depth = 0
             else
-               row.l___.depth = prevWasSingle ? Math.max(lDepth,rDepth) : lDepth
+               row.l___.depth = prevWasSingle ? Math.max(lastIterLDepth,lastIterRDepth) : lDepth
             lDepth += row.l___.orien.L
          }
          if (row.___r !== null) {
             if (i === 0)
                row.___r.depth = 0
             else
-               row.___r.depth = prevWasSingle ? Math.max(lDepth,rDepth) : rDepth
+               row.___r.depth = prevWasSingle ? Math.max(lastIterLDepth,lastIterRDepth) : rDepth
             rDepth += row.___r.orien.L
          }
          prevWasSingle = false //must be last in condition block
