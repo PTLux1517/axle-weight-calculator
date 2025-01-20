@@ -34,6 +34,10 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
+      'no-unused-vars': [
+         'error',
+         { argsIgnorePattern: '^_' }
+      ]
     },
   },
 )

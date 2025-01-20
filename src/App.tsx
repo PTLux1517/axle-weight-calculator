@@ -450,7 +450,7 @@ function App() {
                                           return movedRow
                                        }
                                     })
-                                    .filter((row,idx) => idx!==i)
+                                    .filter((_,idx) => idx!==i)
                               }))
                               break;
                            }
