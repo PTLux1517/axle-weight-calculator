@@ -108,7 +108,7 @@ export function rotatePosition(prev:Trailer&Load, rowNum:number, side:Side):Trai
    return newTrailer
 }
 
-function recalcDepths(trailer:Trailer&Load) {
+export function recalcDepths(trailer:Trailer&Load) {
    let lDepth = 0
    let rDepth = 0
    let prevWasSingle = false

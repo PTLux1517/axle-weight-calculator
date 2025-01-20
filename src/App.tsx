@@ -4,7 +4,7 @@ import {AxleReferencePoint,AxleWeights,Double,Load,O,P,Position,PositionWithMeta
 import {
    calcAxleWeights,
    getStateTandemMaxLength,
-   getStateTandemMeasurementReference,
+   getStateTandemMeasurementReference,recalcDepths,
    rotatePosition,
    stateRefDistanceToAxleDistanceFromNose,
    tandemCenterDistanceFromNoseToStateRefDistance,
@@ -12,7 +12,7 @@ import {
    toInches,totalGrossWt,totalLoadWt,
    toTitleCase
 } from "./calculations.ts";
-import {maxLengthStraightTrailer,minSlideTrailer,minTandCenterSlideLengthFromNose} from "./sampleTrailers.ts";
+import {maxWeightCostcoTrailer,minSlideTrailer,minTandCenterSlideLengthFromNose} from "./sampleTrailers.ts";
 import {slideAxleRestrictedStates,SlideAxleRestrictionsDivider,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
 
 
@@ -184,7 +184,7 @@ function App() {
    const [selectedPosition1, setSelectedPosition1] = useState<PositionWithMeta|null>(null)
    const [selectedPosition2, setSelectedPosition2] = useState<PositionWithMeta|null>(null)
 
-   const defaultTrailer:Trailer&Load = maxLengthStraightTrailer
+   const defaultTrailer:Trailer&Load = maxWeightCostcoTrailer
    const defaultState:State = State.CA
    const defaultRearAxleType:RearAxleTypeCapacity = RearAxleTypeCapacity.Tandem
    const defaultUnloadedWeights:AxleWeights = {
@@ -336,7 +336,9 @@ function App() {
             {/* ----------------------------------------------------------------- COLUMN 1 ----------------------------------------------------------------- */}
             <div id={"unloaded-weight-container"} style={{gridRow: 1, gridColumn: 1}}>
                <h3>Unloaded Weight (lbs)</h3>
-               <button onClick={() => {
+               (section under development)
+               <hr/>
+               <button hidden onClick={() => {
                   setUnloaded(defaultUnloadedWeights)
                }}>reset</button>
                <div>Real World Examples:</div>
@@ -412,6 +414,7 @@ function App() {
             </div>
             <div id={"editor-container"} style={{gridRow: 2, gridColumn: 3}}>
                <h3>Edit Pallet/Load</h3>
+               (section under development)
                {loaded && <div>Order Weight: {Math.ceil(totalLoadWt(loaded,unloaded)).toLocaleString()}</div>}
                <div id={"selected-position-1"}>
                   {selectedPosition1 && <>
@@ -424,6 +427,54 @@ function App() {
                      <button onClick={() => {
                         setSelectedPosition1(null)
                      }}>deselect</button>
+                     <button onClick={() => {
+                        const i = selectedPosition1!.row - 1
+                        const side = selectedPosition1!.side
+                        switch (side) {
+                           case Side.C: {
+                              const deletedLength = (sampleTrailer.loadRows[i] as Single)._ctr_.orien.L
+                              setSampleTrailer(prev => ({
+                                 ...prev,
+                                 loadRows: prev.loadRows
+                                    .map((row,idx) => {
+                                       if (idx <= i) return row
+                                       else if (row.hasOwnProperty(Side.L) && row.hasOwnProperty(Side.R)) {
+                                          let movedRow = JSON.parse(JSON.stringify(row)) as Double
+                                          if (movedRow.l___!==null) movedRow.l___.depth -= deletedLength
+                                          if (movedRow.___r!==null) movedRow.___r.depth -= deletedLength
+                                          return movedRow
+                                       }
+                                       else {
+                                          let movedRow = JSON.parse(JSON.stringify(row)) as Single
+                                          movedRow._ctr_.depth -= deletedLength
+                                          return movedRow
+                                       }
+                                    })
+                                    .filter((row,idx) => idx!==i)
+                              }))
+                              break;
+                           }
+                           case Side.L: {
+                              (sampleTrailer.loadRows[i] as Double).l___ = null
+                              setSampleTrailer(prev => {
+                                 let after = JSON.parse(JSON.stringify(prev)) as Trailer&Load
+                                 recalcDepths(after)
+                                 return after
+                              })
+                              break;
+                           }
+                           case Side.R: {
+                              (sampleTrailer.loadRows[i] as Double).___r = null
+                              setSampleTrailer(prev => {
+                                 let after = JSON.parse(JSON.stringify(prev)) as Trailer&Load
+                                 recalcDepths(after)
+                                 return after
+                              })
+                              break;
+                           }
+                        }
+                        setSelectedPosition1(null)
+                     }}>delete</button>
                   </>}
                </div>
                <div id={"selected-position-2"}>
