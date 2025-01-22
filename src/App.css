@@ -85,6 +85,21 @@ main {
       border: 1px solid white;
       margin-top: 40px !important;
    }
+   #add-pallet-buttons-container {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      grid-gap: 5px;
+   }
+   #staged-pallets-container {
+      #pallet-pool{
+         display: flex;
+      }
+   }
+}
+
+header {
+   min-width: 1272px;
+   width: 85vw;
 }
 
 hr {

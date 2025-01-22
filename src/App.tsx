@@ -2,14 +2,18 @@ import {ChangeEvent,MouseEvent,useEffect,useState} from 'react'
 import './App.css'
 import {AxleReferencePoint,AxleWeights,Double,Load,O,P,Position,PositionWithMeta,RearAxleTypeCapacity,Side,Single,State,Trailer} from './types.ts'
 import {
-   calcAxleWeights,deletePosition,
+   calcAxleWeights,
+   deletePosition,
    getStateTandemMaxLength,
-   getStateTandemMeasurementReference,recalcDepths,
+   getStateTandemMeasurementReference,
    rotatePosition,
-   stateRefDistanceToAxleDistanceFromNose,swapPositions,
+   stateRefDistanceToAxleDistanceFromNose,
+   swapPositions,
    tandemCenterDistanceFromNoseToStateRefDistance,
    toFeet,
-   toInches,totalGrossWt,totalLoadWt,
+   toInches,
+   totalGrossWt,
+   totalLoadWt,
    toTitleCase
 } from "./calculations.ts";
 import {maxWeightCostcoTrailer,minSlideTrailer,minTandCenterSlideLengthFromNose} from "./sampleTrailers.ts";
@@ -183,6 +187,8 @@ function App() {
    const [zoom,setZoom] = useState(defaultZoom)
    const [selectedPosition1, setSelectedPosition1] = useState<PositionWithMeta|null>(null)
    const [selectedPosition2, setSelectedPosition2] = useState<PositionWithMeta|null>(null)
+   const selectionColor1 = "darkgoldenrod"
+   const selectionColor2 = "darkcyan"
 
    const defaultTrailer:Trailer&Load = maxWeightCostcoTrailer
    const defaultState:State = State.CA
@@ -236,6 +242,8 @@ function App() {
                const length = zoom * (l.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
                /* draw pallet */
                ctx.fillStyle = l.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
+               if (i+1===selectedPosition1?.row && selectedPosition1.side===Side.L) ctx.fillStyle = selectionColor1
+               if (i+1===selectedPosition2?.row && selectedPosition2.side===Side.L) ctx.fillStyle = selectionColor2
                ctx.beginPath()
                ctx.rect(0,depth,width,length)
                ctx.fill()
@@ -261,6 +269,8 @@ function App() {
                const length = zoom * (r.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
                /* draw pallet */
                ctx.fillStyle = r.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
+               if (i+1===selectedPosition1?.row && selectedPosition1.side===Side.R) ctx.fillStyle = selectionColor1
+               if (i+1===selectedPosition2?.row && selectedPosition2.side===Side.R) ctx.fillStyle = selectionColor2
                ctx.beginPath()
                ctx.rect(zoom*toInches(8)-width,depth,width,length)
                ctx.fill()
@@ -288,6 +298,8 @@ function App() {
             const length = zoom * (c.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
             /* draw pallet */
             ctx.fillStyle = c.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
+            if (i+1===selectedPosition1?.row && selectedPosition1.side===Side.C) ctx.fillStyle = selectionColor1
+            if (i+1===selectedPosition2?.row && selectedPosition2.side===Side.C) ctx.fillStyle = selectionColor2
             ctx.beginPath()
             ctx.rect(zoom*toInches(4) - width/2,depth,width,length)
             ctx.fill()
@@ -327,11 +339,11 @@ function App() {
       ctx.strokeRect(zoom*39,frontTandAxleRenderPos-(axleThickness/2),axleWidth,axleThickness)
       ctx.strokeRect(zoom*39,rearTandAxleRenderPos-(axleThickness/2),axleWidth,axleThickness)
 
-   }, [zoom, sampleTrailer])
+   }, [zoom, sampleTrailer, selectedPosition1, selectedPosition2])
 
    return (
       <>
-         <h1>Axle Weight Calculator</h1>
+         <header><h1>Axle Weight Calculator</h1></header>
          <main>
             {/* ----------------------------------------------------------------- COLUMN 1 ----------------------------------------------------------------- */}
             <div id={"unloaded-weight-container"} style={{gridRow: 1, gridColumn: 1}}>
@@ -354,8 +366,15 @@ function App() {
                   {Math.ceil(loaded ? loaded.fTandem : unloaded.fTandem).toLocaleString()} / {rearAxleTypeCapacity.toLocaleString()}</div>
                <div id={"rear-tandem-weight"} style={{top: rearTandAxleRenderPos + 8 + (6/zoom), color: (loaded?.rTandem > rearAxleTypeCapacity ? "red": "")}}>Trailer axle:<br/>
                   {Math.ceil(loaded ? loaded.rTandem : unloaded.rTandem).toLocaleString()} / {rearAxleTypeCapacity.toLocaleString()}</div>
-               <div id={"combined-weight"} style={{top: zoom*sampleTrailer.interiorLength - 10, color: (totalGrossWt(loaded) > 80000 ? "red" : "")}}>Combined:<br/>
+               <div id={"combined-weight"} style={{top: zoom*sampleTrailer.interiorLength - 10, color: (totalGrossWt(loaded ?? unloaded) > 80000 ? "red" : "")}}>Combined:<br/>
                   {Math.ceil(loaded ? totalGrossWt(loaded) : totalGrossWt(unloaded)).toLocaleString()} / {Number(80000).toLocaleString()}</div>
+            </div>
+            <div style={{gridRow: 4, gridColumn: "1/4"}} id={"staged-pallets-container"}>
+               <h3>Staged Pallets</h3>
+               <div style={{color: "orange"}}>(section under development)</div><hr/>
+               <div id={"pallet-pool"}>
+
+               </div>
             </div>
             {/* ----------------------------------------------------------------- COLUMN 2 ----------------------------------------------------------------- */}
             <div id={"zoom-container"} style={{gridRow: 1, gridColumn: 2}}>
@@ -381,13 +400,21 @@ function App() {
                <button onClick={() => {
                   setZoom(defaultZoom);
                   setZoomSlider(defaultZoom);
-               }}>reset</button>
+               }}>reset zoom</button>
             </div>
             <canvas id={"load-diagram"} className={"no-border"} width={toInches(8)*zoom} height={sampleTrailer.interiorLength*zoom} style={{margin: "0 calc(50% - "+(toInches(4)*zoom)+"px)", gridRow: 2, gridColumn: 2}} onMouseUp={canvasClickListener}/>
+            <div style={{gridRow: 3, gridColumn: 2}} id={"add-pallet-buttons-container"}>
+               <button>load straight left</button>
+               <button>load straight center</button>
+               <button>load straight right</button>
+               <button>load sideways left</button>
+               <button>load sideways center</button>
+               <button>load sideways right</button>
+            </div>
             {/* ----------------------------------------------------------------- COLUMN 3 ----------------------------------------------------------------- */}
             <div id={"trailer-dimensions-container"} style={{gridRow: 1, gridColumn: 3}}>
                <h3 style={{gridColumn: "1/4"}}>Trailer Dimensions</h3>
-               <button onClick={resetTrailerDimensionsListener}>reset</button>
+               <button onClick={resetTrailerDimensionsListener}>reset trailer</button>
                <div style={{gridColumn: 2}}>in</div>
                <div style={{gridColumn: 3}}>ft</div>
                <label style={{gridColumn: 1}} className={"divided"} htmlFor={"interior-length-in"}>Interior Length</label>
@@ -415,7 +442,7 @@ function App() {
                <h3>Edit Pallet/Load</h3>
                <div style={{color: "orange"}}>(section under development)</div><hr/>
                {loaded && <div style={{marginBottom: "40px"}}>Order Weight: {Math.ceil(totalLoadWt(loaded,unloaded)).toLocaleString()}</div>}
-               {!selectedPosition1 && <div style={{marginTop: "40px"}}>click on a pallet in the diagram to edit</div>}
+               {!selectedPosition1 && <div style={{marginTop: "40px", color: "hsl(0,0%,25%)"}}>click on a pallet in the diagram to edit</div>}
                {selectedPosition1 && selectedPosition2 && <>
                   <button onClick={() => {setSampleTrailer(prev => swapPositions(selectedPosition1!.row, selectedPosition1!.side, selectedPosition2!.row, selectedPosition2!.side, prev)); setSelectedPosition1(null); setSelectedPosition2(null);}}>swap selected</button>
                   <button onClick={() => {setSelectedPosition1(null); setSelectedPosition2(null);}}>deselect all</button>
@@ -423,7 +450,7 @@ function App() {
                <div id={"selected-position-1"}>
                   {selectedPosition1 && <>
                      <h3>Selected Position 1</h3>
-                     <div style={{whiteSpace: "pre", textAlign: "left", fontSize: "smaller"}}>{JSON.stringify(selectedPosition1,null,2)}</div>
+                     <div style={{whiteSpace: "pre", textAlign: "left", fontSize: "smaller", color: selectionColor1}}>{JSON.stringify(selectedPosition1,null,2)}</div>
                      <button onClick={() => {
                         setSampleTrailer(prev => rotatePosition(prev, selectedPosition1!.row, selectedPosition1!.side))
                         setSelectedPosition1(null)
@@ -441,7 +468,7 @@ function App() {
                   {selectedPosition2 && <>
                      <hr/>
                      <h3>Selected Position 2</h3>
-                     <div style={{whiteSpace: "pre", textAlign: "left", fontSize: "smaller"}}>{JSON.stringify(selectedPosition2,null,2)}</div>
+                     <div style={{whiteSpace: "pre", textAlign: "left", fontSize: "smaller", color: selectionColor2}}>{JSON.stringify(selectedPosition2,null,2)}</div>
                      <button onClick={() => {
                         setSampleTrailer(prev => rotatePosition(prev, selectedPosition2!.row, selectedPosition2!.side))
                         setSelectedPosition2(null)
