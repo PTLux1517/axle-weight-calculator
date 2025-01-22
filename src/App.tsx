@@ -2,7 +2,7 @@ import {ChangeEvent,MouseEvent,useEffect,useState} from 'react'
 import './App.css'
 import {AxleReferencePoint,AxleWeights,Double,Load,O,P,Position,PositionWithMeta,RearAxleTypeCapacity,Side,Single,State,Trailer} from './types.ts'
 import {
-   calcAxleWeights,
+   calcAxleWeights,deletePosition,
    getStateTandemMaxLength,
    getStateTandemMeasurementReference,recalcDepths,
    rotatePosition,
@@ -427,52 +427,8 @@ function App() {
                      <button onClick={() => {
                         setSelectedPosition1(null)
                      }}>deselect</button>
-                     <button onClick={() => {
-                        const i = selectedPosition1!.row - 1
-                        const side = selectedPosition1!.side
-                        switch (side) {
-                           case Side.C: {
-                              const deletedLength = (sampleTrailer.loadRows[i] as Single)._ctr_.orien.L
-                              setSampleTrailer(prev => ({
-                                 ...prev,
-                                 loadRows: prev.loadRows
-                                    .map((row,idx) => {
-                                       if (idx <= i) return row
-                                       else if (row.hasOwnProperty(Side.L) && row.hasOwnProperty(Side.R)) {
-                                          let movedRow = JSON.parse(JSON.stringify(row)) as Double
-                                          if (movedRow.l___!==null) movedRow.l___.depth -= deletedLength
-                                          if (movedRow.___r!==null) movedRow.___r.depth -= deletedLength
-                                          return movedRow
-                                       }
-                                       else {
-                                          let movedRow = JSON.parse(JSON.stringify(row)) as Single
-                                          movedRow._ctr_.depth -= deletedLength
-                                          return movedRow
-                                       }
-                                    })
-                                    .filter((_,idx) => idx!==i)
-                              }))
-                              break;
-                           }
-                           case Side.L: {
-                              (sampleTrailer.loadRows[i] as Double).l___ = null
-                              setSampleTrailer(prev => {
-                                 let after = JSON.parse(JSON.stringify(prev)) as Trailer&Load
-                                 recalcDepths(after)
-                                 return after
-                              })
-                              break;
-                           }
-                           case Side.R: {
-                              (sampleTrailer.loadRows[i] as Double).___r = null
-                              setSampleTrailer(prev => {
-                                 let after = JSON.parse(JSON.stringify(prev)) as Trailer&Load
-                                 recalcDepths(after)
-                                 return after
-                              })
-                              break;
-                           }
-                        }
+                     <button style={{backgroundColor: "red"}} onClick={() => {
+                        setSampleTrailer(prev => deletePosition(selectedPosition1!.row, selectedPosition1!.side, prev))
                         setSelectedPosition1(null)
                      }}>delete</button>
                   </>}

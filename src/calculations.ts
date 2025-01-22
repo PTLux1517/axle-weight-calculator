@@ -2,8 +2,8 @@ import {
    AxleReferencePoint,AxleWeights,
    Double,
    Load,
-   O,
-   RearAxleTypeCapacity,
+   O,Position,
+   RearAxleTypeCapacity,Row,
    Side,
    Single,
    SlideAxleNoRestrictionMaxLength,
@@ -106,6 +106,63 @@ export function rotatePosition(prev:Trailer&Load, rowNum:number, side:Side):Trai
    }
    recalcDepths(newTrailer)
    return newTrailer
+}
+
+function convertDoubleToSingle(rowNum:number, trailer:Trailer&Load) {
+   const rowToConvert = trailer.loadRows[rowNum-1]
+   if (!(rowToConvert.hasOwnProperty(Side.L) && rowToConvert.hasOwnProperty(Side.R))) return
+   const double:Double = rowToConvert as Double
+   const data:Position = double.l___!==null
+      ? double.l___
+      : double.___r!==null
+         ? double.___r
+         : {depth: 0, orien: O.Straight, stack: []}
+   trailer.loadRows[rowNum-1] = { _ctr_: data }
+}
+
+export function deletePosition(rowNum:number, side:Side, trailer:Trailer&Load):Trailer&Load {
+   let returnTrailer:Trailer&Load;
+   const i = rowNum - 1
+   switch (side) {
+      case Side.C: {
+         const deletedLength = (trailer.loadRows[i] as Single)._ctr_.orien.L
+         returnTrailer = {
+            ...trailer,
+            loadRows: trailer.loadRows
+               .map((row,idx) => {
+                  if (idx<=i) return row
+                  else if (row.hasOwnProperty(Side.L) && row.hasOwnProperty(Side.R)) {
+                     let movedRow = JSON.parse(JSON.stringify(row)) as Double
+                     if (movedRow.l___!==null) movedRow.l___.depth -= deletedLength
+                     if (movedRow.___r!==null) movedRow.___r.depth -= deletedLength
+                     return movedRow
+                  }
+                  else {
+                     let movedRow = JSON.parse(JSON.stringify(row)) as Single
+                     movedRow._ctr_.depth -= deletedLength
+                     return movedRow
+                  }
+               })
+               .filter((_,idx) => idx!==i)
+         }
+         break;
+      }
+      case Side.L: {
+         let after = JSON.parse(JSON.stringify(trailer)) as Trailer&Load
+         (after.loadRows[i] as Double).l___ = null
+         convertDoubleToSingle(rowNum, after)
+         returnTrailer = after
+         break;
+      }
+      case Side.R: {
+         let after = JSON.parse(JSON.stringify(trailer)) as Trailer&Load
+         (after.loadRows[i] as Double).___r = null
+         convertDoubleToSingle(rowNum, after)
+         returnTrailer = after
+         break;
+      }
+   }
+   return returnTrailer
 }
 
 export function recalcDepths(trailer:Trailer&Load) {
