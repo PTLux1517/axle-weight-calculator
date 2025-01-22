@@ -360,11 +360,11 @@ function App() {
             </div>
             <div id={"loaded-weight-container"} style={{gridRow: 2, gridColumn: 1}}>
                <h3>Loaded Weight (lbs)</h3>
-               <div id={"drive-weight"} style={{top: zoom*sampleTrailer.kingpinDistanceFromNose + 15, color: (loaded?.drives > 34000 ? "red" : "")}}>Drive axles:<br/>
+               <div id={"drive-weight"} style={{top: zoom*sampleTrailer.kingpinDistanceFromNose + 15, color: (loaded && loaded.drives > 34000 ? "red" : "")}}>Drive axles:<br/>
                   {Math.ceil(loaded ? loaded.drives : unloaded.drives).toLocaleString()} / {Number(34000).toLocaleString()}</div>
-               <div id={"front-tandem-weight"} style={{top: frontTandAxleRenderPos + 8 - (6/zoom), color: (loaded?.fTandem > rearAxleTypeCapacity ? "red": "")}}>Trailer axle:<br/>
+               <div id={"front-tandem-weight"} style={{top: frontTandAxleRenderPos + 8 - (6/zoom), color: (loaded && loaded.fTandem > rearAxleTypeCapacity ? "red": "")}}>Trailer axle:<br/>
                   {Math.ceil(loaded ? loaded.fTandem : unloaded.fTandem).toLocaleString()} / {rearAxleTypeCapacity.toLocaleString()}</div>
-               <div id={"rear-tandem-weight"} style={{top: rearTandAxleRenderPos + 8 + (6/zoom), color: (loaded?.rTandem > rearAxleTypeCapacity ? "red": "")}}>Trailer axle:<br/>
+               <div id={"rear-tandem-weight"} style={{top: rearTandAxleRenderPos + 8 + (6/zoom), color: (loaded && loaded.rTandem > rearAxleTypeCapacity ? "red": "")}}>Trailer axle:<br/>
                   {Math.ceil(loaded ? loaded.rTandem : unloaded.rTandem).toLocaleString()} / {rearAxleTypeCapacity.toLocaleString()}</div>
                <div id={"combined-weight"} style={{top: zoom*sampleTrailer.interiorLength - 10, color: (totalGrossWt(loaded ?? unloaded) > 80000 ? "red" : "")}}>Combined:<br/>
                   {Math.ceil(loaded ? totalGrossWt(loaded) : totalGrossWt(unloaded)).toLocaleString()} / {Number(80000).toLocaleString()}</div>
