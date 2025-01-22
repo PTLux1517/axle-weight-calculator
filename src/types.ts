@@ -133,3 +133,5 @@ export enum RearAxleTypeCapacity {
    Tandem = 17000,
    Spread = 20000,
 }
+
+export const placeholderPosition = {depth: 0, orien: O.Straight, stack: []} as Position

@@ -2,7 +2,7 @@ import {
    AxleReferencePoint,AxleWeights,
    Double,
    Load,
-   O,Position,
+   O,placeholderPosition,Position,
    RearAxleTypeCapacity,Row,
    Side,
    Single,
@@ -14,6 +14,10 @@ import {
 } from "./types.ts";
 import {slideAxleRestrictedStates,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
 
+
+export function deepCopy<T>(original:T):T {
+   return JSON.parse(JSON.stringify(original)) as T
+}
 
 export function toInches(feet:number):number {
    return 12*feet;
@@ -73,7 +77,7 @@ export function stateRefDistanceToAxleDistanceFromNose(axle:"F"|"R", trailer:Tra
 }
 
 export function rotatePosition(prev:Trailer&Load, rowNum:number, side:Side):Trailer&Load {
-   let newTrailer:Trailer&Load = JSON.parse(JSON.stringify(prev)) //deep copy
+   let newTrailer:Trailer&Load = deepCopy(prev)
    const i = rowNum - 1
    switch (side) {
       case Side.L: {
@@ -116,7 +120,7 @@ function convertDoubleToSingle(rowNum:number, trailer:Trailer&Load) {
       ? double.l___
       : double.___r!==null
          ? double.___r
-         : {depth: 0, orien: O.Straight, stack: []}
+         : placeholderPosition
    trailer.loadRows[rowNum-1] = { _ctr_: data }
 }
 
@@ -132,13 +136,13 @@ export function deletePosition(rowNum:number, side:Side, trailer:Trailer&Load):T
                .map((row,idx) => {
                   if (idx<=i) return row
                   else if (row.hasOwnProperty(Side.L) && row.hasOwnProperty(Side.R)) {
-                     let movedRow = JSON.parse(JSON.stringify(row)) as Double
+                     let movedRow = deepCopy(row) as Double
                      if (movedRow.l___!==null) movedRow.l___.depth -= deletedLength
                      if (movedRow.___r!==null) movedRow.___r.depth -= deletedLength
                      return movedRow
                   }
                   else {
-                     let movedRow = JSON.parse(JSON.stringify(row)) as Single
+                     let movedRow = deepCopy(row) as Single
                      movedRow._ctr_.depth -= deletedLength
                      return movedRow
                   }
@@ -148,19 +152,46 @@ export function deletePosition(rowNum:number, side:Side, trailer:Trailer&Load):T
          break;
       }
       case Side.L: {
-         let after = JSON.parse(JSON.stringify(trailer)) as Trailer&Load
+         let after = deepCopy(trailer);
          (after.loadRows[i] as Double).l___ = null
          convertDoubleToSingle(rowNum, after)
          returnTrailer = after
          break;
       }
       case Side.R: {
-         let after = JSON.parse(JSON.stringify(trailer)) as Trailer&Load
+         let after = deepCopy(trailer);
          (after.loadRows[i] as Double).___r = null
          convertDoubleToSingle(rowNum, after)
          returnTrailer = after
          break;
       }
+   }
+   return returnTrailer
+}
+
+export function swapPositions(rowNum1:number, side1:Side, rowNum2:number, side2:Side, trailer:Trailer&Load):Trailer&Load {
+   let returnTrailer:Trailer&Load = deepCopy(trailer)
+   let pos1Data:Position
+   let pos2Data:Position
+   switch (side1) {
+      case Side.C: pos1Data = (trailer.loadRows[rowNum1-1] as Single)._ctr_; break;
+      case Side.L: pos1Data = (trailer.loadRows[rowNum1-1] as Double).l___ ?? placeholderPosition; break;
+      case Side.R: pos1Data = (trailer.loadRows[rowNum1-1] as Double).___r ?? placeholderPosition; break;
+   }
+   switch (side2) {
+      case Side.C: pos2Data = (trailer.loadRows[rowNum2-1] as Single)._ctr_; break;
+      case Side.L: pos2Data = (trailer.loadRows[rowNum2-1] as Double).l___ ?? placeholderPosition; break;
+      case Side.R: pos2Data = (trailer.loadRows[rowNum2-1] as Double).___r ?? placeholderPosition; break;
+   }
+   switch (side1) {
+      case Side.C: (returnTrailer.loadRows[rowNum1-1] as Single)._ctr_.stack = deepCopy(pos2Data.stack); break;
+      case Side.L: (returnTrailer.loadRows[rowNum1-1] as Double).l___!.stack = deepCopy(pos2Data.stack); break;
+      case Side.R: (returnTrailer.loadRows[rowNum1-1] as Double).___r!.stack = deepCopy(pos2Data.stack); break;
+   }
+   switch (side2) {
+      case Side.C: (returnTrailer.loadRows[rowNum2-1] as Single)._ctr_.stack = deepCopy(pos1Data.stack); break;
+      case Side.L: (returnTrailer.loadRows[rowNum2-1] as Double).l___!.stack = deepCopy(pos1Data.stack); break;
+      case Side.R: (returnTrailer.loadRows[rowNum2-1] as Double).___r!.stack = deepCopy(pos1Data.stack); break;
    }
    return returnTrailer
 }
@@ -248,6 +279,20 @@ export function calcAxleWeights(trailer:Trailer&Load, unloaded:AxleWeights, rear
          }
          else if (rearAxleType===RearAxleTypeCapacity.Spread) {
             console.log(COM2FT)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             console.log(COM2RT)
          }
       })

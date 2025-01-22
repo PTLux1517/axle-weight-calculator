@@ -6,7 +6,7 @@ import {
    getStateTandemMaxLength,
    getStateTandemMeasurementReference,recalcDepths,
    rotatePosition,
-   stateRefDistanceToAxleDistanceFromNose,
+   stateRefDistanceToAxleDistanceFromNose,swapPositions,
    tandemCenterDistanceFromNoseToStateRefDistance,
    toFeet,
    toInches,totalGrossWt,totalLoadWt,
@@ -416,6 +416,10 @@ function App() {
                <h3>Edit Pallet/Load</h3>
                (section under development)
                {loaded && <div>Order Weight: {Math.ceil(totalLoadWt(loaded,unloaded)).toLocaleString()}</div>}
+               {selectedPosition1 && selectedPosition2 && <>
+                  <button onClick={() => {setSampleTrailer(prev => swapPositions(selectedPosition1!.row, selectedPosition1!.side, selectedPosition2!.row, selectedPosition2!.side, prev)); setSelectedPosition1(null); setSelectedPosition2(null);}}>swap selected</button>
+                  <button onClick={() => {setSelectedPosition1(null); setSelectedPosition2(null);}}>deselect all</button>
+               </>}
                <div id={"selected-position-1"}>
                   {selectedPosition1 && <>
                      <h3>Selected Position 1</h3>
