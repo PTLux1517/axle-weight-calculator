@@ -336,8 +336,7 @@ function App() {
             {/* ----------------------------------------------------------------- COLUMN 1 ----------------------------------------------------------------- */}
             <div id={"unloaded-weight-container"} style={{gridRow: 1, gridColumn: 1}}>
                <h3>Unloaded Weight (lbs)</h3>
-               (section under development)
-               <hr/>
+               <div style={{color: "orange"}}>(section under development)</div><hr/>
                <button hidden onClick={() => {
                   setUnloaded(defaultUnloadedWeights)
                }}>reset</button>
@@ -349,13 +348,13 @@ function App() {
             </div>
             <div id={"loaded-weight-container"} style={{gridRow: 2, gridColumn: 1}}>
                <h3>Loaded Weight (lbs)</h3>
-               <div id={"drive-weight"} style={{top: zoom*sampleTrailer.kingpinDistanceFromNose + 15}}>Drive axles:<br/>
+               <div id={"drive-weight"} style={{top: zoom*sampleTrailer.kingpinDistanceFromNose + 15, color: (loaded?.drives > 34000 ? "red" : "")}}>Drive axles:<br/>
                   {Math.ceil(loaded ? loaded.drives : unloaded.drives).toLocaleString()} / {Number(34000).toLocaleString()}</div>
-               <div id={"front-tandem-weight"} style={{top: frontTandAxleRenderPos + 8 - (6/zoom)}}>Trailer axle:<br/>
+               <div id={"front-tandem-weight"} style={{top: frontTandAxleRenderPos + 8 - (6/zoom), color: (loaded?.fTandem > rearAxleTypeCapacity ? "red": "")}}>Trailer axle:<br/>
                   {Math.ceil(loaded ? loaded.fTandem : unloaded.fTandem).toLocaleString()} / {rearAxleTypeCapacity.toLocaleString()}</div>
-               <div id={"rear-tandem-weight"} style={{top: rearTandAxleRenderPos + 8 + (6/zoom)}}>Trailer axle:<br/>
+               <div id={"rear-tandem-weight"} style={{top: rearTandAxleRenderPos + 8 + (6/zoom), color: (loaded?.rTandem > rearAxleTypeCapacity ? "red": "")}}>Trailer axle:<br/>
                   {Math.ceil(loaded ? loaded.rTandem : unloaded.rTandem).toLocaleString()} / {rearAxleTypeCapacity.toLocaleString()}</div>
-               <div id={"combined-weight"} style={{top: zoom*sampleTrailer.interiorLength - 10}}>Combined:<br/>
+               <div id={"combined-weight"} style={{top: zoom*sampleTrailer.interiorLength - 10, color: (totalGrossWt(loaded) > 80000 ? "red" : "")}}>Combined:<br/>
                   {Math.ceil(loaded ? totalGrossWt(loaded) : totalGrossWt(unloaded)).toLocaleString()} / {Number(80000).toLocaleString()}</div>
             </div>
             {/* ----------------------------------------------------------------- COLUMN 2 ----------------------------------------------------------------- */}
@@ -414,8 +413,9 @@ function App() {
             </div>
             <div id={"editor-container"} style={{gridRow: 2, gridColumn: 3}}>
                <h3>Edit Pallet/Load</h3>
-               (section under development)
-               {loaded && <div>Order Weight: {Math.ceil(totalLoadWt(loaded,unloaded)).toLocaleString()}</div>}
+               <div style={{color: "orange"}}>(section under development)</div><hr/>
+               {loaded && <div style={{marginBottom: "40px"}}>Order Weight: {Math.ceil(totalLoadWt(loaded,unloaded)).toLocaleString()}</div>}
+               {!selectedPosition1 && <div style={{marginTop: "40px"}}>click on a pallet in the diagram to edit</div>}
                {selectedPosition1 && selectedPosition2 && <>
                   <button onClick={() => {setSampleTrailer(prev => swapPositions(selectedPosition1!.row, selectedPosition1!.side, selectedPosition2!.row, selectedPosition2!.side, prev)); setSelectedPosition1(null); setSelectedPosition2(null);}}>swap selected</button>
                   <button onClick={() => {setSelectedPosition1(null); setSelectedPosition2(null);}}>deselect all</button>

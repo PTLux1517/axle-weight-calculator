@@ -237,6 +237,7 @@ export function recalcDepths(trailer:Trailer&Load) {
 
 export function calcAxleWeights(trailer:Trailer&Load, unloaded:AxleWeights, rearAxleType:RearAxleTypeCapacity):AxleWeights {
    let loaded:AxleWeights = {...unloaded}
+   let showAlert = false
    trailer.loadRows.forEach(row => {
       Object.values(row).forEach(pos => {
          if (pos===null) return;
@@ -278,25 +279,13 @@ export function calcAxleWeights(trailer:Trailer&Load, unloaded:AxleWeights, rear
             }
          }
          else if (rearAxleType===RearAxleTypeCapacity.Spread) {
+            showAlert = true
             console.log(COM2FT)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             console.log(COM2RT)
          }
       })
    })
+   if (showAlert) alert("spread axle weight calculation not implemented yet")
    return loaded
 }
 
