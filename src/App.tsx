@@ -26,6 +26,24 @@ function App() {
       (document.getElementById("zoom-slider") as HTMLInputElement).value = String(newZoom);
    }
 
+   function resetUnloadedWeightsListener() {
+      setUnloaded(defaultUnloadedWeights);
+      (document.getElementById("steers-wt-unloaded") as HTMLInputElement).value = String(defaultUnloadedWeights.steers);
+      (document.getElementById("drives-wt-unloaded") as HTMLInputElement).value = String(defaultUnloadedWeights.drives);
+      (document.getElementById("fTandem-wt-unloaded") as HTMLInputElement).value = String(defaultUnloadedWeights.fTandem);
+      (document.getElementById("rTandem-wt-unloaded") as HTMLInputElement).value = String(defaultUnloadedWeights.rTandem);
+   }
+
+   function unloadedAxleWeightListener(e:ChangeEvent<HTMLInputElement>, axle:"steers"|"drives"|"front_tandem"|"rear_tandem") {
+      const newAxleWt = Number(e.target?.value)
+      setUnloaded((prev:AxleWeights) => (() => {switch (axle) {
+         case "steers": return {...prev, steers: newAxleWt};
+         case "drives": return {...prev, drives: newAxleWt};
+         case "front_tandem": return {...prev, fTandem: newAxleWt};
+         case "rear_tandem": return {...prev, rTandem: newAxleWt};
+      }})())
+   }
+
    function resetTrailerDimensionsListener() {
       setSampleTrailer(defaultTrailer);
       setStateRestriction(defaultState);
@@ -208,7 +226,7 @@ function App() {
 
    useEffect(() => {
       setLoaded(calcAxleWeights(sampleTrailer,unloaded,rearAxleTypeCapacity))
-   },[sampleTrailer]);
+   },[sampleTrailer, unloaded]);
 
    const frontTandAxleRenderPos = zoom * (sampleTrailer.tandemCenterDistanceFromNose - sampleTrailer.tandemSpreadWidth/2)
    const rearTandAxleRenderPos = zoom * (sampleTrailer.tandemCenterDistanceFromNose + sampleTrailer.tandemSpreadWidth/2)
@@ -347,16 +365,23 @@ function App() {
          <main>
             {/* ----------------------------------------------------------------- COLUMN 1 ----------------------------------------------------------------- */}
             <div id={"unloaded-weight-container"} style={{gridRow: 1, gridColumn: 1}}>
-               <h3>Unloaded Weight (lbs)</h3>
-               <div style={{color: "orange"}}>(section under development)</div><hr/>
-               <button hidden onClick={() => {
-                  setUnloaded(defaultUnloadedWeights)
-               }}>reset</button>
-               <div>Real World Examples:</div>
-               <ul>
-                  <li><a href={"https://www.thetruckersreport.com/truckingindustryforum/attachments/b9a6ca71-b803-4b06-8dd5-b43491aeb7ee-jpeg.389972/"} target={"_blank"}>unloaded weigh ticket</a></li>
-                  <li><a href={"https://www.reddit.com/r/Truckers/comments/oipyl5/what_are_the_average_axle_weights_of_an_empty/"} target={"_blank"}>discussion forum</a></li>
-               </ul>
+               <h3 style={{gridColumn: "1/3"}}>Unloaded Weight</h3>
+               <button style={{gridColumn: 1}} onClick={resetUnloadedWeightsListener}>reset weights</button>
+               <div style={{gridColumn: 2}}>lbs</div>
+               <label style={{gridColumn: 1}} className={"divided"} htmlFor={"steers-wt-unloaded"}>Steers</label>
+               <input style={{gridColumn: 2}} type={"number"} id={"steers-wt-unloaded"} name={"steers-wt-unloaded"} min={100} max={12000} step={20} defaultValue={unloaded.steers} onChange={e => unloadedAxleWeightListener(e,"steers")}/>
+               <label style={{gridColumn: 1}} className={"divided"} htmlFor={"drives-wt-unloaded"}>Drives</label>
+               <input style={{gridColumn: 2}} type={"number"} id={"drives-wt-unloaded"} name={"drives-wt-unloaded"} min={100} max={34000} step={20} defaultValue={unloaded.drives} onChange={e => unloadedAxleWeightListener(e,"drives")}/>
+               <label style={{gridColumn: 1}} className={"divided"} htmlFor={"fTandem-wt-unloaded"}>Front Tandem</label>
+               <input style={{gridColumn: 2}} type={"number"} id={"fTandem-wt-unloaded"} name={"fTandem-wt-unloaded"} min={100} max={rearAxleTypeCapacity} step={20} defaultValue={unloaded.fTandem} onChange={e => unloadedAxleWeightListener(e,"front_tandem")}/>
+               <label style={{gridColumn: 1}} htmlFor={"rTandem-wt-unloaded"}>Rear Tandem</label>
+               <input style={{gridColumn: 2}} type={"number"} id={"rTandem-wt-unloaded"} name={"rTandem-wt-unloaded"}  min={100} max={rearAxleTypeCapacity} step={20} defaultValue={unloaded.rTandem} onChange={e => unloadedAxleWeightListener(e,"rear_tandem")}/>
+               <div style={{gridColumn: "1/3", marginTop: "20px"}} id={"examples"}>Real World Examples:
+                  <ul>
+                     <li><a href={"https://www.thetruckersreport.com/truckingindustryforum/attachments/b9a6ca71-b803-4b06-8dd5-b43491aeb7ee-jpeg.389972/"} target={"_blank"}>unloaded weigh ticket</a></li>
+                     <li><a href={"https://www.reddit.com/r/Truckers/comments/oipyl5/what_are_the_average_axle_weights_of_an_empty/"} target={"_blank"}>discussion forum</a></li>
+                  </ul>
+               </div>
             </div>
             <div id={"loaded-weight-container"} style={{gridRow: 2, gridColumn: 1}}>
                <h3>Loaded Weight (lbs)</h3>
@@ -371,7 +396,7 @@ function App() {
             </div>
             <div style={{gridRow: 4, gridColumn: "1/4"}} id={"staged-pallets-container"}>
                <h3>Staged Pallets</h3>
-               <div style={{color: "orange"}}>(section under development)</div><hr/>
+               <div style={{color: "orange"}}>(section under development)<hr/></div>
                <div id={"pallet-pool"}>
 
                </div>
@@ -440,7 +465,7 @@ function App() {
             </div>
             <div id={"editor-container"} style={{gridRow: 2, gridColumn: 3}}>
                <h3>Edit Pallet/Load</h3>
-               <div style={{color: "orange"}}>(section under development)</div><hr/>
+               <div style={{color: "orange"}}>(section under development)<hr/></div>
                {loaded && <div style={{marginBottom: "40px"}}>Order Weight: {Math.ceil(totalLoadWt(loaded,unloaded)).toLocaleString()}</div>}
                {!selectedPosition1 && <div style={{marginTop: "40px", color: "hsl(0,0%,25%)"}}>click on a pallet in the diagram to edit</div>}
                {selectedPosition1 && selectedPosition2 && <>

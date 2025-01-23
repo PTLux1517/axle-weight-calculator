@@ -17,6 +17,33 @@ main {
       border-radius: 16px;
       padding: 8px;
    }
+   #unloaded-weight-container {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      align-items: center;
+      grid-gap: 5px;
+      font-size: smaller;
+      & h3 {
+         align-self: start;
+      }
+      & input {
+         width: 80%;
+         height: 20px;
+      }
+      .divided {
+         border-bottom: 2px solid hsl(0,0%,10%);
+      }
+      #examples {
+         line-height: 0.8;
+         font-size: x-small;
+         & ul {
+            text-align: start;
+            & li::marker {
+               color: hsl(0,0%,40%);
+            }
+         }
+      }
+   }
    #trailer-dimensions-container {
       display: grid;
       grid-template-columns: 3fr 1fr 1fr;
