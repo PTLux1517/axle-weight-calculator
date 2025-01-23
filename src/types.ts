@@ -24,6 +24,10 @@ export interface Load {
    loadRows: Array<Row>,
 }
 
+export interface Named {
+   name: String,
+}
+
 export enum Side {
    L = "l___",
    C = "_ctr_",

@@ -16,7 +16,14 @@ import {
    totalLoadWt,
    toTitleCase
 } from "./calculations.ts";
-import {maxWeightCostcoTrailer,minSlideTrailer,minTandCenterSlideLengthFromNose} from "./sampleTrailers.ts";
+import {
+   costcoAllShredTrailer,
+   costcoMaxWeightTrailer,
+   emptyTrailer,
+   maxRowsAllStraightTrailer,
+   minSlideTrailer,
+   minTandCenterSlideLengthFromNose
+} from "./sampleTrailers.ts";
 import {slideAxleRestrictedStates,SlideAxleRestrictionsDivider,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
 
 
@@ -208,7 +215,7 @@ function App() {
    const selectionColor1 = "darkgoldenrod"
    const selectionColor2 = "darkcyan"
 
-   const defaultTrailer:Trailer&Load = maxWeightCostcoTrailer
+   const defaultTrailer:Trailer&Load = costcoMaxWeightTrailer
    const defaultState:State = State.CA
    const defaultRearAxleType:RearAxleTypeCapacity = RearAxleTypeCapacity.Tandem
    const defaultUnloadedWeights:AxleWeights = {
@@ -357,6 +364,13 @@ function App() {
       ctx.strokeRect(zoom*39,frontTandAxleRenderPos-(axleThickness/2),axleWidth,axleThickness)
       ctx.strokeRect(zoom*39,rearTandAxleRenderPos-(axleThickness/2),axleWidth,axleThickness)
 
+      /* draw 48 foot line */
+      ctx.strokeStyle = "red"
+      ctx.lineWidth = zoom
+      ctx.strokeRect(zoom*39,zoom*toInches(48),axleWidth,zoom)
+      ctx.fillStyle = "black"
+      ctx.fillText("48ft",zoom*toInches(4),zoom*toInches(49))
+
    }, [zoom, sampleTrailer, selectedPosition1, selectedPosition2])
 
    return (
@@ -376,11 +390,10 @@ function App() {
                <input style={{gridColumn: 2}} type={"number"} id={"fTandem-wt-unloaded"} name={"fTandem-wt-unloaded"} min={100} max={rearAxleTypeCapacity} step={20} defaultValue={unloaded.fTandem} onChange={e => unloadedAxleWeightListener(e,"front_tandem")}/>
                <label style={{gridColumn: 1}} htmlFor={"rTandem-wt-unloaded"}>Rear Tandem</label>
                <input style={{gridColumn: 2}} type={"number"} id={"rTandem-wt-unloaded"} name={"rTandem-wt-unloaded"}  min={100} max={rearAxleTypeCapacity} step={20} defaultValue={unloaded.rTandem} onChange={e => unloadedAxleWeightListener(e,"rear_tandem")}/>
-               <div style={{gridColumn: "1/3", marginTop: "20px"}} id={"examples"}>Real World Examples:
-                  <ul>
-                     <li><a href={"https://www.thetruckersreport.com/truckingindustryforum/attachments/b9a6ca71-b803-4b06-8dd5-b43491aeb7ee-jpeg.389972/"} target={"_blank"}>unloaded weigh ticket</a></li>
-                     <li><a href={"https://www.reddit.com/r/Truckers/comments/oipyl5/what_are_the_average_axle_weights_of_an_empty/"} target={"_blank"}>discussion forum</a></li>
-                  </ul>
+               <div style={{gridColumn: "1/3"}} id={"examples"}>
+                  <div style={{gridColumn: "1/4"}}>Real World Examples:</div>
+                  <div><a href={"https://www.thetruckersreport.com/truckingindustryforum/attachments/b9a6ca71-b803-4b06-8dd5-b43491aeb7ee-jpeg.389972/"} target={"_blank"}>unloaded weigh ticket</a></div> |
+                  <div><a href={"https://www.reddit.com/r/Truckers/comments/oipyl5/what_are_the_average_axle_weights_of_an_empty/"} target={"_blank"}>discussion forum</a></div>
                </div>
             </div>
             <div id={"loaded-weight-container"} style={{gridRow: 2, gridColumn: 1}}>
@@ -393,6 +406,72 @@ function App() {
                   {Math.ceil(loaded ? loaded.rTandem : unloaded.rTandem).toLocaleString()} / {rearAxleTypeCapacity.toLocaleString()}</div>
                <div id={"combined-weight"} style={{top: zoom*sampleTrailer.interiorLength - 10, color: (totalGrossWt(loaded ?? unloaded) > 80000 ? "red" : "")}}>Combined:<br/>
                   {Math.ceil(loaded ? totalGrossWt(loaded) : totalGrossWt(unloaded)).toLocaleString()} / {Number(80000).toLocaleString()}</div>
+            </div>
+            <div style={{gridRow: 3, gridColumn: "1"}} id={"populate-staging-area-container"}>
+               <h3>Populate Staging Area</h3>
+               <div style={{color: "orange"}}>(section under development)<hr/></div>
+               <input type={"number"} defaultValue={1}/><span>x</span><input type={"text"} list={"finished-goods-pallet-weights"}/>
+               <datalist id={"finished-goods-pallet-weights"}>
+                  <option>382</option>
+                  <option>393</option>
+                  <option>408</option>
+                  <option>429</option>
+                  <option>468</option>
+                  <option>472</option>
+                  <option>500</option>
+                  <option>511</option>
+                  <option>526</option>
+                  <option>567</option>
+                  <option>585</option>
+                  <option>624</option>
+                  <option>630</option>
+                  <option>648</option>
+                  <option>649</option>
+                  <option>702</option>
+                  <option>714</option>
+                  <option>716</option>
+                  <option>720</option>
+                  <option>726</option>
+                  <option>729</option>
+                  <option>800</option>
+                  <option>816</option>
+                  <option>850</option>
+                  <option>864</option>
+                  <option>966</option>
+                  <option>972</option>
+                  <option>1008</option>
+                  <option>1092</option>
+                  <option>1134</option>
+                  <option>1260</option>
+                  <option>1280</option>
+                  <option>1287</option>
+                  <option>1350</option>
+                  <option>1428</option>
+                  <option>1440</option>
+                  <option>1488</option>
+                  <option>1519</option>
+                  <option>1530</option>
+                  <option>1560</option>
+                  <option>1656</option>
+                  <option>1680</option>
+                  <option>1728</option>
+                  <option>1740</option>
+                  <option>1800</option>
+                  <option>1836</option>
+                  <option>1890</option>
+                  <option>1920</option>
+                  <option>1944</option>
+                  <option>2000</option>
+                  <option>2028</option>
+                  <option>2160</option>
+                  <option>2184</option>
+                  <option>2240</option>
+               </datalist>
+               <span><form>
+                  <label htmlFor="stage-chep">C</label><input type={"radio"} id={"stage-chep"} name={"stage-color"} value={P.Chep} defaultChecked={true}/><br/>
+                  <label htmlFor="stage-white">W</label><input type={"radio"} id={"stage-white"} name={"stage-color"} value={P.White}/>
+               </form></span>
+               <button>add</button>
             </div>
             <div style={{gridRow: 4, gridColumn: "1/4"}} id={"staged-pallets-container"}>
                <h3>Staged Pallets</h3>
