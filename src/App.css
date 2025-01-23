@@ -26,6 +26,11 @@ main {
       & h3 {
          align-self: start;
       }
+      #unloaded-weight-subtext {
+         font-size: smaller;
+         color: hsl(0,0%,40%);
+         margin-top: -10px;
+      }
       & input {
          width: 80%;
          height: 20px;

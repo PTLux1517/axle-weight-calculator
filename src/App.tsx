@@ -1,6 +1,21 @@
 import {ChangeEvent,MouseEvent,useEffect,useState} from 'react'
 import './App.css'
-import {AxleReferencePoint,AxleWeights,Double,Load,O,P,Position,PositionWithMeta,RearAxleTypeCapacity,Side,Single,State,Trailer} from './types.ts'
+import {
+   AxleReferencePoint,
+   AxleWeights,
+   Double,
+   fgPalletWeights,
+   Load,
+   O,
+   P,
+   Position,
+   PositionWithMeta,
+   RearAxleTypeCapacity,
+   Side,
+   Single,
+   State,
+   Trailer
+} from './types.ts'
 import {
    calcAxleWeights,
    deletePosition,
@@ -215,7 +230,7 @@ function App() {
    const selectionColor1 = "darkgoldenrod"
    const selectionColor2 = "darkcyan"
 
-   const defaultTrailer:Trailer&Load = costcoMaxWeightTrailer
+   const defaultTrailer:Trailer&Load = costcoAllShredTrailer
    const defaultState:State = State.CA
    const defaultRearAxleType:RearAxleTypeCapacity = RearAxleTypeCapacity.Tandem
    const defaultUnloadedWeights:AxleWeights = {
@@ -380,6 +395,7 @@ function App() {
             {/* ----------------------------------------------------------------- COLUMN 1 ----------------------------------------------------------------- */}
             <div id={"unloaded-weight-container"} style={{gridRow: 1, gridColumn: 1}}>
                <h3 style={{gridColumn: "1/3"}}>Unloaded Weight</h3>
+               <div style={{gridColumn: "1/3"}} id={"unloaded-weight-subtext"}>(measured with tandems slid all the way back)</div>
                <button style={{gridColumn: 1}} onClick={resetUnloadedWeightsListener}>reset weights</button>
                <div style={{gridColumn: 2}}>lbs</div>
                <label style={{gridColumn: 1}} className={"divided"} htmlFor={"steers-wt-unloaded"}>Steers</label>
@@ -411,62 +427,7 @@ function App() {
                <h3>Populate Staging Area</h3>
                <div style={{color: "orange"}}>(section under development)<hr/></div>
                <input type={"number"} defaultValue={1}/><span>x</span><input type={"text"} list={"finished-goods-pallet-weights"}/>
-               <datalist id={"finished-goods-pallet-weights"}>
-                  <option>382</option>
-                  <option>393</option>
-                  <option>408</option>
-                  <option>429</option>
-                  <option>468</option>
-                  <option>472</option>
-                  <option>500</option>
-                  <option>511</option>
-                  <option>526</option>
-                  <option>567</option>
-                  <option>585</option>
-                  <option>624</option>
-                  <option>630</option>
-                  <option>648</option>
-                  <option>649</option>
-                  <option>702</option>
-                  <option>714</option>
-                  <option>716</option>
-                  <option>720</option>
-                  <option>726</option>
-                  <option>729</option>
-                  <option>800</option>
-                  <option>816</option>
-                  <option>850</option>
-                  <option>864</option>
-                  <option>966</option>
-                  <option>972</option>
-                  <option>1008</option>
-                  <option>1092</option>
-                  <option>1134</option>
-                  <option>1260</option>
-                  <option>1280</option>
-                  <option>1287</option>
-                  <option>1350</option>
-                  <option>1428</option>
-                  <option>1440</option>
-                  <option>1488</option>
-                  <option>1519</option>
-                  <option>1530</option>
-                  <option>1560</option>
-                  <option>1656</option>
-                  <option>1680</option>
-                  <option>1728</option>
-                  <option>1740</option>
-                  <option>1800</option>
-                  <option>1836</option>
-                  <option>1890</option>
-                  <option>1920</option>
-                  <option>1944</option>
-                  <option>2000</option>
-                  <option>2028</option>
-                  <option>2160</option>
-                  <option>2184</option>
-                  <option>2240</option>
-               </datalist>
+               <datalist id={"finished-goods-pallet-weights"}>{fgPalletWeights.map(elem => <option>{elem}</option>)}</datalist>
                <span><form>
                   <label htmlFor="stage-chep">C</label><input type={"radio"} id={"stage-chep"} name={"stage-color"} value={P.Chep} defaultChecked={true}/><br/>
                   <label htmlFor="stage-white">W</label><input type={"radio"} id={"stage-white"} name={"stage-color"} value={P.White}/>
@@ -545,7 +506,7 @@ function App() {
             <div id={"editor-container"} style={{gridRow: 2, gridColumn: 3}}>
                <h3>Edit Pallet/Load</h3>
                <div style={{color: "orange"}}>(section under development)<hr/></div>
-               {loaded && <div style={{marginBottom: "40px"}}>Order Weight: {Math.ceil(totalLoadWt(loaded,unloaded)).toLocaleString()}</div>}
+               {loaded && <div style={{marginBottom: "40px"}}>Order Weight w/ Pallets: {Math.ceil(totalLoadWt(loaded,unloaded)).toLocaleString()}</div>}
                {!selectedPosition1 && <div style={{marginTop: "40px", color: "hsl(0,0%,25%)"}}>click on a pallet in the diagram to edit</div>}
                {selectedPosition1 && selectedPosition2 && <>
                   <button onClick={() => {setSampleTrailer(prev => swapPositions(selectedPosition1!.row, selectedPosition1!.side, selectedPosition2!.row, selectedPosition2!.side, prev)); setSelectedPosition1(null); setSelectedPosition2(null);}}>swap selected</button>

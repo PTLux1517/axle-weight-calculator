@@ -10,7 +10,7 @@ import {
    SlideAxleRestriction,
    SlideAxleRestrictionMaxLength,
    State,
-   Trailer
+   Trailer,trailerWeightEmptyMinusAxlesAndReefer
 } from "./types.ts";
 import {slideAxleRestrictedStates,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
 
@@ -236,7 +236,13 @@ export function recalcDepths(trailer:Trailer&Load) {
 }
 
 export function calcAxleWeights(trailer:Trailer&Load, unloaded:AxleWeights, rearAxleType:RearAxleTypeCapacity):AxleWeights {
+   const trailerBodyWeightPerLinearInch = trailerWeightEmptyMinusAxlesAndReefer / trailer.interiorLength
+   const tandemCenterDistanceFromMaxRearwardPosition = trailer.interiorLength - trailer.tandemCenterDistanceFromNose - trailer.tandemSpreadWidth/2
+   const additionalTrailerWeightRear = trailerBodyWeightPerLinearInch * tandemCenterDistanceFromMaxRearwardPosition
    let loaded:AxleWeights = {...unloaded}
+   loaded.drives -= additionalTrailerWeightRear
+   loaded.fTandem += additionalTrailerWeightRear/2
+   loaded.rTandem += additionalTrailerWeightRear/2
    let showAlert = false
    trailer.loadRows.forEach(row => {
       Object.values(row).forEach(pos => {
