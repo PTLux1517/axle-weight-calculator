@@ -2,7 +2,7 @@ import {
    AxleReferencePoint,AxleWeights,
    Double,
    Load,
-   O,placeholderPosition,Position,
+   O,Pallet,placeholderPosition,Position,
    RearAxleTypeCapacity,
    Side,
    Single,
@@ -301,4 +301,12 @@ export function totalGrossWt(loaded:AxleWeights):number {
 
 export function totalLoadWt(loaded:AxleWeights, unloaded:AxleWeights):number {
    return totalGrossWt(loaded) - totalGrossWt(unloaded)
+}
+
+export function sortStagedPalletsByStackWeight(stacks:Pallet[][]):Pallet[][] {
+   return stacks.sort((stack1:Pallet[],stack2:Pallet[]) => {
+      const stack1Wt = stack1.map(pallet => pallet.prdWt+pallet.palWt).reduce((acc,curr) => acc+curr,0)
+      const stack2Wt = stack2.map(pallet => pallet.prdWt+pallet.palWt).reduce((acc,curr) => acc+curr,0)
+      return stack1Wt-stack2Wt
+   })
 }

@@ -7,7 +7,7 @@ import {
    fgPalletWeights,
    Load,
    O,
-   P,
+   P,Pallet,
    Position,
    PositionWithMeta,
    RearAxleTypeCapacity,
@@ -21,7 +21,7 @@ import {
    deletePosition,
    getStateTandemMaxLength,
    getStateTandemMeasurementReference,
-   rotatePosition,
+   rotatePosition,sortStagedPalletsByStackWeight,
    stateRefDistanceToAxleDistanceFromNose,
    swapPositions,
    tandemCenterDistanceFromNoseToStateRefDistance,
@@ -48,7 +48,8 @@ function App() {
       (document.getElementById("zoom-slider") as HTMLInputElement).value = String(newZoom);
    }
 
-   function resetUnloadedWeightsListener() {
+   function resetUnloadedWeightsListener(e:MouseEvent) {
+      (e.target as HTMLButtonElement).blur()
       setUnloaded(defaultUnloadedWeights);
       (document.getElementById("steers-wt-unloaded") as HTMLInputElement).value = String(defaultUnloadedWeights.steers);
       (document.getElementById("drives-wt-unloaded") as HTMLInputElement).value = String(defaultUnloadedWeights.drives);
@@ -66,7 +67,8 @@ function App() {
       }})())
    }
 
-   function resetTrailerDimensionsListener() {
+   function resetTrailerDimensionsListener(e:MouseEvent) {
+      (e.target as HTMLButtonElement).blur()
       setSampleTrailer(defaultTrailer);
       setStateRestriction(defaultState);
       setRearAxleTypeCapacity(defaultRearAxleType);
@@ -219,6 +221,46 @@ function App() {
       });
    }
 
+   function addPalletToStagingListener(e:MouseEvent) {
+      (e.target as HTMLButtonElement).blur()
+      setStaged(prev => {
+         let newStaged:Pallet[][] = [...prev]
+         const stagingMultiplier = document.getElementById("staging-multiplier") as HTMLInputElement
+         const stagingWeight = document.getElementById("staging-weight") as HTMLInputElement
+         const stagingStack = document.getElementById("stage-stacked") as HTMLInputElement
+         const stagingColorChep = document.getElementById("stage-chep") as HTMLInputElement
+         const stagingColorWhite = document.getElementById("stage-white") as HTMLInputElement
+         let multiplierSanitized = Math.min(100,Math.abs(Math.floor(Number(stagingMultiplier.value)))) ?? 0
+         if (prev.length + multiplierSanitized > 100)
+            multiplierSanitized = 100 - prev.length
+         const weightSanitized = Math.min(5000,Math.abs(Math.floor(Number(stagingWeight.value)))) ?? 0
+         const doubleStack = stagingStack.checked
+         const color = stagingColorChep.checked ? P.Chep : P.White
+         setTimeout(() => {
+            stagingMultiplier.value = "1";
+            stagingWeight.value = "";
+            stagingStack.checked = false;
+            stagingColorChep.checked = true;
+            stagingColorWhite.checked = false;
+         }, 100)
+         if (isNaN(multiplierSanitized) || multiplierSanitized===0 || isNaN(weightSanitized) || weightSanitized===0) return prev
+         while (multiplierSanitized>0) {
+            if (doubleStack && multiplierSanitized>1) {
+               newStaged.push([
+                  {prdWt: weightSanitized,palWt: color},
+                  {prdWt: weightSanitized,palWt: color}
+               ])
+               multiplierSanitized -= 2
+            }
+            else {
+               newStaged.push([{prdWt: weightSanitized, palWt:color}])
+               multiplierSanitized -= 1
+            }
+         }
+         return sortStagedPalletsByStackWeight(newStaged)
+      })
+   }
+
    //const forceUpdate = useReducer(x => x+1, 0, () => 0)[1]
    const defaultZoom = 1.5
    const minZoom = 0.5
@@ -245,6 +287,7 @@ function App() {
    const [rearAxleTypeCapacity, setRearAxleTypeCapacity] = useState<RearAxleTypeCapacity>(defaultRearAxleType)
    const [unloaded, setUnloaded] = useState<AxleWeights>(defaultUnloadedWeights)
    const [loaded, setLoaded] = useState<AxleWeights|null>(null)
+   const [staged, setStaged] = useState<Pallet[][]>([])
 
    useEffect(() => {
       setLoaded(calcAxleWeights(sampleTrailer,unloaded,rearAxleTypeCapacity))
@@ -426,22 +469,42 @@ function App() {
             <div style={{gridRow: 3, gridColumn: "1"}} id={"populate-staging-area-container"}>
                <h3>Populate Staging Area</h3>
                <div style={{color: "orange"}}>(section under development)<hr/></div>
-               <input type={"number"} defaultValue={1}/><span>x</span><input type={"text"} list={"finished-goods-pallet-weights"}/>
-               <datalist id={"finished-goods-pallet-weights"}>{fgPalletWeights.map(elem => <option>{elem}</option>)}</datalist>
-               <span><form>
-                  <label htmlFor="stage-chep">C</label><input type={"radio"} id={"stage-chep"} name={"stage-color"} value={P.Chep} defaultChecked={true}/><br/>
-                  <label htmlFor="stage-white">W</label><input type={"radio"} id={"stage-white"} name={"stage-color"} value={P.White}/>
-               </form></span>
-               <button>add</button>
+               <div id={"staging-form-container"}>
+                  <input type={"number"} id={"staging-multiplier"} min={1} max={100} step={1} defaultValue={1}/><span>x</span><input type={"text"} id={"staging-weight"} list={"finished-goods-pallet-weights"}/><datalist id={"finished-goods-pallet-weights"}>{fgPalletWeights.map(elem => <option>{elem}</option>)}</datalist>
+                  <label htmlFor={"stage-stacked"}>double stack?</label><input type={"checkbox"} id={"stage-stacked"} name={"stage-stacked"} defaultChecked={false}/>
+                  <span><div id={"staging-color"}>
+                     <label htmlFor="stage-chep">C</label><input type={"radio"} id={"stage-chep"} name={"stage-color"} value={P.Chep} defaultChecked={true}/><br/>
+                     <label htmlFor="stage-white">W</label><input type={"radio"} id={"stage-white"} name={"stage-color"} value={P.White}/>
+                  </div></span>
+                  <button id={"add-to-staging-button"} onClick={addPalletToStagingListener}>add</button>
+               </div>
+               <button id={"clear-staging-button"} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); setStaged([]);}}>clear staged</button>
             </div>
             <div style={{gridRow: 4, gridColumn: "1/4"}} id={"staged-pallets-container"}>
                <h3>Staged Pallets</h3>
                <div style={{color: "orange"}}>(section under development)<hr/></div>
-               <div id={"pallet-pool"}>
-                  <div style={{width: zoom*O.Straight.W, height: zoom*O.Straight.L, background: "mediumblue", border: "4px solid black", display: "flex", flexDirection: "column-reverse", fontFamily: "monospace", fontSize: zoom*7.7, fontWeight: "bold", lineHeight: 1}}><div>1c</div><div>2c</div><div>3c</div></div>
-                  <div style={{width: zoom*O.Straight.W, height: zoom*O.Straight.L, background: "mediumblue", border: "4px solid black"}}></div>
-                  <div style={{width: zoom*O.Straight.W, height: zoom*O.Straight.L, background: "mediumblue", border: "4px solid black"}}></div>
-               </div>
+               <div id={"pallet-pool"}>{
+                  staged.map(stack =>
+                     <div style={{
+                        width: zoom*O.Straight.W,
+                        height: zoom*O.Straight.L,
+                        background: (stack[0].palWt===P.Chep ? "mediumblue" : "burlywood"),
+                        border: "4px solid black",
+                        display: "flex",
+                        flexDirection: "column-reverse",
+                        fontFamily: "monospace",
+                        fontSize: zoom*7.7,
+                        fontWeight: "bold",
+                        lineHeight: 1
+                     }}>{
+                        stack.map(pallet =>
+                           <div>{
+                              pallet.prdWt+""+(pallet.palWt===P.Chep ? "c" : "w")
+                           }</div>
+                        )
+                     }</div>
+                  )
+               }</div>
             </div>
             {/* ----------------------------------------------------------------- COLUMN 2 ----------------------------------------------------------------- */}
             <div id={"zoom-container"} style={{gridRow: 1, gridColumn: 2}}>
@@ -464,7 +527,8 @@ function App() {
                      setZoomSlider(newZoom);
                   }}>+</button>
                </div>
-               <button onClick={() => {
+               <button onClick={(e:MouseEvent) => {
+                  (e.target as HTMLButtonElement).blur();
                   setZoom(defaultZoom);
                   setZoomSlider(defaultZoom);
                }}>reset zoom</button>
@@ -472,6 +536,7 @@ function App() {
             <canvas id={"load-diagram"} className={"no-border"} width={toInches(8)*zoom} height={sampleTrailer.interiorLength*zoom} style={{margin: "0 calc(50% - "+(toInches(4)*zoom)+"px)", gridRow: 2, gridColumn: 2}} onMouseUp={canvasClickListener}/>
             <div style={{gridRow: 3, gridColumn: 2}} id={"add-pallet-buttons-container"}>
                <h3 style={{gridColumn: "1/4"}}>Load Selected Staged Pallet</h3>
+               <div style={{gridColumn: "1/4",color: "orange"}}>(section under development)<hr/></div>
                <div style={{color: "orange", fontWeight: "bold"}}>to left</div>
                <div style={{color: "orange", fontWeight: "bold"}}>in center</div>
                <div style={{color: "orange", fontWeight: "bold"}}>to right</div>

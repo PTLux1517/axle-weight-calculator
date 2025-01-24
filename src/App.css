@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 
 #root {
   /*max-width: 1280px;*/
@@ -119,26 +119,49 @@ main {
       margin-top: 40px !important;
    }
    #populate-staging-area-container {
-      & input[type=number] {
-         width: 12%;
-         height: 20px;
+      & hr {
+         margin-bottom: 0;
       }
-      & span {
-         display: inline-block;
-         min-width: 10%;
-         &:has(form) {
+      #staging-form-container {
+         margin-bottom: 5px;
+         & input[type=number] {
+            width: 12%;
+            height: 20px;
+         }
+         & span {
+            display: inline-block;
+            min-width: 10%;
+            &:has(div) {
+               margin-left: 10px;
+               position: relative;
+               top: 13px;
+            }
+         }
+         & input[type=text] {
+            width: 24%;
+            height: 20px;
+         }
+         & label[for=stage-stacked] {
+            display: inline-block;
+            text-wrap: normal;
+            width: 20%;
             margin-left: 10px;
             position: relative;
             top: 13px;
          }
+         & input[type=checkbox] {
+            position: relative;
+            top: 2px;
+            left: 3px;
+            scale: 130%;
+         }
+         #add-to-staging-button {
+            width: 100%;
+            margin-top: 16px;
+         }
       }
-      & input[type=text] {
-         width: 24%;
-         height: 20px;
-      }
-      & button {
-         margin-left: 10px;
-         margin-right: 0;
+      #clear-staging-button {
+         width: 100%;
       }
    }
    #add-pallet-buttons-container {
@@ -149,7 +172,9 @@ main {
    #staged-pallets-container {
       #pallet-pool{
          display: flex;
+         flex-wrap: wrap;
          gap: 8px;
+         justify-content: center;
       }
    }
 }
