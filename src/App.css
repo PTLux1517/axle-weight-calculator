@@ -119,9 +119,6 @@ main {
       margin-top: 40px !important;
    }
    #populate-staging-area-container {
-      /* > * { */
-      /*    margin: 0 8px; */
-      /* } */
       & input[type=number] {
          width: 12%;
          height: 20px;
@@ -131,7 +128,8 @@ main {
          min-width: 10%;
          &:has(form) {
             margin-left: 10px;
-            margin-top: -18px;
+            position: relative;
+            top: 13px;
          }
       }
       & input[type=text] {
@@ -151,6 +149,7 @@ main {
    #staged-pallets-container {
       #pallet-pool{
          display: flex;
+         gap: 8px;
       }
    }
 }

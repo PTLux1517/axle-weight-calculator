@@ -438,7 +438,9 @@ function App() {
                <h3>Staged Pallets</h3>
                <div style={{color: "orange"}}>(section under development)<hr/></div>
                <div id={"pallet-pool"}>
-
+                  <div style={{width: zoom*O.Straight.W, height: zoom*O.Straight.L, background: "mediumblue", border: "4px solid black", display: "flex", flexDirection: "column-reverse", fontFamily: "monospace", fontSize: zoom*7.7, fontWeight: "bold", lineHeight: 1}}><div>1c</div><div>2c</div><div>3c</div></div>
+                  <div style={{width: zoom*O.Straight.W, height: zoom*O.Straight.L, background: "mediumblue", border: "4px solid black"}}></div>
+                  <div style={{width: zoom*O.Straight.W, height: zoom*O.Straight.L, background: "mediumblue", border: "4px solid black"}}></div>
                </div>
             </div>
             {/* ----------------------------------------------------------------- COLUMN 2 ----------------------------------------------------------------- */}
@@ -469,12 +471,12 @@ function App() {
             </div>
             <canvas id={"load-diagram"} className={"no-border"} width={toInches(8)*zoom} height={sampleTrailer.interiorLength*zoom} style={{margin: "0 calc(50% - "+(toInches(4)*zoom)+"px)", gridRow: 2, gridColumn: 2}} onMouseUp={canvasClickListener}/>
             <div style={{gridRow: 3, gridColumn: 2}} id={"add-pallet-buttons-container"}>
-               <button>load straight left</button>
-               <button>load straight center</button>
-               <button>load straight right</button>
-               <button>load sideways left</button>
-               <button>load sideways center</button>
-               <button>load sideways right</button>
+               <h3 style={{gridColumn: "1/4"}}>Load Selected Staged Pallet</h3>
+               <div style={{color: "orange", fontWeight: "bold"}}>to left</div>
+               <div style={{color: "orange", fontWeight: "bold"}}>in center</div>
+               <div style={{color: "orange", fontWeight: "bold"}}>to right</div>
+               <button>straight</button><button>straight</button><button>straight</button>
+               <button>sideways</button><button>sideways</button><button>sideways</button>
             </div>
             {/* ----------------------------------------------------------------- COLUMN 3 ----------------------------------------------------------------- */}
             <div id={"trailer-dimensions-container"} style={{gridRow: 1, gridColumn: 3}}>
