@@ -97,3 +97,26 @@ export const costcoAllShredTrailer:Named&Trailer&Load = {
       {l___: {depth: 12*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep},{prdWt: 720, palWt: P.Chep}]}, ___r: {depth: 12*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 720, palWt: P.Chep},{prdWt: 720, palWt: P.Chep}]}},
    ]
 }
+
+export const costco24ChunkTrailer:Named&Trailer&Load = {
+   ...defaultTrailerDimensions,
+   name: "costco max weight",
+   loadRows: [
+      {l___: {depth: 0*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 0*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+      {l___: {depth: 1*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 1*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+      {l___: {depth: 2*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 2*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+      {l___: {depth: 3*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 3*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+
+      {l___: {depth: 4*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 4*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+      {l___: {depth: 5*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 5*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+      {l___: {depth: 6*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 6*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+      {l___: {depth: 7*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 7*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+
+      {l___: {depth: 8*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 8*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+      {l___: {depth: 9*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 9*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+      {l___: {depth: 10*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 10*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+      {l___: {depth: 11*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 11*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+
+      //{l___: {depth: 12*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 12*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
+   ]
+}

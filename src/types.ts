@@ -138,7 +138,7 @@ export enum RearAxleTypeCapacity {
    Spread = 20000,
 }
 
-export const trailerWeightEmptyMinusAxlesAndReefer = 10000
+export const trailerWeightEmptyMinusAxlesAndReefer = 7000
 
 export const placeholderPosition = {depth: 0, orien: O.Straight, stack: []} as Position
 

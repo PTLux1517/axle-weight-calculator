@@ -32,6 +32,7 @@ import {
    toTitleCase
 } from "./calculations.ts";
 import {
+   costco24ChunkTrailer,
    costcoAllShredTrailer,
    costcoMaxWeightTrailer,
    emptyTrailer,
@@ -272,7 +273,7 @@ function App() {
    const selectionColor1 = "darkgoldenrod"
    const selectionColor2 = "darkcyan"
 
-   const defaultTrailer:Trailer&Load = costcoAllShredTrailer
+   const defaultTrailer:Trailer&Load = costco24ChunkTrailer
    const defaultState:State = State.CA
    const defaultRearAxleType:RearAxleTypeCapacity = RearAxleTypeCapacity.Tandem
    const defaultUnloadedWeights:AxleWeights = {
@@ -459,10 +460,16 @@ function App() {
                <h3>Loaded Weight (lbs)</h3>
                <div id={"drive-weight"} style={{top: zoom*sampleTrailer.kingpinDistanceFromNose + 15, color: (loaded && loaded.drives > 34000 ? "red" : "")}}>Drive axles:<br/>
                   {Math.ceil(loaded ? loaded.drives : unloaded.drives).toLocaleString()} / {Number(34000).toLocaleString()}</div>
+               {rearAxleTypeCapacity===RearAxleTypeCapacity.Tandem && <>
+                  <div id={"tandem-weight"} style={{top: zoom * sampleTrailer.tandemCenterDistanceFromNose, color: (loaded && loaded.fTandem > rearAxleTypeCapacity ? "red": "")}}>Trailer axles:<br/>
+                     {Math.ceil(loaded ? loaded.fTandem+loaded.rTandem : unloaded.fTandem+unloaded.rTandem).toLocaleString()} / {(2*rearAxleTypeCapacity).toLocaleString()}</div>
+               </>}
+               {rearAxleTypeCapacity===RearAxleTypeCapacity.Spread && <>
                <div id={"front-tandem-weight"} style={{top: frontTandAxleRenderPos + 8 - (6/zoom), color: (loaded && loaded.fTandem > rearAxleTypeCapacity ? "red": "")}}>Trailer axle:<br/>
                   {Math.ceil(loaded ? loaded.fTandem : unloaded.fTandem).toLocaleString()} / {rearAxleTypeCapacity.toLocaleString()}</div>
                <div id={"rear-tandem-weight"} style={{top: rearTandAxleRenderPos + 8 + (6/zoom), color: (loaded && loaded.rTandem > rearAxleTypeCapacity ? "red": "")}}>Trailer axle:<br/>
                   {Math.ceil(loaded ? loaded.rTandem : unloaded.rTandem).toLocaleString()} / {rearAxleTypeCapacity.toLocaleString()}</div>
+               </>}
                <div id={"combined-weight"} style={{top: zoom*sampleTrailer.interiorLength - 10, color: (totalGrossWt(loaded ?? unloaded) > 80000 ? "red" : "")}}>Combined:<br/>
                   {Math.ceil(loaded ? totalGrossWt(loaded) : totalGrossWt(unloaded)).toLocaleString()} / {Number(80000).toLocaleString()}</div>
             </div>
