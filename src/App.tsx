@@ -28,7 +28,7 @@ import {
    toFeet,
    toInches,
    totalGrossWt,
-   totalLoadWt,
+   totalLoadWt,totalStagedWt,
    toTitleCase
 } from "./calculations.ts";
 import {
@@ -273,7 +273,7 @@ function App() {
    const selectionColor1 = "darkgoldenrod"
    const selectionColor2 = "darkcyan"
 
-   const defaultTrailer:Trailer&Load = costco24ChunkTrailer
+   const defaultTrailer:Trailer&Load = emptyTrailer
    const defaultState:State = State.CA
    const defaultRearAxleType:RearAxleTypeCapacity = RearAxleTypeCapacity.Tandem
    const defaultUnloadedWeights:AxleWeights = {
@@ -515,6 +515,7 @@ function App() {
             </div>
             {/* ----------------------------------------------------------------- COLUMN 2 ----------------------------------------------------------------- */}
             <div id={"zoom-container"} style={{gridRow: 1, gridColumn: 2}}>
+               <div>(Todo: disclaimer/license)</div>
                <label id={"zoom-label"} htmlFor={"zoom"}>Zoom Diagram</label>
                <hr/>
                <div>
@@ -618,7 +619,19 @@ function App() {
                   </>}
                </div>
             </div>
+            <div id={"staging-info-container"} style={{gridRow: 3, gridColumn: 3}}>
+               <h3>Staging Info</h3>
+               <div style={{color: "orange"}}>(section under development)<hr/></div>
+               {staged.length > 0 && <>
+                  <div>Staged Weight w/ Pallets: {Math.ceil(totalStagedWt(staged)).toLocaleString()}</div>
+                  <div>Position Count: {staged.length}</div>
+               </>}
+
+            </div>
          </main>
+         <footer>
+            <div id="copyright-text">&copy; {new Date().getFullYear()} <a href={"https://ptlux1517.github.io"} target={"_blank"}>Cory Tomlinson</a>. All rights reserved. (<a href={"mailto:cory@ptlux1517.mozmail.com?subject=(Axle%20Weight%20Calculator%20Contact)%3A%20*your%20subject%20here*"} target={"_blank"}>Contact</a>)</div>
+         </footer>
       </>
    )
 }

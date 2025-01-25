@@ -303,6 +303,16 @@ export function totalLoadWt(loaded:AxleWeights, unloaded:AxleWeights):number {
    return totalGrossWt(loaded) - totalGrossWt(unloaded)
 }
 
+export function totalStagedWt(staged:Pallet[][]):number {
+   return staged
+      .map(stack =>
+         stack
+            .map(pal => pal.prdWt + pal.palWt)
+            .reduce((acc,curr) => acc + curr, 0)
+      )
+      .reduce((acc,curr) => acc + curr, 0)
+}
+
 export function sortStagedPalletsByStackWeight(stacks:Pallet[][]):Pallet[][] {
    return stacks.sort((stack1:Pallet[],stack2:Pallet[]) => {
       const stack1Wt = stack1.map(pallet => pallet.prdWt+pallet.palWt).reduce((acc,curr) => acc+curr,0)

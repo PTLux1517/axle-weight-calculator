@@ -184,6 +184,10 @@ header {
    width: 85vw;
 }
 
+footer {
+   margin-top: 30px;
+}
+
 hr {
    width: 90%;
    border: 1.5px solid hsl(0,0%,10%);
