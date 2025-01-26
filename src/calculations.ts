@@ -103,7 +103,7 @@ export function loadStack(trailer:Trailer&Load, stack:Pallet[], side:Side, orien
       newTrailer.loadRows.push(newRow)
    }
    else { //determine if pushing new row or updating a null side (if L and R are same length or C is last, then new row, else updating existing row)
-      const stackPlacement:[boolean,number] = newTrailer.loadRows.reduce((acc,row,idx) => {
+      const stackPlacement:[boolean,number] = newTrailer.loadRows.reduce<[boolean,number]>((acc,row,idx) => {
          if (row.hasOwnProperty(Side.C)) return [true,idx+1] //always need to add new row after a center row, regardless of what came before
          else if ((row as Double).l___!==null && (row as Double).___r!==null) return [true,idx+1] //always need to add new row after a full double row, regardless of what came before
          else if (side===Side.L) return (row as Double).l___===null && (row as Double).___r!==null ? [false,acc[1]] : [true,idx+1] //if left is selected and is the non-full side, don't add row and insert on the row where the accumulator stopped
