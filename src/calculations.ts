@@ -108,7 +108,7 @@ export function loadStack(trailer:Trailer&Load, stack:Pallet[], side:Side, orien
          else if ((row as Double).l___!==null && (row as Double).___r!==null) return [true,idx+1] //always need to add new row after a full double row, regardless of what came before
          else if (side===Side.L) return (row as Double).l___===null && (row as Double).___r!==null ? [false,acc[1]] : [true,idx+1] //if left is selected and is the non-full side, don't add row and insert on the row where the accumulator stopped
          else if (side===Side.R) return (row as Double).___r===null && (row as Double).l___!==null ? [false,acc[1]] : [true,idx+1] //if right is selected and is the non-full side, don't add row and insert on the row where the accumulator stopped
-         else return [true,idx+1] //should be non-reachable
+         else return [true,idx+1] //should be unreachable
       },[true,0])
       if (stackPlacement[0]) { //pushing new row
          let maxDepth = 0
@@ -134,10 +134,12 @@ export function loadStack(trailer:Trailer&Load, stack:Pallet[], side:Side, orien
          newTrailer.loadRows.push(newRow)
       }
       else { //updating a null side
-         const prevRow = newTrailer.loadRows[stackPlacement[1]-1] as Double
-         const depth = side===Side.L
-                          ? (prevRow?.l___?.depth ?? 0) + (prevRow?.l___?.orien.L ?? 0)
-                          : (prevRow?.___r?.depth ?? 0) + (prevRow?.___r?.orien.L ?? 0)
+         let prevRow = newTrailer.loadRows[stackPlacement[1]-1]
+         const depth = prevRow.hasOwnProperty(Side.C)
+                          ? ((prevRow as Single)?._ctr_?.depth ?? 0) + ((prevRow as Single)?._ctr_?.orien.L ?? 0)
+                          : side===Side.L
+                             ? ((prevRow as Double)?.l___?.depth ?? 0) + ((prevRow as Double)?.l___?.orien.L ?? 0)
+                             : ((prevRow as Double)?.___r?.depth ?? 0) + ((prevRow as Double)?.___r?.orien.L ?? 0)
          const newPos:Position = {
             depth: depth,
             orien: orien,
