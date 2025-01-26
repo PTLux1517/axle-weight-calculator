@@ -7,7 +7,8 @@ import {
    Pallet,
    placeholderPosition,
    Position,
-   RearAxleTypeCapacity,Row,
+   RearAxleTypeCapacity,
+   Row,
    Side,
    Single,
    SlideAxleNoRestrictionMaxLength,
@@ -18,7 +19,6 @@ import {
    trailerWeightEmptyMinusAxlesAndReefer
 } from "./types.ts";
 import {slideAxleRestrictedStates,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
-import {emptyTrailer} from "./sampleTrailers.ts";
 
 
 export function deepCopy<T>(original:T):T {
@@ -86,11 +86,10 @@ export function loadStack(trailer:Trailer&Load, stack:Pallet[], side:Side, orien
    if (!trailer || !stack) return trailer
    let newTrailer:Trailer&Load = deepCopy(trailer)
    if (side === Side.C) {
-
       let maxDepth = Object.values(newTrailer.loadRows[newTrailer.loadRows.length-1] ?? {})
-         .map(pos => pos===null ? 0 : pos.depth + pos.orien.L)
-         .reduce((leftOrAcc,rightOrC) => Math.max(leftOrAcc,rightOrC),0)
-         ?? 0
+                        .map(pos => pos===null ? 0 : pos.depth + pos.orien.L)
+                        .reduce((leftOrAcc,rightOrC) => Math.max(leftOrAcc,rightOrC),0)
+                        ?? 0
       if (maxDepth + orien.L > trailer.interiorLength) {
          alert("Not enough interior length remaining on the trailer to load the selected pallet "+orien.text)
          return trailer
@@ -103,12 +102,52 @@ export function loadStack(trailer:Trailer&Load, stack:Pallet[], side:Side, orien
       const newRow:Row = {_ctr_: newPos}
       newTrailer.loadRows.push(newRow)
    }
-   else {
-      let selectedSideLastRowIdx = 0
-      newTrailer.loadRows.forEach(row => {
-
-      })
-      //determine if pushing new row or updating a null side
+   else { //determine if pushing new row or updating a null side (if L and R are same length or C is last, then new row, else updating existing row)
+      const stackPlacement:[boolean,number] = newTrailer.loadRows.reduce((acc,row,idx) => {
+         if (row.hasOwnProperty(Side.C)) return [true,idx+1] //always need to add new row after a center row, regardless of what came before
+         else if ((row as Double).l___!==null && (row as Double).___r!==null) return [true,idx+1] //always need to add new row after a full double row, regardless of what came before
+         else if (side===Side.L) return (row as Double).l___===null && (row as Double).___r!==null ? [false,acc[1]] : [true,idx+1] //if left is selected and is the non-full side, don't add row and insert on the row where the accumulator stopped
+         else if (side===Side.R) return (row as Double).___r===null && (row as Double).l___!==null ? [false,acc[1]] : [true,idx+1] //if right is selected and is the non-full side, don't add row and insert on the row where the accumulator stopped
+         else return [true,idx+1] //should be non-reachable
+      },[true,0])
+      if (stackPlacement[0]) { //pushing new row
+         let maxDepth = 0
+         if (stackPlacement[1]>0) {
+            const lastRow = newTrailer.loadRows[newTrailer.loadRows.length-1]
+            const lDepth = ((lastRow as Double)?.l___?.depth ?? 0) + ((lastRow as Double)?.l___?.orien.L ?? 0)
+            const rDepth = ((lastRow as Double)?.___r?.depth ?? 0) + ((lastRow as Double)?.___r?.orien.L ?? 0)
+            const cDepth = ((lastRow as Single)?._ctr_?.depth ?? 0) + ((lastRow as Single)?._ctr_?.orien.L ?? 0)
+            maxDepth = side===Side.L
+               ? Math.max(lDepth,cDepth)
+               : Math.max(rDepth,cDepth)
+            if (maxDepth + orien.L > trailer.interiorLength) {
+               alert("Not enough interior length remaining on the trailer to load the selected pallet "+orien.text)
+               return trailer
+            }
+         }
+         const newPos:Position = {
+            depth: maxDepth,
+            orien: orien,
+            stack: stack
+         }
+         const newRow:Row = side===Side.L ? {l___: newPos, ___r: null} : {l___: null, ___r: newPos}
+         newTrailer.loadRows.push(newRow)
+      }
+      else { //updating a null side
+         const prevRow = newTrailer.loadRows[stackPlacement[1]-1] as Double
+         const depth = side===Side.L
+                          ? (prevRow?.l___?.depth ?? 0) + (prevRow?.l___?.orien.L ?? 0)
+                          : (prevRow?.___r?.depth ?? 0) + (prevRow?.___r?.orien.L ?? 0)
+         const newPos:Position = {
+            depth: depth,
+            orien: orien,
+            stack: stack
+         }
+         const currentRow = newTrailer.loadRows[stackPlacement[1]] as Double
+         newTrailer.loadRows[stackPlacement[1]] = side===Side.L
+                                                     ? {...currentRow, l___: newPos}
+                                                     : {...currentRow, ___r: newPos}
+      }
    }
    return newTrailer
 }

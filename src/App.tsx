@@ -271,11 +271,14 @@ function App() {
    function loadPalletListener(side:Side, orien:O) {
       if (selectedStaged[0]!==undefined) {
          const selIdx = selectedStaged[0]
-         setSampleTrailer(loadStack(sampleTrailer, staged[selIdx], side, orien))
-         setStaged(prev => prev.filter((_,idx) => idx!==selIdx))
-         const div = document.getElementById("staged-stack-"+selIdx) as HTMLDivElement
-         if (div && staged[selIdx][0]) div.style.background = staged[selIdx][0].palWt===P.Chep? "mediumblue" : "burlywood"
-         setSelectedStaged(prev => prev.slice(1))
+         const newTrailer = loadStack(sampleTrailer, staged[selIdx], side, orien)
+         if (newTrailer!==sampleTrailer) {
+            setSampleTrailer(newTrailer)
+            setStaged(prev => prev.filter((_,idx) => idx!==selIdx))
+            const div = document.getElementById("staged-stack-" + selIdx) as HTMLDivElement
+            if (div && staged[selIdx][0]) div.style.background = staged[selIdx][0].palWt===P.Chep? "mediumblue" : "burlywood"
+            setSelectedStaged(prev => prev.slice(1))
+         }
       }
    }
 
