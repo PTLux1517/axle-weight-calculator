@@ -34,7 +34,7 @@ import {
 import {
    costco24ChunkTrailer,
    costcoAllShredTrailer,
-   costcoMaxWeightTrailer,
+   costcoMaxWeightTrailer,defaultTrailerDimensions,
    emptyTrailer,
    maxRowsAllStraightTrailer,
    minSlideTrailer,
@@ -70,7 +70,13 @@ function App() {
 
    function resetTrailerDimensionsListener(e:MouseEvent) {
       (e.target as HTMLButtonElement).blur()
-      setSampleTrailer(defaultTrailer);
+      setSampleTrailer((prev:Trailer&Load) => ({
+         ...prev,
+         interiorLength: defaultTrailerDimensions.interiorLength,
+         kingpinDistanceFromNose: defaultTrailerDimensions.kingpinDistanceFromNose,
+         tandemSpreadWidth: defaultTrailerDimensions.tandemSpreadWidth,
+         tandemCenterDistanceFromNose: defaultTrailerDimensions.tandemCenterDistanceFromNose,
+      }));
       setStateRestriction(defaultState);
       setRearAxleTypeCapacity(defaultRearAxleType);
       (document.getElementById("interior-length-in") as HTMLInputElement).value = String(defaultTrailer.interiorLength);
@@ -263,10 +269,12 @@ function App() {
    }
 
    function loadPalletListener(side:Side, orien:O) {
-      if (selectedStaged[0]) {
-         setSampleTrailer(loadStack(sampleTrailer, selectedStaged[0].stack, side, orien))
-         setStaged(prev => prev.filter((_,idx) => idx!==selectedStaged[0].stagedIdx))
-         setLastLoadedStageId("staged-stack-"+selectedStaged[0].stagedIdx)
+      if (selectedStaged[0]!==undefined) {
+         const selIdx = selectedStaged[0]
+         setSampleTrailer(loadStack(sampleTrailer, staged[selIdx], side, orien))
+         setStaged(prev => prev.filter((_,idx) => idx!==selIdx))
+         const div = document.getElementById("staged-stack-"+selIdx) as HTMLDivElement
+         if (div && staged[selIdx][0]) div.style.background = staged[selIdx][0].palWt===P.Chep? "mediumblue" : "burlywood"
          setSelectedStaged(prev => prev.slice(1))
       }
    }
@@ -279,8 +287,7 @@ function App() {
    const [zoom,setZoom] = useState(defaultZoom)
    const [selectedPosition1, setSelectedPosition1] = useState<PositionWithMeta|null>(null)
    const [selectedPosition2, setSelectedPosition2] = useState<PositionWithMeta|null>(null)
-   const [selectedStaged, setSelectedStaged] = useState<StagedStackWithMeta[]>([])
-   const [lastLoadedStageId, setLastLoadedStageId] = useState("")
+   const [selectedStaged, setSelectedStaged] = useState<number[]>([])
    const selectionColor1 = "darkgoldenrod"
    const selectionColor2 = "darkcyan"
 
@@ -443,19 +450,6 @@ function App() {
 
    }, [zoom, sampleTrailer, selectedPosition1, selectedPosition2])
 
-   useEffect(() => {
-      const lastSelectedStaged:StagedStackWithMeta = selectedStaged[selectedStaged.length-1]
-      if (!lastSelectedStaged) return
-
-      const lastSelectedStagedDiv = document.getElementById("staged-stack-"+lastSelectedStaged.stagedIdx) as HTMLDivElement
-      if (!lastSelectedStagedDiv) return
-
-      console.log(lastSelectedStagedDiv.id, lastLoadedStageId)
-
-      if (lastSelectedStagedDiv.id===lastLoadedStageId) lastSelectedStagedDiv.style.background = (staged[lastSelectedStaged.stagedIdx][0] as Pallet).palWt===P.Chep ? "mediumblue" : "burlywood"
-      else lastSelectedStagedDiv.style.background = selectionColor1
-   },[selectedStaged]);
-
    return (
       <>
          <header><h1>Axle Weight Calculator</h1></header>
@@ -514,6 +508,10 @@ function App() {
             <div style={{gridRow: 4, gridColumn: "1/4"}} id={"staged-pallets-container"}>
                <h3>Staged Pallets</h3>
                <div style={{color: "orange"}}>(section under development)<hr/></div>
+               {staged.length > 0 && <div className={"hint"}>
+                  <div>sorted by stack weight</div>
+                  <div>click on a pallet to select</div>
+               </div>}
                <div id={"pallet-pool"}>{
                   staged.map((stack,idx) =>
                      <div id={"staged-stack-"+idx} style={{
@@ -527,7 +525,7 @@ function App() {
                         fontSize: zoom*7.7,
                         fontWeight: "bold",
                         lineHeight: 1
-                     }} onMouseUp={() => setSelectedStaged(prev => [...prev, {stack:stack, stagedIdx:idx}])}>{
+                     }} onMouseUp={() => {setSelectedStaged(prev => [...prev, idx]); const div = document.getElementById("staged-stack-"+idx) as HTMLDivElement; if (div) div.style.background = selectionColor1;}}>{
                         stack.map(pallet =>
                            <div>{
                               pallet.prdWt+""+(pallet.palWt===P.Chep ? "c" : "w")
@@ -539,7 +537,7 @@ function App() {
             </div>
             {/* ----------------------------------------------------------------- COLUMN 2 ----------------------------------------------------------------- */}
             <div id={"zoom-container"} style={{gridRow: 1, gridColumn: 2}}>
-               <div>(Todo: disclaimer/license)</div>
+               <div style={{color: "red"}}>(Todo: disclaimer/license)</div>
                <label id={"zoom-label"} htmlFor={"zoom"}>Zoom Diagram</label>
                <hr/>
                <div>
@@ -578,7 +576,7 @@ function App() {
             {/* ----------------------------------------------------------------- COLUMN 3 ----------------------------------------------------------------- */}
             <div id={"trailer-dimensions-container"} style={{gridRow: 1, gridColumn: 3}}>
                <h3 style={{gridColumn: "1/4"}}>Trailer Dimensions</h3>
-               <button onClick={resetTrailerDimensionsListener}>reset trailer</button>
+               <button onClick={resetTrailerDimensionsListener}>reset dimensions</button>
                <div style={{gridColumn: 2}}>in</div>
                <div style={{gridColumn: 3}}>ft</div>
                <label style={{gridColumn: 1}} className={"divided"} htmlFor={"interior-length-in"}>Interior Length</label>
@@ -606,7 +604,7 @@ function App() {
                <h3>Edit Pallet/Load</h3>
                <div style={{color: "orange"}}>(section under development)<hr/></div>
                {loaded && <div style={{marginBottom: "40px"}}>Load Weight w/ Pallets: {Math.ceil(totalLoadWt(loaded,unloaded)).toLocaleString()}</div>}
-               {!selectedPosition1 && <div style={{marginTop: "40px", color: "hsl(0,0%,25%)"}}>click on a pallet in the diagram to edit</div>}
+               {!selectedPosition1 && <div className={"hint"}>click on a pallet in the diagram to edit</div>}
                {selectedPosition1 && selectedPosition2 && <>
                   <button onClick={() => {setSampleTrailer(prev => swapPositions(selectedPosition1!.row, selectedPosition1!.side, selectedPosition2!.row, selectedPosition2!.side, prev)); setSelectedPosition1(null); setSelectedPosition2(null);}}>swap selected</button>
                   <button onClick={() => {setSelectedPosition1(null); setSelectedPosition2(null);}}>deselect all</button>
@@ -654,7 +652,7 @@ function App() {
             </div>
          </main>
          <footer>
-            <div id="copyright-text">&copy; {new Date().getFullYear()} <a href={"https://ptlux1517.github.io"} target={"_blank"}>Cory Tomlinson</a>. All rights reserved. (<a href={"mailto:cory@ptlux1517.mozmail.com?subject=(Axle%20Weight%20Calculator%20Contact)%3A%20*your%20subject%20here*"} target={"_blank"}>Contact</a>)</div>
+            <div id="copyright-text">&copy; {new Date().getFullYear()} Cory Tomlinson. All rights reserved. [<a href={"https://ptlux1517.github.io"} target={"_blank"}>Portfolio</a> | <a href={"mailto:cory@ptlux1517.mozmail.com?subject=(Axle%20Weight%20Calculator%20Contact)%3A%20*your%20subject%20here*"} target={"_blank"}>Contact</a>]</div>
          </footer>
       </>
    )

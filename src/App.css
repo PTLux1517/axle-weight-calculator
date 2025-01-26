@@ -201,3 +201,8 @@ h3, #zoom-label {
    font-size: 20px;
    font-weight: bold;
 }
+
+.hint {
+   color: hsl(0,0%,25%);
+   margin: 30px 0;
+}
