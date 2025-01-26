@@ -65,6 +65,11 @@ export enum P {
    White = 40,
 }
 
+export interface StagedStackWithMeta {
+   stack:Pallet[],
+   stagedIdx:number,
+}
+
 export type SlideAxleNoRestrictionMaxLength = 46.5
 export type SlideAxleRestrictionMaxLength = 40|41|43|45.5
 

@@ -1,18 +1,24 @@
 import {
-   AxleReferencePoint,AxleWeights,
+   AxleReferencePoint,
+   AxleWeights,
    Double,
    Load,
-   O,Pallet,placeholderPosition,Position,
-   RearAxleTypeCapacity,
+   O,
+   Pallet,
+   placeholderPosition,
+   Position,
+   RearAxleTypeCapacity,Row,
    Side,
    Single,
    SlideAxleNoRestrictionMaxLength,
    SlideAxleRestriction,
    SlideAxleRestrictionMaxLength,
    State,
-   Trailer,trailerWeightEmptyMinusAxlesAndReefer
+   Trailer,
+   trailerWeightEmptyMinusAxlesAndReefer
 } from "./types.ts";
 import {slideAxleRestrictedStates,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
+import {emptyTrailer} from "./sampleTrailers.ts";
 
 
 export function deepCopy<T>(original:T):T {
@@ -74,6 +80,37 @@ export function stateRefDistanceToAxleDistanceFromNose(axle:"F"|"R", trailer:Tra
             case "R": return 0;
          }})()
    }
+}
+
+export function loadStack(trailer:Trailer&Load, stack:Pallet[], side:Side, orien:O):Trailer&Load {
+   if (!trailer || !stack) return trailer
+   let newTrailer:Trailer&Load = deepCopy(trailer)
+   if (side === Side.C) {
+
+      let maxDepth = Object.values(newTrailer.loadRows[newTrailer.loadRows.length-1] ?? {})
+         .map(pos => pos===null ? 0 : pos.depth + pos.orien.L)
+         .reduce((leftOrAcc,rightOrC) => Math.max(leftOrAcc,rightOrC),0)
+         ?? 0
+      if (maxDepth + orien.L > trailer.interiorLength) {
+         alert("Not enough interior length remaining on the trailer to load the selected pallet "+orien.text)
+         return trailer
+      }
+      const newPos:Position = {
+         depth: maxDepth,
+         orien: orien,
+         stack: stack
+      }
+      const newRow:Row = {_ctr_: newPos}
+      newTrailer.loadRows.push(newRow)
+   }
+   else {
+      let selectedSideLastRowIdx = 0
+      newTrailer.loadRows.forEach(row => {
+
+      })
+      //determine if pushing new row or updating a null side
+   }
+   return newTrailer
 }
 
 export function rotatePosition(prev:Trailer&Load, rowNum:number, side:Side):Trailer&Load {
