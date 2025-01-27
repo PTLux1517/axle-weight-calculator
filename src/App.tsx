@@ -18,7 +18,7 @@ import {
 } from './types.ts'
 import {
    alertWithBlur,
-   calcAxleWeights,confirmWithBlur,
+   calcAxleWeights,
    deletePosition,
    getStateTandemMaxLength,
    getStateTandemMeasurementReference,loadStack,
