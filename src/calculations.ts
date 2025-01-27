@@ -27,16 +27,16 @@ export function alertWithBlur(msg:string) {
    setTimeout(() => document.body.style.filter = "none", 100)
 }
 
-export async function confirmWithBlur(msg:string):Promise<boolean> {
-   document.body.style.filter = "blur(5px)";
-   let ok = await new Promise<boolean>(resolve => {
-      setTimeout(() => {
-         resolve(confirm(msg));
-      },100);
-   });
-   setTimeout(() => document.body.style.filter = "none", 100);
-   return ok
-}
+//export async function confirmWithBlur(msg:string):Promise<boolean> {
+//   document.body.style.filter = "blur(5px)";
+//   let ok = await new Promise<boolean>(resolve => {
+//      setTimeout(() => {
+//         resolve(confirm(msg));
+//      },100);
+//   });
+//   setTimeout(() => document.body.style.filter = "none", 100);
+//   return ok
+//}
 
 export function deepCopy<T>(original:T):T {
    return JSON.parse(JSON.stringify(original)) as T

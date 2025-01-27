@@ -518,7 +518,7 @@ function App() {
                   </div></span>
                   <button id={"add-to-staging-button"} onClick={addPalletToStagingListener}>add</button>
                </div>
-               <button id={"clear-staging-button"} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); if ((async () => await confirmWithBlur("Clear all pallets from the staging area?"))()) {setSelectedStaged([]); setStaged([]);}}} disabled={staged.length===0}>clear staged</button>
+               <button id={"clear-staging-button"} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); if (confirm("Clear all pallets from the staging area?")) {setSelectedStaged([]); setStaged([]);}}} disabled={staged.length===0}>clear staged</button>
             </div>
             <div style={{gridRow: 4, gridColumn: "1/4"}} id={"staged-pallets-container"}>
                <h3>Staged Pallets</h3>
@@ -648,8 +648,10 @@ function App() {
                         setSelectedPosition1(null)
                      }}>deselect</button>
                      <button style={{backgroundColor: "red"}} onClick={() => {
-                        setSampleTrailer(prev =>  deletePosition(selectedPosition1!.row,selectedPosition1!.side,prev))
-                        setSelectedPosition1(null)
+                        if (confirm("delete selected position 1?")) {
+                           setSampleTrailer(prev => deletePosition(selectedPosition1!.row,selectedPosition1!.side,prev))
+                           setSelectedPosition1(null)
+                        }
                      }}>delete</button>
                   </>}
                </div>
