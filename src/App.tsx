@@ -529,11 +529,11 @@ function App() {
                {staged.length > 0 && <>
                   <div style={{position: "absolute", left: "10vw"}}>
                      <button disabled={selectedStaged.length===0} onClick={deselectAllStagedListener}>deselect all</button>&nbsp;
-                     <button disabled={selectedStaged.length===0}>stack together</button>
+                     <button disabled={selectedStaged.length<2}>stack together</button>
                   </div>
                   <div style={{position: "absolute", right: "10vw"}}>combine material to single: <br/>
-                     <button disabled={selectedStaged.length===0}>chep</button>&nbsp;
-                     <button disabled={selectedStaged.length===0}>white</button>
+                     <button disabled={selectedStaged.length<2}>chep</button>&nbsp;
+                     <button disabled={selectedStaged.length<2}>white</button>
                   </div>
                   <div className={"hint"}>
                      <div>sorted by stack weight</div>
