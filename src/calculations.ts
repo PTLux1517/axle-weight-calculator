@@ -152,11 +152,12 @@ export function loadStack(trailer:Trailer&Load, stack:Pallet[], side:Side, orien
       }
       else { //updating a null side
          let prevRow = newTrailer.loadRows[stackPlacement[1]-1]
-         const depth = prevRow.hasOwnProperty(Side.C)
+         const depth = (prevRow?.hasOwnProperty(Side.C)
                           ? ((prevRow as Single)?._ctr_?.depth ?? 0) + ((prevRow as Single)?._ctr_?.orien.L ?? 0)
                           : side===Side.L
                              ? ((prevRow as Double)?.l___?.depth ?? 0) + ((prevRow as Double)?.l___?.orien.L ?? 0)
-                             : ((prevRow as Double)?.___r?.depth ?? 0) + ((prevRow as Double)?.___r?.orien.L ?? 0)
+                             : ((prevRow as Double)?.___r?.depth ?? 0) + ((prevRow as Double)?.___r?.orien.L ?? 0))
+                        ?? 0
          const newPos:Position = {
             depth: depth,
             orien: orien,
