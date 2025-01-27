@@ -162,6 +162,9 @@ main {
       }
       #clear-staging-button {
          width: 100%;
+         &:not(:disabled) {
+            background: red;
+         }
       }
    }
    #add-pallet-buttons-container {

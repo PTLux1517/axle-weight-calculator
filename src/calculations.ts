@@ -21,6 +21,23 @@ import {
 import {slideAxleRestrictedStates,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
 
 
+export function alertWithBlur(msg:string) {
+   document.body.style.filter = "blur(5px)"
+   setTimeout(() => alert(msg),100)
+   setTimeout(() => document.body.style.filter = "none", 100)
+}
+
+export async function confirmWithBlur(msg:string):Promise<boolean> {
+   document.body.style.filter = "blur(5px)";
+   let ok = await new Promise<boolean>(resolve => {
+      setTimeout(() => {
+         resolve(confirm(msg));
+      },100);
+   });
+   setTimeout(() => document.body.style.filter = "none", 100);
+   return ok
+}
+
 export function deepCopy<T>(original:T):T {
    return JSON.parse(JSON.stringify(original)) as T
 }
@@ -66,7 +83,7 @@ export function tandemCenterDistanceFromNoseToStateRefDistance(trailer:Trailer, 
 
 /* inches */
 export function stateRefDistanceToAxleDistanceFromNose(axle:"F"|"R", trailer:Trailer, inputLengthInches:number, state:State|null):number {
-   if (isNaN(inputLengthInches)) {inputLengthInches = toInches(40); alert("Distance From Kingpin input passed value of NaN to stateRefDistanceToAxleDistanceFromNose() function. Defaulting to 40'.");}
+   if (isNaN(inputLengthInches)) {inputLengthInches = toInches(40); alertWithBlur("Distance From Kingpin input passed value of NaN to stateRefDistanceToAxleDistanceFromNose() function. Defaulting to 40'.");}
    const refPoint = getStateTandemMeasurementReference(state)
    switch (refPoint) {
       case AxleReferencePoint.Ctr:
@@ -91,7 +108,7 @@ export function loadStack(trailer:Trailer&Load, stack:Pallet[], side:Side, orien
                         .reduce((leftOrAcc,rightOrC) => Math.max(leftOrAcc,rightOrC),0)
                         ?? 0
       if (maxDepth + orien.L > trailer.interiorLength) {
-         alert("Not enough interior length remaining on the trailer to load the selected pallet "+orien.text)
+         alertWithBlur("Not enough interior length remaining on the trailer to load the selected pallet "+orien.text)
          return trailer
       }
       const newPos:Position = {
@@ -121,7 +138,7 @@ export function loadStack(trailer:Trailer&Load, stack:Pallet[], side:Side, orien
                ? Math.max(lDepth,cDepth)
                : Math.max(rDepth,cDepth)
             if (maxDepth + orien.L > trailer.interiorLength) {
-               alert("Not enough interior length remaining on the trailer to load the selected pallet "+orien.text)
+               alertWithBlur("Not enough interior length remaining on the trailer to load the selected pallet "+orien.text)
                return trailer
             }
          }
@@ -161,7 +178,7 @@ export function rotatePosition(prev:Trailer&Load, rowNum:number, side:Side):Trai
       case Side.L: {
          const orientation = (prev.loadRows[i] as Double)?.l___?.orien?.text;
          if (orientation===undefined) {
-            alert("rotate position called with wrong side argument")
+            alertWithBlur("rotate position called with wrong side argument")
             return prev
          }
          (newTrailer.loadRows[i] as Double).l___!.orien = orientation === O.Straight.text ? O.Sideways : O.Straight;
@@ -170,7 +187,7 @@ export function rotatePosition(prev:Trailer&Load, rowNum:number, side:Side):Trai
       case Side.C: {
          const orientation = (prev.loadRows[i] as Single)?._ctr_?.orien?.text;
          if (orientation===undefined) {
-            alert("rotate position called with wrong side argument")
+            alertWithBlur("rotate position called with wrong side argument")
             return prev
          }
          (newTrailer.loadRows[i] as Single)._ctr_!.orien = orientation === O.Straight.text ? O.Sideways : O.Straight;
@@ -179,7 +196,7 @@ export function rotatePosition(prev:Trailer&Load, rowNum:number, side:Side):Trai
       case Side.R: {
          const orientation = (prev.loadRows[i] as Double)?.___r?.orien?.text;
          if (orientation===undefined) {
-            alert("rotate position called with wrong side argument")
+            alertWithBlur("rotate position called with wrong side argument")
             return prev
          }
          (newTrailer.loadRows[i] as Double).___r!.orien = orientation === O.Straight.text ? O.Sideways : O.Straight;
@@ -205,6 +222,16 @@ function convertDoubleToSingle(rowNum:number, trailer:Trailer&Load) {
 export function deletePosition(rowNum:number, side:Side, trailer:Trailer&Load):Trailer&Load {
    let returnTrailer:Trailer&Load;
    const i = rowNum - 1
+   if (rowNum === trailer.loadRows.length) {
+      if (
+         (side===Side.L && (trailer.loadRows[i] as Double).___r===null)
+      || (side===Side.R && (trailer.loadRows[i] as Double).l___===null)
+      ) {
+         let shortened = deepCopy(trailer)
+         shortened.loadRows.pop();
+         return shortened;
+      }
+   }
    switch (side) {
       case Side.C: {
          const deletedLength = (trailer.loadRows[i] as Single)._ctr_.orien.L
@@ -369,7 +396,7 @@ export function calcAxleWeights(trailer:Trailer&Load, unloaded:AxleWeights, rear
          }
       })
    })
-   if (showAlert) alert("spread axle weight calculation not implemented yet")
+   if (showAlert) alertWithBlur("spread axle weight calculation not implemented yet")
    return loaded
 }
 

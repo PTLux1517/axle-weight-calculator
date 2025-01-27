@@ -17,7 +17,8 @@ import {
    Trailer
 } from './types.ts'
 import {
-   calcAxleWeights,
+   alertWithBlur,
+   calcAxleWeights,confirmWithBlur,
    deletePosition,
    getStateTandemMaxLength,
    getStateTandemMeasurementReference,loadStack,
@@ -269,6 +270,10 @@ function App() {
    }
 
    function loadPalletListener(side:Side, orien:O) {
+      if (selectedStaged.length!==1) {
+         alertWithBlur("Only one pallet/stack can be loaded at a time. Please deselect all pallets, if necessary, and select only one pallet to load.")
+         return
+      }
       if (selectedStaged[0]!==undefined) {
          const selIdx = selectedStaged[0]
          const newTrailer = loadStack(sampleTrailer, staged[selIdx], side, orien)
@@ -280,6 +285,14 @@ function App() {
             setSelectedStaged(prev => prev.slice(1))
          }
       }
+   }
+
+   function deselectAllStagedListener(e:MouseEvent) {
+      (e.target as HTMLButtonElement).blur();
+      selectedStaged.forEach(stagedIdx =>
+         (document.getElementById("staged-stack-"+stagedIdx) as HTMLDivElement).style.background = staged[stagedIdx][0].palWt===P.Chep ? "mediumblue" : "burlywood"
+      )
+      setSelectedStaged([]);
    }
 
    //const forceUpdate = useReducer(x => x+1, 0, () => 0)[1]
@@ -402,7 +415,7 @@ function App() {
             const width = zoom * (c.orien.text === O.Straight.text ? O.Straight.W : O.Sideways.W)
             const length = zoom * (c.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
             /* draw pallet */
-            ctx.fillStyle = c.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
+            ctx.fillStyle = c.stack[0] && c.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
             if (i+1===selectedPosition1?.row && selectedPosition1.side===Side.C) ctx.fillStyle = selectionColor1
             if (i+1===selectedPosition2?.row && selectedPosition2.side===Side.C) ctx.fillStyle = selectionColor2
             ctx.beginPath()
@@ -479,16 +492,16 @@ function App() {
             </div>
             <div id={"loaded-weight-container"} style={{gridRow: 2, gridColumn: 1}}>
                <h3>Loaded Weight (lbs)</h3>
-               <div id={"drive-weight"} style={{top: zoom*sampleTrailer.kingpinDistanceFromNose + 15, color: (loaded && loaded.drives > 34000 ? "red" : "")}}>Drive axles:<br/>
+               <div id={"drive-weight"} style={{top: zoom*sampleTrailer.kingpinDistanceFromNose + 15, color: (loaded && loaded.drives > 34000 ? "red" : "")}}>Drive Axles:<br/>
                   {Math.ceil(loaded ? loaded.drives : unloaded.drives).toLocaleString()} / {Number(34000).toLocaleString()}</div>
                {rearAxleTypeCapacity===RearAxleTypeCapacity.Tandem && <>
-                  <div id={"tandem-weight"} style={{top: zoom * sampleTrailer.tandemCenterDistanceFromNose, color: (loaded && loaded.fTandem > rearAxleTypeCapacity ? "red": "")}}>Trailer axles:<br/>
+                  <div id={"tandem-weight"} style={{top: zoom * sampleTrailer.tandemCenterDistanceFromNose, color: (loaded && loaded.fTandem > rearAxleTypeCapacity ? "red": "")}}>Trailer Axles:<br/>
                      {Math.ceil(loaded ? loaded.fTandem+loaded.rTandem : unloaded.fTandem+unloaded.rTandem).toLocaleString()} / {(2*rearAxleTypeCapacity).toLocaleString()}</div>
                </>}
                {rearAxleTypeCapacity===RearAxleTypeCapacity.Spread && <>
-               <div id={"front-tandem-weight"} style={{top: frontTandAxleRenderPos + 8 - (6/zoom), color: (loaded && loaded.fTandem > rearAxleTypeCapacity ? "red": "")}}>Trailer axle:<br/>
+               <div id={"front-tandem-weight"} style={{top: frontTandAxleRenderPos + 8 - (6/zoom), color: (loaded && loaded.fTandem > rearAxleTypeCapacity ? "red": "")}}>Trailer Axle:<br/>
                   {Math.ceil(loaded ? loaded.fTandem : unloaded.fTandem).toLocaleString()} / {rearAxleTypeCapacity.toLocaleString()}</div>
-               <div id={"rear-tandem-weight"} style={{top: rearTandAxleRenderPos + 8 + (6/zoom), color: (loaded && loaded.rTandem > rearAxleTypeCapacity ? "red": "")}}>Trailer axle:<br/>
+               <div id={"rear-tandem-weight"} style={{top: rearTandAxleRenderPos + 8 + (6/zoom), color: (loaded && loaded.rTandem > rearAxleTypeCapacity ? "red": "")}}>Trailer Axle:<br/>
                   {Math.ceil(loaded ? loaded.rTandem : unloaded.rTandem).toLocaleString()} / {rearAxleTypeCapacity.toLocaleString()}</div>
                </>}
                <div id={"combined-weight"} style={{top: zoom*sampleTrailer.interiorLength - 10, color: (totalGrossWt(loaded ?? unloaded) > 80000 ? "red" : "")}}>Combined:<br/>
@@ -496,7 +509,6 @@ function App() {
             </div>
             <div style={{gridRow: 3, gridColumn: "1"}} id={"populate-staging-area-container"}>
                <h3>Populate Staging Area</h3>
-               <div style={{color: "orange"}}>(section under development)<hr/></div>
                <div id={"staging-form-container"}>
                   <input type={"number"} id={"staging-multiplier"} min={1} max={100} step={1} defaultValue={1}/><span>x</span><input type={"text"} id={"staging-weight"} list={"finished-goods-pallet-weights"}/><datalist id={"finished-goods-pallet-weights"}>{fgPalletWeights.map(elem => <option>{elem}</option>)}</datalist>
                   <label htmlFor={"stage-stacked"}>double stack?</label><input type={"checkbox"} id={"stage-stacked"} name={"stage-stacked"} defaultChecked={false}/>
@@ -506,15 +518,28 @@ function App() {
                   </div></span>
                   <button id={"add-to-staging-button"} onClick={addPalletToStagingListener}>add</button>
                </div>
-               <button id={"clear-staging-button"} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); setStaged([]);}}>clear staged</button>
+               <button id={"clear-staging-button"} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); if ((async () => await confirmWithBlur("Clear all pallets from the staging area?"))()) {setSelectedStaged([]); setStaged([]);}}} disabled={staged.length===0}>clear staged</button>
             </div>
             <div style={{gridRow: 4, gridColumn: "1/4"}} id={"staged-pallets-container"}>
                <h3>Staged Pallets</h3>
                <div style={{color: "orange"}}>(section under development)<hr/></div>
-               {staged.length > 0 && <div className={"hint"}>
-                  <div>sorted by stack weight</div>
-                  <div>click on a pallet to select</div>
+               {staged.length === 0 && <div className={"hint"}>
+                  <div>use the "Populate Staging Area" section to add pallets</div>
                </div>}
+               {staged.length > 0 && <>
+                  <div style={{position: "absolute", left: "10vw"}}>
+                     <button disabled={selectedStaged.length===0} onClick={deselectAllStagedListener}>deselect all</button>&nbsp;
+                     <button disabled={selectedStaged.length===0}>stack together</button>
+                  </div>
+                  <div style={{position: "absolute", right: "10vw"}}>combine material to single: <br/>
+                     <button disabled={selectedStaged.length===0}>chep</button>&nbsp;
+                     <button disabled={selectedStaged.length===0}>white</button>
+                  </div>
+                  <div className={"hint"}>
+                     <div>sorted by stack weight</div>
+                     <div>click on a pallet to select</div>
+                  </div>
+               </>}
                <div id={"pallet-pool"}>{
                   staged.map((stack,idx) =>
                      <div id={"staged-stack-"+idx} style={{
@@ -569,7 +594,6 @@ function App() {
             <canvas id={"load-diagram"} className={"no-border"} width={toInches(8)*zoom} height={sampleTrailer.interiorLength*zoom} style={{margin: "0 calc(50% - "+(toInches(4)*zoom)+"px)", gridRow: 2, gridColumn: 2}} onMouseUp={canvasClickListener}/>
             <div style={{gridRow: 3, gridColumn: 2}} id={"add-pallet-buttons-container"}>
                <h3 style={{gridColumn: "1/4"}}>Load Selected Staged Pallet</h3>
-               <div style={{gridColumn: "1/4",color: "orange"}}>(section under development)<hr/></div>
                <div style={{color: "orange", fontWeight: "bold"}}>to left</div>
                <div style={{color: "orange", fontWeight: "bold"}}>in center</div>
                <div style={{color: "orange", fontWeight: "bold"}}>to right</div>
@@ -624,7 +648,7 @@ function App() {
                         setSelectedPosition1(null)
                      }}>deselect</button>
                      <button style={{backgroundColor: "red"}} onClick={() => {
-                        setSampleTrailer(prev => deletePosition(selectedPosition1!.row, selectedPosition1!.side, prev))
+                        setSampleTrailer(prev =>  deletePosition(selectedPosition1!.row,selectedPosition1!.side,prev))
                         setSelectedPosition1(null)
                      }}>delete</button>
                   </>}
@@ -646,7 +670,6 @@ function App() {
             </div>
             <div id={"staging-info-container"} style={{gridRow: 3, gridColumn: 3}}>
                <h3>Staging Info</h3>
-               <div style={{color: "orange"}}>(section under development)<hr/></div>
                {staged.length > 0 && <>
                   <div>Staged Weight w/ Pallets: {Math.ceil(totalStagedWt(staged)).toLocaleString()}</div>
                   <div>Position Count: {staged.length}</div>
