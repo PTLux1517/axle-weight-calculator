@@ -269,6 +269,28 @@ function App() {
       })
    }
 
+   function unloadAllPalletsListener(e:MouseEvent) {
+      (e.target as HTMLButtonElement).blur()
+      setStaged(prev => {
+         let unloaded:Pallet[][] = []
+         sampleTrailer.loadRows.forEach(row => {
+            if (row.hasOwnProperty(Side.C)) {
+               row = row as Single
+               unloaded.push(row._ctr_.stack)
+            }
+            else if (row.hasOwnProperty(Side.L) && row.hasOwnProperty(Side.R)) {
+               row = row as Double
+               if (row.l___!==null) unloaded.push(row.l___.stack)
+               if (row.___r!==null) unloaded.push(row.___r.stack)
+            }
+         })
+         return sortStagedPalletsByStackWeight([...prev].concat(unloaded))
+      })
+      setSelectedPosition1(null)
+      setSelectedPosition2(null)
+      setSampleTrailer(emptyTrailer)
+   }
+
    function loadPalletListener(side:Side, orien:O) {
       if (selectedStaged.length!==1) {
          alertWithBlur("Only one pallet/stack can be loaded at a time. Please deselect all pallets, if necessary, and select only one pallet to load.")
@@ -529,7 +551,7 @@ function App() {
                {staged.length > 0 && <>
                   <div style={{position: "absolute", left: "10vw"}}>
                      <button disabled={selectedStaged.length===0} onClick={deselectAllStagedListener}>deselect all</button>&nbsp;
-                     <button disabled={selectedStaged.length<2}>stack together</button>
+                     <button disabled={selectedStaged.length<2||6<selectedStaged.length}>stack together</button>
                   </div>
                   <div style={{position: "absolute", right: "10vw"}}>combine material to single: <br/>
                      <button disabled={selectedStaged.length<2}>chep</button>&nbsp;
@@ -630,7 +652,13 @@ function App() {
             <div id={"editor-container"} style={{gridRow: 2, gridColumn: 3}}>
                <h3>Edit Pallet/Load</h3>
                <div style={{color: "orange"}}>(section under development)<hr/></div>
-               {loaded && <div style={{marginBottom: "40px"}}>Load Weight w/ Pallets: {Math.ceil(totalLoadWt(loaded,unloaded)).toLocaleString()}</div>}
+               {sampleTrailer.loadRows.length>0 && <>
+                  <div style={{marginBottom: "20px"}}>Load lbs w/ Pallets: {loaded && Math.ceil(totalLoadWt(loaded,unloaded)).toLocaleString()}</div>
+                  <div>
+                     <button style={{display: "block", width: "100%", margin: "10px 0", background: "red"}} onMouseUp={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); if (confirm("permanently delete all pallets from trailer?")) setSampleTrailer(emptyTrailer);}}>delete load</button>
+                     <button style={{display: "block", width: "100%", margin: "10px 0"}} onMouseUp={unloadAllPalletsListener}>unload all</button>
+                  </div>
+               </>}
                {!selectedPosition1 && <div className={"hint"}>click on a pallet in the diagram to edit</div>}
                {selectedPosition1 && selectedPosition2 && <>
                   <button onClick={() => {setSampleTrailer(prev => swapPositions(selectedPosition1!.row, selectedPosition1!.side, selectedPosition2!.row, selectedPosition2!.side, prev)); setSelectedPosition1(null); setSelectedPosition2(null);}}>swap selected</button>
@@ -672,10 +700,12 @@ function App() {
             </div>
             <div id={"staging-info-container"} style={{gridRow: 3, gridColumn: 3}}>
                <h3>Staging Info</h3>
-               {staged.length > 0 && <>
-                  <div>Staged Weight w/ Pallets: {Math.ceil(totalStagedWt(staged)).toLocaleString()}</div>
-                  <div>Position Count: {staged.length}</div>
-               </>}
+               {staged.length > 0 && <div style={{display: "grid", gridTemplateColumns: "4fr 1fr", textAlign: "right"!}}>
+                  <div style={{gridColumn:1}}>Staged Position Count: </div><div style={{gridColumn:2}}>{staged.length}</div>
+                  <div style={{gridColumn:1}}>Staged lbs w/ Pallets: </div><div style={{gridColumn:2}}>{Math.ceil(totalStagedWt(staged)).toLocaleString()}</div><br/>
+                  <div style={{gridColumn:1}}>Selected Position Count: </div><div style={{gridColumn:2}}>{selectedStaged.length}</div>
+                  <div style={{gridColumn:1}}>Selected lbs w/ Pallets: </div><div style={{gridColumn:2}}>{Math.ceil(selectedStaged.map(idx => staged[idx]).reduce((selWtAcc,currSelStack) => selWtAcc+currSelStack.reduce((stackWtAcc,currPal) => stackWtAcc+currPal.prdWt+currPal.palWt,0),0)).toLocaleString()}</div>
+               </div>}
 
             </div>
          </main>
