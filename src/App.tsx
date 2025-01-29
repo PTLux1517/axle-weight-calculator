@@ -575,7 +575,7 @@ function App() {
                         fontSize: zoom*7.7,
                         fontWeight: "bold",
                         lineHeight: 1
-                     }} onMouseUp={() => {setSelectedStaged(prev => [...prev, idx]); const div = document.getElementById("staged-stack-"+idx) as HTMLDivElement; if (div) div.style.background = selectionColor1;}}>{
+                     }} onMouseUp={() => {if (!selectedStaged.includes(idx)) setSelectedStaged(prev => [...prev, idx]); const div = document.getElementById("staged-stack-"+idx) as HTMLDivElement; if (div) div.style.background = selectionColor1;}}>{
                         stack.map(pallet =>
                            <div>{
                               pallet.prdWt+""+(pallet.palWt===P.Chep ? "c" : "w")
