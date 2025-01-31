@@ -660,27 +660,33 @@ function App() {
                   </div>
                </>}
                {!selectedPosition1 && <div className={"hint"}>click on a pallet in the diagram to edit</div>}
-               {selectedPosition1 && selectedPosition2 && <>
-                  <button onClick={() => {setSampleTrailer(prev => swapPositions(selectedPosition1!.row, selectedPosition1!.side, selectedPosition2!.row, selectedPosition2!.side, prev)); setSelectedPosition1(null); setSelectedPosition2(null);}}>swap selected</button>
-                  <button onClick={() => {setSelectedPosition1(null); setSelectedPosition2(null);}}>deselect all</button>
-               </>}
+               {selectedPosition1 && selectedPosition2 && <div style={{display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "4px"}}>
+                  <button style={{flex: 1}} onClick={() => {setSampleTrailer(prev => swapPositions(selectedPosition1!.row, selectedPosition1!.side, selectedPosition2!.row, selectedPosition2!.side, prev)); setSelectedPosition1(null); setSelectedPosition2(null);}}>swap selected</button>
+                  <button style={{flex: 1}} onClick={() => {setSelectedPosition1(null); setSelectedPosition2(null);}}>deselect all</button>
+               </div>}
                <div id={"selected-position-1"}>
                   {selectedPosition1 && <>
                      <h3>Selected Position 1</h3>
                      <div style={{whiteSpace: "pre", textAlign: "left", fontSize: "smaller", color: selectionColor1}}>{JSON.stringify(selectedPosition1,null,2)}</div>
-                     <button onClick={() => {
-                        setSampleTrailer(prev => rotatePosition(prev, selectedPosition1!.row, selectedPosition1!.side))
-                        setSelectedPosition1(null)
-                     }}>rotate</button>
-                     <button onClick={() => {
-                        setSelectedPosition1(null)
-                     }}>deselect</button>
-                     <button style={{backgroundColor: "red"}} onClick={() => {
-                        if (confirm("delete selected position 1?")) {
-                           setSampleTrailer(prev => deletePosition(selectedPosition1!.row,selectedPosition1!.side,prev))
+                     <div style={{display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "4px"}}>
+                        <button style={{flex: 1}} onClick={() => {
+                           setSampleTrailer(prev => rotatePosition(prev, selectedPosition1!.row, selectedPosition1!.side))
                            setSelectedPosition1(null)
-                        }
-                     }}>delete</button>
+                        }}>rotate</button>
+                        <button style={{flex: 1}} onClick={() => {
+                           setSelectedPosition1(null)
+                        }}>deselect</button>
+                        <button style={{flex: 1}} onClick={() => {
+
+                           setSelectedPosition1(null)
+                        }}>unload</button>
+                        <button style={{flex: 1, backgroundColor: "red"}} onClick={() => {
+                           if (confirm("delete selected position 1?")) {
+                              setSampleTrailer(prev => deletePosition(selectedPosition1!.row,selectedPosition1!.side,prev))
+                              setSelectedPosition1(null)
+                           }
+                        }}>delete</button>
+                     </div>
                   </>}
                </div>
                <div id={"selected-position-2"}>
@@ -688,13 +694,15 @@ function App() {
                      <hr/>
                      <h3>Selected Position 2</h3>
                      <div style={{whiteSpace: "pre", textAlign: "left", fontSize: "smaller", color: selectionColor2}}>{JSON.stringify(selectedPosition2,null,2)}</div>
-                     <button onClick={() => {
-                        setSampleTrailer(prev => rotatePosition(prev, selectedPosition2!.row, selectedPosition2!.side))
-                        setSelectedPosition2(null)
-                     }}>rotate</button>
-                     <button onClick={() => {
-                        setSelectedPosition2(null)
-                     }}>deselect</button>
+                     <div style={{display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "4px"}}>
+                        <button style={{flex: 1}} onClick={() => {
+                           setSampleTrailer(prev => rotatePosition(prev, selectedPosition2!.row, selectedPosition2!.side))
+                           setSelectedPosition2(null)
+                        }}>rotate</button>
+                        <button style={{flex: 1}} onClick={() => {
+                           setSelectedPosition2(null)
+                        }}>deselect</button>
+                     </div>
                   </>}
                </div>
             </div>
