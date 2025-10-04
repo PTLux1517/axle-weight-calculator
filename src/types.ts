@@ -2,6 +2,8 @@
 export class O {
    static readonly Straight = new O('Straight',48,40)
    static readonly Sideways = new O('Sideways',40,48)
+   static readonly ToscaSm = new O('ToscaSm',24,30)
+   static readonly ToscaLg = new O('ToscaLg',30,30)
    private constructor(public readonly text:String, public readonly L:number, public readonly W:number) {}
    toString() {return this.text}
 }
@@ -33,9 +35,10 @@ export enum Side {
    C = "_ctr_",
    R = "___r",
 }
-export type Row = Single | Double
+export type Row = Single | Double | Triple
 export type Single = {_ctr_: Position}
 export type Double = {l___: Position|null, ___r: Position|null}
+export type Triple = {l___: Position|null, _ctr_: Position|null, ___r: Position|null}
 
 
 export interface Position {
@@ -54,7 +57,7 @@ export interface PositionWithMeta extends Position {
 
 export interface Pallet {
    /* product weight in pounds */
-   prdWt: number,
+   prdWt?: number,
    /* pallet weight in pounds */
    palWt: P,
 }
@@ -63,6 +66,13 @@ export interface Pallet {
 export enum P {
    Chep = 60,
    White = 40,
+   ToscaCatchFrames = 398,
+   ToscaLegFrames = 461,
+   ToscaShortBoards2Stack = 756,
+   Tosca0TongueBoards = 874,
+   ToscaSpringBox = 981,
+   Tosca2TongueBoards = 986,
+   Tosca3TongueBoards = 1272,
 }
 
 export interface StagedStackWithMeta {
@@ -148,10 +158,14 @@ export const trailerWeightEmptyMinusAxlesAndReefer = 9000
 export const placeholderPosition = {depth: 0, orien: O.Straight, stack: []} as Position
 
 export const fgPalletWeights = [
+   0, //tosca
+   280,
    382,
    393,
+   //398, //tosca top irons
    408,
    429,
+   //461, //tosca bottom irons
    468,
    472,
    500,
@@ -163,22 +177,28 @@ export const fgPalletWeights = [
    630,
    648,
    649,
+   658,
    702,
    714,
    716,
    720,
    726,
    729,
+   //756, //tosca pressure plates
    800,
    816,
    850,
    864,
+   //874, //tosca top|bottom boards
    966,
    972,
+   981, //tosca springs
+   986, //tosca narrow sides
    1008,
    1092,
    1134,
    1260,
+   //1272, //tosca wide sides
    1280,
    1287,
    1350,

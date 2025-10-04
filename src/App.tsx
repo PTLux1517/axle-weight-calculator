@@ -399,7 +399,7 @@ function App() {
                ctx.fillStyle = "white"
                l.stack.forEach((pal,j) => {
                   const color = pal.palWt === P.Chep ? "c" : "w"
-                  ctx.fillText(pal.prdWt+color, width/2, depth + length - j*fontPx*zoom)
+                  ctx.fillText(pal.prdWt??0+color, width/2, depth + length - j*fontPx*zoom)
                })
             }
             if (row.___r !== null) {
@@ -426,7 +426,7 @@ function App() {
                ctx.fillStyle = "white"
                r.stack.forEach((pal,j) => {
                   const color = pal.palWt === P.Chep ? "c" : "w"
-                  ctx.fillText(pal.prdWt+color, zoom*toInches(8) - width/2, depth + length - j*fontPx*zoom)
+                  ctx.fillText(pal.prdWt??0+color, zoom*toInches(8) - width/2, depth + length - j*fontPx*zoom)
                })
             }
          }
@@ -461,7 +461,7 @@ function App() {
             ctx.fillStyle = "white"
             c.stack.forEach((pal,j) => {
                const color = pal.palWt === P.Chep ? "c" : "w"
-               ctx.fillText(pal.prdWt+color, zoom*toInches(4), depth + length - j*fontPx*zoom)
+               ctx.fillText(pal.prdWt??0+color, zoom*toInches(4), depth + length - j*fontPx*zoom)
             })
          }
       });
@@ -578,7 +578,7 @@ function App() {
                      }} onMouseUp={() => {if (!selectedStaged.includes(idx)) setSelectedStaged(prev => [...prev, idx]); const div = document.getElementById("staged-stack-"+idx) as HTMLDivElement; if (div) div.style.background = selectionColor1;}}>{
                         stack.map(pallet =>
                            <div>{
-                              pallet.prdWt+""+(pallet.palWt===P.Chep ? "c" : "w")
+                              pallet.prdWt??0+""+(pallet.palWt===P.Chep ? "c" : "w")
                            }</div>
                         )
                      }</div>
@@ -712,7 +712,7 @@ function App() {
                   <div style={{gridColumn:1}}>Staged Position Count: </div><div style={{gridColumn:2}}>{staged.length}</div>
                   <div style={{gridColumn:1}}>Staged lbs w/ Pallets: </div><div style={{gridColumn:2}}>{Math.ceil(totalStagedWt(staged)).toLocaleString()}</div><br/>
                   <div style={{gridColumn:1}}>Selected Position Count: </div><div style={{gridColumn:2}}>{selectedStaged.length}</div>
-                  <div style={{gridColumn:1}}>Selected lbs w/ Pallets: </div><div style={{gridColumn:2}}>{Math.ceil(selectedStaged.map(idx => staged[idx]).reduce((selWtAcc,currSelStack) => selWtAcc+currSelStack.reduce((stackWtAcc,currPal) => stackWtAcc+currPal.prdWt+currPal.palWt,0),0)).toLocaleString()}</div>
+                  <div style={{gridColumn:1}}>Selected lbs w/ Pallets: </div><div style={{gridColumn:2}}>{Math.ceil(selectedStaged.map(idx => staged[idx]).reduce((selWtAcc,currSelStack) => selWtAcc+currSelStack.reduce((stackWtAcc,currPal) => stackWtAcc+currPal.prdWt??0+currPal.palWt,0),0)).toLocaleString()}</div>
                </div>}
 
             </div>

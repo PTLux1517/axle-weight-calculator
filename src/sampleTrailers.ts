@@ -120,3 +120,12 @@ export const costco24ChunkTrailer:Named&Trailer&Load = {
       //{l___: {depth: 12*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}, ___r: {depth: 12*O.Sideways.L, orien: O.Sideways, stack: [{prdWt: 1560, palWt: P.Chep}]}},
    ]
 }
+
+export const toscaOriginal:Named&Trailer&Load = {
+   ...defaultTrailerDimensions,
+   name: "tosca original pattern",
+   loadRows: [
+      {l___: {depth: 0*O.ToscaLg.L, orien: O.ToscaLg, stack: [{palWt: P.ToscaLegFrames}]}, ___r: {depth: 0*O.ToscaLg.L, orien: O.ToscaLg, stack: [{palWt: P.ToscaLegFrames}]}},
+      {l___: {depth: 1*O.ToscaLg.L, orien: O.ToscaLg, stack: [{palWt: P.ToscaCatchFrames}]}, _ctr_: {depth: 1*O.ToscaLg.L, orien: O.ToscaLg, stack: [{palWt: P.ToscaCatchFrames}]}, ___r: {depth: 1*O.ToscaLg.L, orien: O.ToscaLg, stack: [{palWt: P.ToscaCatchFrames}]}}
+   ]
+}
