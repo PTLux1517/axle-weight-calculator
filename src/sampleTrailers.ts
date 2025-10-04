@@ -1,5 +1,5 @@
 import {Load,LoadTemplate,Named,O,P,RO,Trailer} from './types.ts';
-import {toInches} from "./calculations.ts";
+import {toInches,toLoad} from "./calculations.ts";
 
 /* measurements according to https://tprimelogistics.com/wp-content/uploads/2019/04/53-air-ride-roll-door-1.jpg */
 export const minTandCenterSlideLengthFromNose = toInches(53) - 169
@@ -121,35 +121,30 @@ export const costco24ChunkTrailer:Named&Trailer&Load = {
    ]
 }
 
-const toscaOriginalTemplate:LoadTemplate = {
-   rows: [
-      [P.ToscaLeggedFrames,P.ToscaLeggedFrames],
-      [P.ToscaBracketedFrames,P.ToscaBracketedFrames,P.ToscaBracketedFrames],
-      [P.ToscaBracketedFrames,P.ToscaBracketedFrames],
-      [P.ToscaBracketedFrames,P.ToscaBracketedFrames,P.ToscaBracketedFrames],
-      [P.Tosca0TongueBoards,P.Tosca0TongueBoards,P.Tosca0TongueBoards],
-      [P.Tosca0TongueBoards,P.Tosca0TongueBoards,P.Tosca0TongueBoards],
-      [P.Tosca0TongueBoards,P.Tosca0TongueBoards,P.Tosca0TongueBoards],
-      [P.Tosca2TongueBoards,P.Tosca2TongueBoards,P.Tosca2TongueBoards],
-      [P.Tosca2TongueBoards,P.Tosca2TongueBoards,P.Tosca2TongueBoards],
-      [P.Tosca2TongueBoards,P.Tosca2TongueBoards,P.Tosca2TongueBoards],
-      [P.Tosca3TongueBoards,P.Tosca3TongueBoards,P.Tosca3TongueBoards],
-      [P.Tosca3TongueBoards,P.Tosca3TongueBoards,P.Tosca3TongueBoards],
-      [P.Tosca3TongueBoards,P.Tosca3TongueBoards,P.Tosca3TongueBoards],
-      [P.ToscaLeggedFrames,P.ToscaLeggedFrames,P.ToscaLeggedFrames],
-      [P.ToscaLeggedFrames,P.ToscaLeggedFrames,P.ToscaLeggedFrames],
-      [P.ToscaLeggedFrames,P.ToscaLeggedFrames,P.ToscaLeggedFrames],
-      [P.ToscaShortDblStackedBoards,P.ToscaShortDblStackedBoards],
-      [P.ToscaShortDblStackedBoards,P.ToscaSpringBox,P.ToscaShortDblStackedBoards],
-      [P.ToscaLeggedFrames,P.ToscaLeggedFrames],
-   ]
-}
-
 export const toscaOriginal:Named&Trailer&Load = {
    ...defaultTrailerDimensions,
    name: "tosca original pattern",
-   rows: [
-      {L__: {depth: 0*O.ToscaLg.L, orien: O.ToscaLg, stack: [{palWt: P.ToscaLeggedFrames}]}, __R: {depth: 0*O.ToscaLg.L, orien: O.ToscaLg, stack: [{palWt: P.ToscaLeggedFrames}]}},
-      {L__: {depth: 1*O.ToscaLg.L, orien: O.ToscaLg, stack: [{palWt: P.ToscaBracketedFrames}]}, _C_: {depth: 1*O.ToscaLg.L, orien: O.ToscaLg, stack: [{palWt: P.ToscaBracketedFrames}]}, __R: {depth: 1*O.ToscaLg.L, orien: O.ToscaLg, stack: [{palWt: P.ToscaBracketedFrames}]}}
-   ]
+   ...toLoad({
+      rows: [
+         [P.ToscaLeggedFrames,P.ToscaLeggedFrames],
+         [P.ToscaBracketedFrames,P.ToscaBracketedFrames,P.ToscaBracketedFrames],
+         [P.ToscaBracketedFrames,P.ToscaBracketedFrames],
+         [P.ToscaBracketedFrames,P.ToscaBracketedFrames,P.ToscaBracketedFrames],
+         [P.Tosca0TongueBoards,P.Tosca0TongueBoards,P.Tosca0TongueBoards],
+         [P.Tosca0TongueBoards,P.Tosca0TongueBoards,P.Tosca0TongueBoards],
+         [P.Tosca0TongueBoards,P.Tosca0TongueBoards,P.Tosca0TongueBoards],
+         [P.Tosca2TongueBoards,P.Tosca2TongueBoards,P.Tosca2TongueBoards],
+         [P.Tosca2TongueBoards,P.Tosca2TongueBoards,P.Tosca2TongueBoards],
+         [P.Tosca2TongueBoards,P.Tosca2TongueBoards,P.Tosca2TongueBoards],
+         [P.Tosca3TongueBoards,P.Tosca3TongueBoards,P.Tosca3TongueBoards],
+         [P.Tosca3TongueBoards,P.Tosca3TongueBoards,P.Tosca3TongueBoards],
+         [P.Tosca3TongueBoards,P.Tosca3TongueBoards,P.Tosca3TongueBoards],
+         [P.ToscaLeggedFrames,P.ToscaLeggedFrames,P.ToscaLeggedFrames],
+         [P.ToscaLeggedFrames,P.ToscaLeggedFrames,P.ToscaLeggedFrames],
+         [P.ToscaLeggedFrames,P.ToscaLeggedFrames,P.ToscaLeggedFrames],
+         [P.ToscaShortDblStackedBoards,P.ToscaShortDblStackedBoards],
+         [P.ToscaShortDblStackedBoards,P.ToscaSpringBox,P.ToscaShortDblStackedBoards],
+         [P.ToscaLeggedFrames,P.ToscaLeggedFrames],
+      ]
+   })
 }

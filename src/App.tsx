@@ -7,40 +7,37 @@ import {
    fgPalletWeights,
    Load,
    O,
-   P,Pallet,
+   P,
+   Pallet,
    Position,
    PositionWithMeta,
    RearAxleTypeCapacity,
    Side,
-   Single,StagedStackWithMeta,
+   Single,
    State,
-   Trailer
+   Trailer,
+   Triple
 } from './types.ts'
 import {
    alertWithBlur,
    calcAxleWeights,
    deletePosition,
    getStateTandemMaxLength,
-   getStateTandemMeasurementReference,loadStack,
-   rotatePosition,sortStagedPalletsByStackWeight,
+   getStateTandemMeasurementReference,
+   loadStack,
+   rotatePosition,
+   sortStagedPalletsByStackWeight,
    stateRefDistanceToAxleDistanceFromNose,
    swapPositions,
    tandemCenterDistanceFromNoseToStateRefDistance,
    toFeet,
    toInches,
    totalGrossWt,
-   totalLoadWt,totalStagedWt,
+   totalLoadWt,
+   totalStagedWt,
    toTitleCase
 } from "./calculations.ts";
-import {
-   costco24ChunkTrailer,
-   costcoAllShredTrailer,
-   costcoMaxWeightTrailer,defaultTrailerDimensions,
-   emptyTrailer,
-   maxRowsAllStraightTrailer,
-   minSlideTrailer,
-   minTandCenterSlideLengthFromNose
-} from "./sampleTrailers.ts";
+import {defaultTrailerDimensions,emptyTrailer,minSlideTrailer,minTandCenterSlideLengthFromNose} from "./sampleTrailers.ts";
 import {slideAxleRestrictedStates,SlideAxleRestrictionsDivider,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
 
 
@@ -372,20 +369,79 @@ function App() {
       ctx.fillRect(0,0,zoom*toInches(8),zoom*sampleTrailer.interiorLength)
 
       /* draw pallets */
-      sampleTrailer.rows.forEach((row,i) => {
-         if (row.hasOwnProperty(Side.L) && row.hasOwnProperty(Side.R)) {
-            row = row as Double
-            if (row.L__!==null) {
-               const l:Position = row.L__
-               const depth = zoom * l.depth
-               const width = zoom * (l.orien.text === O.Straight.text ? O.Straight.W : O.Sideways.W)
-               const length = zoom * (l.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
+      let posToCheckIfTosca:Position = (sampleTrailer.rows[0] as Triple).L__ ?? (sampleTrailer.rows[0] as Triple)._C_
+      let loadIsTosca:boolean = [O.ToscaLg,O.ToscaSm].includes(posToCheckIfTosca.orien)
+      if (!loadIsTosca) {
+         sampleTrailer.rows.forEach((row,i) => {
+            if (row.hasOwnProperty(Side.L) && row.hasOwnProperty(Side.R)) {
+               row = row as Double
+               if (row.L__!==null) {
+                  const l:Position = row.L__
+                  const depth = zoom * l.depth
+                  const width = zoom * (l.orien.text === O.Straight.text ? O.Straight.W : O.Sideways.W)
+                  const length = zoom * (l.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
+                  /* draw pallet */
+                  ctx.fillStyle = l.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
+                  if (i+1===selectedPosition1?.row && selectedPosition1.side===Side.L) ctx.fillStyle = selectionColor1
+                  if (i+1===selectedPosition2?.row && selectedPosition2.side===Side.L) ctx.fillStyle = selectionColor2
+                  ctx.beginPath()
+                  ctx.rect(0,depth,width,length)
+                  ctx.fill()
+                  ctx.stroke()
+                  /* draw row number */
+                  ctx.save()
+                  ctx.fillStyle = thirdLength <= depth && depth < 2*thirdLength ? "red" : "black"
+                  ctx.translate(10*zoom, depth + length/2)
+                  ctx.rotate(-Math.PI/2)
+                  ctx.fillText("R"+(i+1), 0, 0)
+                  ctx.restore()
+                  /* draw (stacked) pallet weights */
+                  ctx.fillStyle = "white"
+                  l.stack.forEach((pal,j) => {
+                     const color = pal.palWt === P.Chep ? "c" : "w"
+                     ctx.fillText(pal.prdWt??0+color, width/2, depth + length - j*fontPx*zoom)
+                  })
+               }
+               if (row.__R!==null) {
+                  const r:Position = row.__R
+                  const depth = zoom * r.depth
+                  const width = zoom * (r.orien.text === O.Straight.text ? O.Straight.W : O.Sideways.W)
+                  const length = zoom * (r.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
+                  /* draw pallet */
+                  ctx.fillStyle = r.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
+                  if (i+1===selectedPosition1?.row && selectedPosition1.side===Side.R) ctx.fillStyle = selectionColor1
+                  if (i+1===selectedPosition2?.row && selectedPosition2.side===Side.R) ctx.fillStyle = selectionColor2
+                  ctx.beginPath()
+                  ctx.rect(zoom*toInches(8)-width,depth,width,length)
+                  ctx.fill()
+                  ctx.stroke()
+                  /* draw row number */
+                  ctx.save()
+                  ctx.fillStyle = thirdLength <= depth && depth < 2*thirdLength ? "red" : "black"
+                  ctx.translate(zoom*toInches(8) - 10*zoom, depth + length/2)
+                  ctx.rotate(Math.PI/2)
+                  ctx.fillText("R"+(i+1), 0, 0)
+                  ctx.restore()
+                  /* draw (stacked) pallet weights */
+                  ctx.fillStyle = "white"
+                  r.stack.forEach((pal,j) => {
+                     const color = pal.palWt === P.Chep ? "c" : "w"
+                     ctx.fillText(pal.prdWt??0+color, zoom*toInches(8) - width/2, depth + length - j*fontPx*zoom)
+                  })
+               }
+            }
+            else if (row.hasOwnProperty(Side.C)) {
+               row = row as Single
+               const c:Position = row._C_
+               const depth = zoom * c.depth
+               const width = zoom * (c.orien.text === O.Straight.text ? O.Straight.W : O.Sideways.W)
+               const length = zoom * (c.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
                /* draw pallet */
-               ctx.fillStyle = l.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
-               if (i+1===selectedPosition1?.row && selectedPosition1.side===Side.L) ctx.fillStyle = selectionColor1
-               if (i+1===selectedPosition2?.row && selectedPosition2.side===Side.L) ctx.fillStyle = selectionColor2
+               ctx.fillStyle = c.stack[0] && c.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
+               if (i+1===selectedPosition1?.row && selectedPosition1.side===Side.C) ctx.fillStyle = selectionColor1
+               if (i+1===selectedPosition2?.row && selectedPosition2.side===Side.C) ctx.fillStyle = selectionColor2
                ctx.beginPath()
-               ctx.rect(0,depth,width,length)
+               ctx.rect(zoom*toInches(4) - width/2,depth,width,length)
                ctx.fill()
                ctx.stroke()
                /* draw row number */
@@ -395,27 +451,6 @@ function App() {
                ctx.rotate(-Math.PI/2)
                ctx.fillText("R"+(i+1), 0, 0)
                ctx.restore()
-               /* draw (stacked) pallet weights */
-               ctx.fillStyle = "white"
-               l.stack.forEach((pal,j) => {
-                  const color = pal.palWt === P.Chep ? "c" : "w"
-                  ctx.fillText(pal.prdWt??0+color, width/2, depth + length - j*fontPx*zoom)
-               })
-            }
-            if (row.__R!==null) {
-               const r:Position = row.__R
-               const depth = zoom * r.depth
-               const width = zoom * (r.orien.text === O.Straight.text ? O.Straight.W : O.Sideways.W)
-               const length = zoom * (r.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
-               /* draw pallet */
-               ctx.fillStyle = r.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
-               if (i+1===selectedPosition1?.row && selectedPosition1.side===Side.R) ctx.fillStyle = selectionColor1
-               if (i+1===selectedPosition2?.row && selectedPosition2.side===Side.R) ctx.fillStyle = selectionColor2
-               ctx.beginPath()
-               ctx.rect(zoom*toInches(8)-width,depth,width,length)
-               ctx.fill()
-               ctx.stroke()
-               /* draw row number */
                ctx.save()
                ctx.fillStyle = thirdLength <= depth && depth < 2*thirdLength ? "red" : "black"
                ctx.translate(zoom*toInches(8) - 10*zoom, depth + length/2)
@@ -424,47 +459,13 @@ function App() {
                ctx.restore()
                /* draw (stacked) pallet weights */
                ctx.fillStyle = "white"
-               r.stack.forEach((pal,j) => {
+               c.stack.forEach((pal,j) => {
                   const color = pal.palWt === P.Chep ? "c" : "w"
-                  ctx.fillText(pal.prdWt??0+color, zoom*toInches(8) - width/2, depth + length - j*fontPx*zoom)
+                  ctx.fillText(pal.prdWt??0+color, zoom*toInches(4), depth + length - j*fontPx*zoom)
                })
             }
-         }
-         else if (row.hasOwnProperty(Side.C)) {
-            row = row as Single
-            const c:Position = row._C_
-            const depth = zoom * c.depth
-            const width = zoom * (c.orien.text === O.Straight.text ? O.Straight.W : O.Sideways.W)
-            const length = zoom * (c.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
-            /* draw pallet */
-            ctx.fillStyle = c.stack[0] && c.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
-            if (i+1===selectedPosition1?.row && selectedPosition1.side===Side.C) ctx.fillStyle = selectionColor1
-            if (i+1===selectedPosition2?.row && selectedPosition2.side===Side.C) ctx.fillStyle = selectionColor2
-            ctx.beginPath()
-            ctx.rect(zoom*toInches(4) - width/2,depth,width,length)
-            ctx.fill()
-            ctx.stroke()
-            /* draw row number */
-            ctx.save()
-            ctx.fillStyle = thirdLength <= depth && depth < 2*thirdLength ? "red" : "black"
-            ctx.translate(10*zoom, depth + length/2)
-            ctx.rotate(-Math.PI/2)
-            ctx.fillText("R"+(i+1), 0, 0)
-            ctx.restore()
-            ctx.save()
-            ctx.fillStyle = thirdLength <= depth && depth < 2*thirdLength ? "red" : "black"
-            ctx.translate(zoom*toInches(8) - 10*zoom, depth + length/2)
-            ctx.rotate(Math.PI/2)
-            ctx.fillText("R"+(i+1), 0, 0)
-            ctx.restore()
-            /* draw (stacked) pallet weights */
-            ctx.fillStyle = "white"
-            c.stack.forEach((pal,j) => {
-               const color = pal.palWt === P.Chep ? "c" : "w"
-               ctx.fillText(pal.prdWt??0+color, zoom*toInches(4), depth + length - j*fontPx*zoom)
-            })
-         }
-      });
+         });
+      }
 
       /* draw kingpin */
       ctx.strokeStyle = "dimgray"

@@ -434,7 +434,7 @@ export function toLoad(template:LoadTemplate):Load {
    if (typeof template.rows[0][0] === "string") return {rows: []} //TODO: implement ordinary load template ingestion. only tosca supported at first
    let load:Load = {rows: []};
    let currentDepth:number = 0;
-   (template.rows as TRowTosca[]).forEach((tRow,tRowIdx) => {
+   (template.rows as TRowTosca[]).forEach(tRow => {
       /* current row orientation */
       let currentRowOrien:O = O.ToscaLg;
       switch (tRow[0]) {
@@ -469,4 +469,5 @@ export function toLoad(template:LoadTemplate):Load {
       /* increment depth by the length of row just added */
       currentDepth += currentRowOrien.L
    })
+   return load
 }
