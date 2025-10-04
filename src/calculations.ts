@@ -365,7 +365,7 @@ export function calcAxleWeights(trailer:Trailer&Load, unloaded:AxleWeights, rear
          let span = rearAxleType===RearAxleTypeCapacity.Tandem
             ? trailer.tandemCenterDistanceFromNose-trailer.kingpinDistanceFromNose
             : (trailer.tandemCenterDistanceFromNose - trailer.tandemSpreadWidth/2) - trailer.kingpinDistanceFromNose
-         const posWt = pos.stack.map(pal => pal.prdWt??0 + pal.palWt).reduce((acc,wt) => acc + wt, 0)
+         const posWt = pos.stack.map(pal => (pal.prdWt??0) + pal.palWt).reduce((acc,wt) => acc + wt, 0)
          if (COM2KP <= 0) { //position is in front of kingpin: weight contribution is 100% to drives
             loaded.drives += posWt
             const percentBeyondKingpin = (trailer.kingpinDistanceFromNose-COM)/span
@@ -416,7 +416,7 @@ export function totalStagedWt(staged:Pallet[][]):number {
    return staged
       .map(stack =>
          stack
-            .map(pal => pal.prdWt??0 + pal.palWt)
+            .map(pal => (pal.prdWt??0) + pal.palWt)
             .reduce((acc,curr) => acc + curr, 0)
       )
       .reduce((acc,curr) => acc + curr, 0)
@@ -424,8 +424,8 @@ export function totalStagedWt(staged:Pallet[][]):number {
 
 export function sortStagedPalletsByStackWeight(stacks:Pallet[][]):Pallet[][] {
    return stacks.sort((stack1:Pallet[],stack2:Pallet[]) => {
-      const stack1Wt = stack1.map(pallet => pallet.prdWt??0+pallet.palWt).reduce((acc,curr) => acc+curr,0)
-      const stack2Wt = stack2.map(pallet => pallet.prdWt??0+pallet.palWt).reduce((acc,curr) => acc+curr,0)
+      const stack1Wt = stack1.map(pallet => (pallet.prdWt??0)+pallet.palWt).reduce((acc,curr) => acc+curr,0)
+      const stack2Wt = stack2.map(pallet => (pallet.prdWt??0)+pallet.palWt).reduce((acc,curr) => acc+curr,0)
       return stack1Wt-stack2Wt
    })
 }

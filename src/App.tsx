@@ -15,8 +15,7 @@ import {
    Side,
    Single,
    State,
-   Trailer,
-   Triple
+   Trailer,Triple
 } from './types.ts'
 import {
    alertWithBlur,
@@ -369,8 +368,13 @@ function App() {
       ctx.fillRect(0,0,zoom*toInches(8),zoom*sampleTrailer.interiorLength)
 
       /* draw pallets */
-      let posToCheckIfTosca:Position = (sampleTrailer.rows[0] as Triple).L__ ?? (sampleTrailer.rows[0] as Triple)._C_
-      let loadIsTosca:boolean = [O.ToscaLg,O.ToscaSm].includes(posToCheckIfTosca.orien)
+      let loadIsTosca = false
+      let loadIsEmpty = sampleTrailer.rows.length===0
+      if (!loadIsEmpty) {
+         let sideToCheckIfTosca:Side = sampleTrailer.rows[0].hasOwnProperty(Side.C) ? Side.C : Side.L
+         let posToCheckIfTosca:Position|null = sideToCheckIfTosca===Side.C ? (sampleTrailer.rows[0] as Triple)._C_ : (sampleTrailer.rows[0] as Triple).L__
+         loadIsTosca = [O.ToscaLg,O.ToscaSm].includes(posToCheckIfTosca?.orien ?? O.Straight)
+      }
       if (!loadIsTosca) {
          sampleTrailer.rows.forEach((row,i) => {
             if (row.hasOwnProperty(Side.L) && row.hasOwnProperty(Side.R)) {
@@ -399,7 +403,7 @@ function App() {
                   ctx.fillStyle = "white"
                   l.stack.forEach((pal,j) => {
                      const color = pal.palWt === P.Chep ? "c" : "w"
-                     ctx.fillText(pal.prdWt??0+color, width/2, depth + length - j*fontPx*zoom)
+                     ctx.fillText((pal.prdWt??0)+color, width/2, depth + length - j*fontPx*zoom)
                   })
                }
                if (row.__R!==null) {
@@ -426,7 +430,7 @@ function App() {
                   ctx.fillStyle = "white"
                   r.stack.forEach((pal,j) => {
                      const color = pal.palWt === P.Chep ? "c" : "w"
-                     ctx.fillText(pal.prdWt??0+color, zoom*toInches(8) - width/2, depth + length - j*fontPx*zoom)
+                     ctx.fillText((pal.prdWt??0)+color, zoom*toInches(8) - width/2, depth + length - j*fontPx*zoom)
                   })
                }
             }
@@ -461,7 +465,7 @@ function App() {
                ctx.fillStyle = "white"
                c.stack.forEach((pal,j) => {
                   const color = pal.palWt === P.Chep ? "c" : "w"
-                  ctx.fillText(pal.prdWt??0+color, zoom*toInches(4), depth + length - j*fontPx*zoom)
+                  ctx.fillText((pal.prdWt??0)+color, zoom*toInches(4), depth + length - j*fontPx*zoom)
                })
             }
          });
@@ -579,7 +583,7 @@ function App() {
                      }} onMouseUp={() => {if (!selectedStaged.includes(idx)) setSelectedStaged(prev => [...prev, idx]); const div = document.getElementById("staged-stack-"+idx) as HTMLDivElement; if (div) div.style.background = selectionColor1;}}>{
                         stack.map(pallet =>
                            <div>{
-                              pallet.prdWt??0+""+(pallet.palWt===P.Chep ? "c" : "w")
+                              (pallet.prdWt??0)+""+(pallet.palWt===P.Chep ? "c" : "w")
                            }</div>
                         )
                      }</div>
@@ -713,7 +717,7 @@ function App() {
                   <div style={{gridColumn:1}}>Staged Position Count: </div><div style={{gridColumn:2}}>{staged.length}</div>
                   <div style={{gridColumn:1}}>Staged lbs w/ Pallets: </div><div style={{gridColumn:2}}>{Math.ceil(totalStagedWt(staged)).toLocaleString()}</div><br/>
                   <div style={{gridColumn:1}}>Selected Position Count: </div><div style={{gridColumn:2}}>{selectedStaged.length}</div>
-                  <div style={{gridColumn:1}}>Selected lbs w/ Pallets: </div><div style={{gridColumn:2}}>{Math.ceil(selectedStaged.map(idx => staged[idx]).reduce((selWtAcc,currSelStack) => selWtAcc+currSelStack.reduce((stackWtAcc,currPal) => stackWtAcc+currPal.prdWt??0+currPal.palWt,0),0)).toLocaleString()}</div>
+                  <div style={{gridColumn:1}}>Selected lbs w/ Pallets: </div><div style={{gridColumn:2}}>{Math.ceil(selectedStaged.map(idx => staged[idx]).reduce((selWtAcc,currSelStack) => selWtAcc+currSelStack.reduce((stackWtAcc,currPal) => stackWtAcc+(currPal.prdWt??0)+currPal.palWt,0),0)).toLocaleString()}</div>
                </div>}
 
             </div>
