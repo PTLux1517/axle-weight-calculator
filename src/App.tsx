@@ -36,7 +36,7 @@ import {
    totalStagedWt,
    toTitleCase
 } from "./calculations.ts";
-import {defaultTrailerDimensions,emptyTrailer,minSlideTrailer,minTandCenterSlideLengthFromNose} from "./sampleTrailers.ts";
+import {defaultTrailerDimensions,emptyTrailer,minSlideTrailer,minTandCenterSlideLengthFromNose,toscaOriginal,toscaTest} from "./sampleTrailers.ts";
 import {slideAxleRestrictedStates,SlideAxleRestrictionsDivider,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
 
 
@@ -237,7 +237,7 @@ function App() {
          let multiplierSanitized = Math.min(100,Math.abs(Math.floor(Number(stagingMultiplier.value)))) ?? 0
          if (prev.length + multiplierSanitized > 100)
             multiplierSanitized = 100 - prev.length
-         const weightSanitized = Math.min(5000,Math.abs(Math.floor(Number(stagingWeight.value)))) ?? 0
+         const weightSanitized = Math.min(5000,Math.abs(Math.floor(Number(stagingWeight.value)))) ?? -1
          const doubleStack = stagingStack.checked
          const color = stagingColorChep.checked ? P.Chep : P.White
          setTimeout(() => {
@@ -247,7 +247,7 @@ function App() {
             stagingColorChep.checked = true;
             stagingColorWhite.checked = false;
          }, 100)
-         if (isNaN(multiplierSanitized) || multiplierSanitized===0 || isNaN(weightSanitized) || weightSanitized===0) return prev
+         if (isNaN(multiplierSanitized) || multiplierSanitized===0 || isNaN(weightSanitized) || weightSanitized===-1) return prev
          while (multiplierSanitized>0) {
             if (doubleStack && multiplierSanitized>1) {
                newStaged.push([
@@ -325,7 +325,7 @@ function App() {
    const selectionColor1 = "darkgoldenrod"
    const selectionColor2 = "darkcyan"
 
-   const defaultTrailer:Trailer&Load = emptyTrailer
+   const defaultTrailer:Trailer&Load = toscaTest
    const defaultState:State = State.CA
    const defaultRearAxleType:RearAxleTypeCapacity = RearAxleTypeCapacity.Tandem
    const defaultUnloadedWeights:AxleWeights = {
@@ -556,9 +556,9 @@ function App() {
                {staged.length > 0 && <>
                   <div style={{position: "absolute", left: "10vw"}}>
                      <button disabled={selectedStaged.length===0} onClick={deselectAllStagedListener}>deselect all</button>&nbsp;
-                     <button disabled={selectedStaged.length<2||6<selectedStaged.length}>stack together</button>
+                     <button disabled={selectedStaged.length<2||6<selectedStaged.length}>stack together</button> {/* TODO: implement stacking selected */}
                   </div>
-                  <div style={{position: "absolute", right: "10vw"}}>combine material to single: <br/>
+                  <div style={{position: "absolute", right: "10vw"}}>combine material to single: <br/> {/* TODO: implement combining selected to single pallet */}
                      <button disabled={selectedStaged.length<2}>chep</button>&nbsp;
                      <button disabled={selectedStaged.length<2}>white</button>
                   </div>
