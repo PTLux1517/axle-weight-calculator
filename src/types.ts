@@ -22,24 +22,18 @@ export interface Trailer {
    tandemSpreadWidth: number,
 }
 
-export interface Load {
-   loadRows: Array<Row>,
-}
-
 export interface Named {
    name: String,
 }
 
-export enum Side {
-   L = "l___",
-   C = "_ctr_",
-   R = "___r",
+export interface Load {
+   rows: Array<Row>,
 }
-export type Row = Single | Double | Triple
-export type Single = {_ctr_: Position}
-export type Double = {l___: Position|null, ___r: Position|null}
-export type Triple = {l___: Position|null, _ctr_: Position|null, ___r: Position|null}
 
+export type Row = Single | Double | Triple
+export type Single = {_C_: Position}
+export type Double = {L__: Position|null, __R: Position|null}
+export type Triple = Single & Double
 
 export interface Position {
    /* front edge distance in inches from the nose */
@@ -54,6 +48,11 @@ export interface PositionWithMeta extends Position {
    row: number,
    side: Side,
 }
+export enum Side {
+   L = "L__",
+   C = "_C_",
+   R = "__R",
+}
 
 export interface Pallet {
    /* product weight in pounds */
@@ -64,16 +63,35 @@ export interface Pallet {
 
 /* Pallet color. Value is the corresponding weight in pounds */
 export enum P {
-   Chep = 60,
-   White = 40,
-   ToscaCatchFrames = 398,
-   ToscaLegFrames = 461,
-   ToscaShortBoards2Stack = 756,
-   Tosca0TongueBoards = 874,
-   ToscaSpringBox = 981,
-   Tosca2TongueBoards = 986,
-   Tosca3TongueBoards = 1272,
+   Chep                       = 60,
+   White                      = 40,
+   ToscaBracketedFrames       = 398, //top irons
+   ToscaLeggedFrames          = 461, //bottom irons
+   ToscaShortDblStackedBoards = 756, //pressure plate boards
+   Tosca0TongueBoards         = 874, //top and bottom boards
+   ToscaSpringBox             = 981, //springs
+   Tosca2TongueBoards         = 986, //narrow side boards
+   Tosca3TongueBoards         = 1272, //wide side boards
 }
+
+export interface LoadTemplate {
+   rows: Array<TRowOrd>|Array<TRowTosca>, //ordinary or tosca templates
+}
+export type TRowOrd = [RO,TSingle|TDouble]
+export type TRowTosca = [P,P]|[P,P,P]
+/* Row Orientation */
+export enum RO {
+   ST = "ST", //straight
+   SD = "SD", //sideways
+   C1 = "C1", //chimney 1 (straight right)
+   C2 = "C2", //chimney 2 (straight left)
+}
+export type TSingle = [TPos]
+export type TDouble = [TPos,TPos]
+export type TPos = P                 //empty pallet
+                 | [P]               //stack of empty pallets
+                 | [number,P]        //prdWt and palWt for singles
+                 | [number,Array<P>] //prdWts and palWts for stacks; ex: [972+393+100,[P.Chep,P.White,P.White]]; convention is bottom pallet first then up
 
 export interface StagedStackWithMeta {
    stack:Pallet[],

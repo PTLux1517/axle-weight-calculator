@@ -207,23 +207,23 @@ function App() {
       const y = Math.round((e.clientY - rect.top)/zoom)
       //console.log("("+x+","+y+")")
       const side:Side = x <= toInches(4) ? Side.L : Side.R;
-      sampleTrailer.loadRows.forEach((row, i) => {
+      sampleTrailer.rows.forEach((row, i) => {
          if (row.hasOwnProperty(Side.L) && row.hasOwnProperty(Side.R)) {
             row = row as Double
-            if (side===Side.L && row.l___!==null && row.l___.depth<=y && y<(row.l___.depth + row.l___.orien.L)) {
-               if (selectedPosition1===null) setSelectedPosition1({row: (i+1), side: Side.L, ...row.l___})
-               else if (selectedPosition2===null) setSelectedPosition2({row: (i+1), side: Side.L, ...row.l___})
+            if (side===Side.L && row.L__!==null && row.L__.depth<=y && y<(row.L__.depth + row.L__.orien.L)) {
+               if (selectedPosition1===null) setSelectedPosition1({row: (i+1), side: Side.L, ...row.L__})
+               else if (selectedPosition2===null) setSelectedPosition2({row: (i+1), side: Side.L, ...row.L__})
             }
-            if (side===Side.R && row.___r !== null && row.___r.depth<=y && y<(row.___r.depth + row.___r.orien.L)) {
-               if (selectedPosition1===null) setSelectedPosition1({row: (i+1), side: Side.R, ...row.___r})
-               else if (selectedPosition2===null) setSelectedPosition2({row: (i+1), side: Side.R, ...row.___r})
+            if (side===Side.R && row.__R!==null && row.__R.depth<=y && y<(row.__R.depth + row.__R.orien.L)) {
+               if (selectedPosition1===null) setSelectedPosition1({row: (i+1), side: Side.R, ...row.__R})
+               else if (selectedPosition2===null) setSelectedPosition2({row: (i+1), side: Side.R, ...row.__R})
             }
          }
          else if (row.hasOwnProperty(Side.C)) {
             row = row as Single
-            if (row._ctr_.depth<= y && y<(row._ctr_.depth + row._ctr_.orien.L)) {
-               if (selectedPosition1===null) setSelectedPosition1({row: (i+1), side: Side.C, ...row._ctr_})
-               else if (selectedPosition2===null) setSelectedPosition2({row: (i+1), side: Side.C, ...row._ctr_})
+            if (row._C_.depth<=y && y<(row._C_.depth + row._C_.orien.L)) {
+               if (selectedPosition1===null) setSelectedPosition1({row: (i+1), side: Side.C, ...row._C_})
+               else if (selectedPosition2===null) setSelectedPosition2({row: (i+1), side: Side.C, ...row._C_})
             }
          }
       });
@@ -273,15 +273,15 @@ function App() {
       (e.target as HTMLButtonElement).blur()
       setStaged(prev => {
          let unloaded:Pallet[][] = []
-         sampleTrailer.loadRows.forEach(row => {
+         sampleTrailer.rows.forEach(row => {
             if (row.hasOwnProperty(Side.C)) {
                row = row as Single
-               unloaded.push(row._ctr_.stack)
+               unloaded.push(row._C_.stack)
             }
             else if (row.hasOwnProperty(Side.L) && row.hasOwnProperty(Side.R)) {
                row = row as Double
-               if (row.l___!==null) unloaded.push(row.l___.stack)
-               if (row.___r!==null) unloaded.push(row.___r.stack)
+               if (row.L__!==null) unloaded.push(row.L__.stack)
+               if (row.__R!==null) unloaded.push(row.__R.stack)
             }
          })
          return sortStagedPalletsByStackWeight([...prev].concat(unloaded))
@@ -372,11 +372,11 @@ function App() {
       ctx.fillRect(0,0,zoom*toInches(8),zoom*sampleTrailer.interiorLength)
 
       /* draw pallets */
-      sampleTrailer.loadRows.forEach((row,i) => {
+      sampleTrailer.rows.forEach((row,i) => {
          if (row.hasOwnProperty(Side.L) && row.hasOwnProperty(Side.R)) {
             row = row as Double
-            if (row.l___ !== null) {
-               const l:Position = row.l___
+            if (row.L__!==null) {
+               const l:Position = row.L__
                const depth = zoom * l.depth
                const width = zoom * (l.orien.text === O.Straight.text ? O.Straight.W : O.Sideways.W)
                const length = zoom * (l.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
@@ -402,8 +402,8 @@ function App() {
                   ctx.fillText(pal.prdWt??0+color, width/2, depth + length - j*fontPx*zoom)
                })
             }
-            if (row.___r !== null) {
-               const r:Position = row.___r
+            if (row.__R!==null) {
+               const r:Position = row.__R
                const depth = zoom * r.depth
                const width = zoom * (r.orien.text === O.Straight.text ? O.Straight.W : O.Sideways.W)
                const length = zoom * (r.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
@@ -432,7 +432,7 @@ function App() {
          }
          else if (row.hasOwnProperty(Side.C)) {
             row = row as Single
-            const c:Position = row._ctr_
+            const c:Position = row._C_
             const depth = zoom * c.depth
             const width = zoom * (c.orien.text === O.Straight.text ? O.Straight.W : O.Sideways.W)
             const length = zoom * (c.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
@@ -652,7 +652,7 @@ function App() {
             <div id={"editor-container"} style={{gridRow: 2, gridColumn: 3}}>
                <h3>Edit Pallet/Load</h3>
                <div style={{color: "orange"}}>(section under development)<hr/></div>
-               {sampleTrailer.loadRows.length>0 && <>
+               {sampleTrailer.rows.length>0 && <>
                   <div style={{marginBottom: "20px"}}>Load lbs w/ Pallets: {loaded && Math.ceil(totalLoadWt(loaded,unloaded)).toLocaleString()}</div>
                   <div>
                      <button style={{display: "block", width: "100%", margin: "10px 0", background: "red"}} onMouseUp={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); if (confirm("permanently delete all pallets from trailer?")) setSampleTrailer(emptyTrailer);}}>delete load</button>
