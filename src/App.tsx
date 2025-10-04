@@ -325,7 +325,7 @@ function App() {
    const selectionColor1 = "darkgoldenrod"
    const selectionColor2 = "darkcyan"
 
-   const defaultTrailer:Trailer&Load = toscaTest
+   const defaultTrailer:Trailer&Load = emptyTrailer
    const defaultState:State = State.CA
    const defaultRearAxleType:RearAxleTypeCapacity = RearAxleTypeCapacity.Tandem
    const defaultUnloadedWeights:AxleWeights = {

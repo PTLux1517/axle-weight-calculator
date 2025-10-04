@@ -1,4 +1,4 @@
-import {Load,LoadTemplate,Named,O,P,RO,Trailer} from './types.ts';
+import {Load,Named,O,P,Trailer} from './types.ts';
 import {toInches,toLoad} from "./calculations.ts";
 
 /* measurements according to https://tprimelogistics.com/wp-content/uploads/2019/04/53-air-ride-roll-door-1.jpg */
