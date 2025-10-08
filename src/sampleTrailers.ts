@@ -149,30 +149,30 @@ export const toscaOriginal:Named&Trailer&Load = {
    })
 }
 
-export const toscaTest:Named&Trailer&Load = {
+export const toscaBoardHeavy:Named&Trailer&Load = {
    ...defaultTrailerDimensions,
-   name: "tosca test pattern",
+   name: "tosca board-heavy pattern",
    ...toLoad({
       rows: [
-         [P.ToscaLeggedFrames,P.ToscaLeggedFrames],
-         [P.ToscaBracketedFrames,P.ToscaBracketedFrames,P.ToscaBracketedFrames],
-         [P.ToscaBracketedFrames,P.ToscaBracketedFrames],
-         [P.ToscaBracketedFrames,P.ToscaBracketedFrames,P.ToscaBracketedFrames],
+         [P.ToscaShortBoards,P.ToscaShortBoards],
+         [P.ToscaShortBoards,P.ToscaShortBoards,P.ToscaShortBoards],
+         [P.ToscaShortBoards,P.ToscaShortBoards],
+         [P.ToscaShortBoards,P.ToscaShortBoards,P.ToscaShortBoards],
+         [P.Tosca0TongueBoards,P.Tosca0TongueBoards],
          [P.Tosca0TongueBoards,P.Tosca0TongueBoards,P.Tosca0TongueBoards],
+         [P.Tosca0TongueBoards,P.Tosca0TongueBoards],
          [P.Tosca0TongueBoards,P.Tosca0TongueBoards,P.Tosca0TongueBoards],
-         [P.Tosca0TongueBoards,P.Tosca0TongueBoards,P.Tosca0TongueBoards],
+         [P.Tosca2TongueBoards,P.Tosca2TongueBoards],
          [P.Tosca2TongueBoards,P.Tosca2TongueBoards,P.Tosca2TongueBoards],
+         [P.Tosca2TongueBoards,P.Tosca2TongueBoards],
          [P.Tosca2TongueBoards,P.Tosca2TongueBoards,P.Tosca2TongueBoards],
-         [P.Tosca2TongueBoards,P.Tosca2TongueBoards,P.Tosca2TongueBoards],
-         [P.Tosca3TongueBoards,P.Tosca3TongueBoards,P.Tosca3TongueBoards],
-         [P.Tosca3TongueBoards,P.Tosca3TongueBoards,P.Tosca3TongueBoards],
-         [P.Tosca3TongueBoards,P.Tosca3TongueBoards,P.Tosca3TongueBoards],
-         [P.ToscaLeggedFrames,P.ToscaLeggedFrames,P.ToscaLeggedFrames],
-         [P.ToscaLeggedFrames,P.ToscaLeggedFrames,P.ToscaLeggedFrames],
-         [P.ToscaBracketedFrames,P.ToscaLeggedFrames,P.ToscaBracketedFrames],
-         [P.ToscaShortDblStackedBoards,P.ToscaShortDblStackedBoards],
-         [P.ToscaShortDblStackedBoards,P.ToscaSpringBox,P.ToscaShortDblStackedBoards],
-         [P.ToscaBracketedFrames,P.ToscaBracketedFrames],
+         [P.Tosca2TongueBoards,P.Tosca2TongueBoards],
+         [P.Tosca3TongueBoards,P.ToscaBracketedFrames,P.Tosca3TongueBoards],
+         [P.Tosca3TongueBoards,P.Tosca3TongueBoards],
+         [P.Tosca3TongueBoards,P.ToscaBracketedFrames,P.Tosca3TongueBoards],
+         [P.Tosca3TongueBoards,P.Tosca3TongueBoards],
+         [P.Tosca3TongueBoards,P.ToscaLeggedFrames,P.Tosca3TongueBoards],
+         [P.Tosca3TongueBoards,P.ToscaLeggedFrames,P.Tosca3TongueBoards],
       ]
    })
 }

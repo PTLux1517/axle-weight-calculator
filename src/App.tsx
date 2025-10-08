@@ -36,7 +36,14 @@ import {
    totalStagedWt,
    toTitleCase
 } from "./calculations.ts";
-import {defaultTrailerDimensions,emptyTrailer,minSlideTrailer,minTandCenterSlideLengthFromNose,toscaOriginal,toscaTest} from "./sampleTrailers.ts";
+import {
+   defaultTrailerDimensions,
+   emptyTrailer,
+   minSlideTrailer,
+   minTandCenterSlideLengthFromNose,
+   toscaBoardHeavy,
+   toscaOriginal,
+} from "./sampleTrailers.ts";
 import {slideAxleRestrictedStates,SlideAxleRestrictionsDivider,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
 
 
@@ -325,7 +332,7 @@ function App() {
    const selectionColor1 = "darkgoldenrod"
    const selectionColor2 = "darkcyan"
 
-   const defaultTrailer:Trailer&Load = emptyTrailer
+   const defaultTrailer:Trailer&Load = toscaBoardHeavy
    const defaultState:State = State.CA
    const defaultRearAxleType:RearAxleTypeCapacity = RearAxleTypeCapacity.Tandem
    const defaultUnloadedWeights:AxleWeights = {

@@ -67,7 +67,8 @@ export enum P {
    White                      = 40,
    ToscaBracketedFrames       = 398, //top irons
    ToscaLeggedFrames          = 461, //bottom irons
-   ToscaShortDblStackedBoards = 756, //pressure plate boards
+   ToscaShortBoards           = 378, //pressure plate boards (as single)
+   ToscaShortDblStackedBoards = 756, //pressure plate boards (as stack)
    Tosca0TongueBoards         = 874, //top and bottom boards
    ToscaSpringBox             = 981, //springs
    Tosca2TongueBoards         = 986, //narrow side boards

@@ -443,6 +443,7 @@ export function toLoad(template:LoadTemplate):Load {
          case P.Tosca3TongueBoards:
             currentRowOrien = O.ToscaLg
             break
+         case P.ToscaShortBoards:
          case P.ToscaShortDblStackedBoards:
          case P.Tosca0TongueBoards:
          case P.Tosca2TongueBoards:
