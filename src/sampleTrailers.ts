@@ -1,3 +1,24 @@
+/*
+Axle Weight Calculator - A job site specific tool for calculating load weight
+distribution, tailored to the needs of such anonymous company, but also available
+open source under the following AGPL license for any who may also find it useful.
+
+Copyright (C) 2026 Cory Tomlinson
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://gnu.org>.
+*/
+
 import {Load,Named,O,P,Trailer} from './types.ts';
 import {toInches,toLoad} from "./calculations.ts";
 
@@ -126,25 +147,25 @@ export const toscaOriginal:Named&Trailer&Load = {
    name: "tosca original pattern",
    ...toLoad({
       rows: [
-         [P.ToscaLeggedFrames,P.ToscaLeggedFrames],
-         [P.ToscaBracketedFrames,P.ToscaBracketedFrames,P.ToscaBracketedFrames],
-         [P.ToscaBracketedFrames,P.ToscaBracketedFrames],
-         [P.ToscaBracketedFrames,P.ToscaBracketedFrames,P.ToscaBracketedFrames],
-         [P.Tosca0TongueBoards,P.Tosca0TongueBoards,P.Tosca0TongueBoards],
-         [P.Tosca0TongueBoards,P.Tosca0TongueBoards,P.Tosca0TongueBoards],
-         [P.Tosca0TongueBoards,P.Tosca0TongueBoards,P.Tosca0TongueBoards],
-         [P.Tosca2TongueBoards,P.Tosca2TongueBoards,P.Tosca2TongueBoards],
-         [P.Tosca2TongueBoards,P.Tosca2TongueBoards,P.Tosca2TongueBoards],
-         [P.Tosca2TongueBoards,P.Tosca2TongueBoards,P.Tosca2TongueBoards],
-         [P.Tosca3TongueBoards,P.Tosca3TongueBoards,P.Tosca3TongueBoards],
-         [P.Tosca3TongueBoards,P.Tosca3TongueBoards,P.Tosca3TongueBoards],
-         [P.Tosca3TongueBoards,P.Tosca3TongueBoards,P.Tosca3TongueBoards],
-         [P.ToscaLeggedFrames,P.ToscaLeggedFrames,P.ToscaLeggedFrames],
-         [P.ToscaLeggedFrames,P.ToscaLeggedFrames,P.ToscaLeggedFrames],
-         [P.ToscaLeggedFrames,P.ToscaLeggedFrames,P.ToscaLeggedFrames],
-         [P.ToscaShortDblStackedBoards,P.ToscaShortDblStackedBoards],
-         [P.ToscaShortDblStackedBoards,P.ToscaSpringBox,P.ToscaShortDblStackedBoards],
-         [P.ToscaLeggedFrames,P.ToscaLeggedFrames],
+         [P.TLegs,P.TLegs],
+         [P.TBrackets,P.TBrackets,P.TBrackets],
+         [P.TBrackets,P.TBrackets],
+         [P.TBrackets,P.TBrackets,P.TBrackets],
+         [P.T0Tabs,P.T0Tabs,P.T0Tabs],
+         [P.T0Tabs,P.T0Tabs,P.T0Tabs],
+         [P.T0Tabs,P.T0Tabs,P.T0Tabs],
+         [P.T2Tabs,P.T2Tabs,P.T2Tabs],
+         [P.T2Tabs,P.T2Tabs,P.T2Tabs],
+         [P.T2Tabs,P.T2Tabs,P.T2Tabs],
+         [P.T3Tabs,P.T3Tabs,P.T3Tabs],
+         [P.T3Tabs,P.T3Tabs,P.T3Tabs],
+         [P.T3Tabs,P.T3Tabs,P.T3Tabs],
+         [P.TLegs,P.TLegs,P.TLegs],
+         [P.TLegs,P.TLegs,P.TLegs],
+         [P.TLegs,P.TLegs,P.TLegs],
+         [P.TShortStacks,P.TShortStacks],
+         [P.TShortStacks,P.TSprings,P.TShortStacks],
+         [P.TLegs,P.TLegs],
       ]
    })
 }
@@ -154,25 +175,113 @@ export const toscaBoardHeavy:Named&Trailer&Load = {
    name: "tosca board-heavy pattern",
    ...toLoad({
       rows: [
-         [P.ToscaShortBoards,P.ToscaShortBoards],
-         [P.ToscaShortBoards,P.ToscaShortBoards,P.ToscaShortBoards],
-         [P.ToscaShortBoards,P.ToscaShortBoards],
-         [P.ToscaShortBoards,P.ToscaShortBoards,P.ToscaShortBoards],
-         [P.Tosca0TongueBoards,P.Tosca0TongueBoards],
-         [P.Tosca0TongueBoards,P.Tosca0TongueBoards,P.Tosca0TongueBoards],
-         [P.Tosca0TongueBoards,P.Tosca0TongueBoards],
-         [P.Tosca0TongueBoards,P.Tosca0TongueBoards,P.Tosca0TongueBoards],
-         [P.Tosca2TongueBoards,P.Tosca2TongueBoards],
-         [P.Tosca2TongueBoards,P.Tosca2TongueBoards,P.Tosca2TongueBoards],
-         [P.Tosca2TongueBoards,P.Tosca2TongueBoards],
-         [P.Tosca2TongueBoards,P.Tosca2TongueBoards,P.Tosca2TongueBoards],
-         [P.Tosca2TongueBoards,P.Tosca2TongueBoards],
-         [P.Tosca3TongueBoards,P.ToscaBracketedFrames,P.Tosca3TongueBoards],
-         [P.Tosca3TongueBoards,P.Tosca3TongueBoards],
-         [P.Tosca3TongueBoards,P.ToscaBracketedFrames,P.Tosca3TongueBoards],
-         [P.Tosca3TongueBoards,P.Tosca3TongueBoards],
-         [P.Tosca3TongueBoards,P.ToscaLeggedFrames,P.Tosca3TongueBoards],
-         [P.Tosca3TongueBoards,P.ToscaLeggedFrames,P.Tosca3TongueBoards],
+         [P.TShortSingle,P.TShortSingle],
+         [P.TShortSingle,P.TShortSingle,P.TShortSingle],
+         [P.TShortSingle,P.TShortSingle],
+         [P.TShortSingle,P.TShortSingle,P.TShortSingle],
+         [P.T0Tabs,P.T0Tabs],
+         [P.T0Tabs,P.T0Tabs,P.T0Tabs],
+         [P.T0Tabs,P.T0Tabs],
+         [P.T0Tabs,P.T0Tabs,P.T0Tabs],
+         [P.T2Tabs,P.T2Tabs],
+         [P.T2Tabs,P.T2Tabs,P.T2Tabs],
+         [P.T2Tabs,P.T2Tabs],
+         [P.T2Tabs,P.T2Tabs,P.T2Tabs],
+         [P.T2Tabs,P.T2Tabs],
+         [P.T3Tabs,P.TBrackets,P.T3Tabs],
+         [P.T3Tabs,P.T3Tabs],
+         [P.T3Tabs,P.TBrackets,P.T3Tabs],
+         [P.T3Tabs,P.T3Tabs],
+         [P.T3Tabs,P.TLegs,P.T3Tabs],
+         [P.T3Tabs,P.TLegs,P.T3Tabs],
+      ]
+   })
+}
+
+export const toscaFrameHeavy:Named&Trailer&Load = {
+   ...defaultTrailerDimensions,
+   name: "tosca frame-heavy pattern",
+   ...toLoad({
+      rows: [
+         [P.TLegs,P.TLegs,P.TLegs],
+         [P.TLegs,P.TLegs,P.TLegs],
+         [P.TLegs,P.TLegs,P.TLegs],
+         [P.TShortStacks,P.TShortStacks,P.TShortStacks],
+         [P.T0Tabs,P.T0Tabs,P.T0Tabs],
+         [P.T0Tabs,P.T0Tabs,P.T0Tabs],
+         [P.T2Tabs,P.T2Tabs,P.T2Tabs],
+         [P.T2Tabs,P.T2Tabs,P.T2Tabs],
+         [P.T3Tabs,P.T3Tabs,P.T3Tabs],
+         [P.T3Tabs,P.T3Tabs,P.T3Tabs],
+         [P.TLegs,P.TLegs,P.TLegs],
+         [P.TLegs,P.TLegs,P.TLegs],
+         [P.TLegs,P.TLegs,P.TLegs],
+         [P.TLegs,P.TLegs,P.TLegs],
+         [P.TBrackets,P.TBrackets,P.TBrackets],
+         [P.TBrackets,P.TBrackets,P.TBrackets],
+         [P.TBrackets,P.TBrackets,P.TBrackets],
+         [P.TBrackets,P.TBrackets,P.TBrackets],
+         [P.TBrackets,P.TBrackets,P.TBrackets],
+         [P.TBrackets,P.TBrackets,P.TBrackets],
+         [P.TBrackets,P.TBrackets,P.TBrackets],
+         [P.TBrackets,P.TBrackets,P.TBrackets],
+      ]
+   })
+}
+
+export const toscaBalanced:Named&Trailer&Load = {
+   ...defaultTrailerDimensions,
+   name: "tosca balanced pattern",
+   ...toLoad({
+      rows: [
+         [P.TShortSingle,P.TShortSingle,P.TShortSingle],
+         [P.TShortSingle,P.TShortSingle,P.TShortSingle],
+         [P.TShortSingle,P.TShortSingle,P.TShortSingle],
+         [P.T0Tabs,P.T0Tabs,P.T0Tabs],
+         [P.T0Tabs,P.T0Tabs,P.T0Tabs],
+         [P.T0Tabs,P.T0Tabs,P.T0Tabs],
+         [P.TLegs,P.TLegs,P.TLegs],
+         [P.TLegs,P.TLegs,P.TLegs],
+         [P.TLegs,P.TLegs,P.TLegs],
+         [P.T2Tabs,P.T2Tabs,P.T2Tabs],
+         [P.T2Tabs,P.T2Tabs,P.T2Tabs],
+         [P.T2Tabs,P.T2Tabs,P.T2Tabs],
+         [P.TBrackets,P.TBrackets],
+         [P.TBrackets,P.TBrackets,P.TBrackets],
+         [P.T3Tabs,P.T3Tabs,P.T3Tabs],
+         [P.T3Tabs,P.T3Tabs,P.T3Tabs],
+         [P.T3Tabs,P.T3Tabs,P.T3Tabs],
+         [P.TBrackets,P.TBrackets],
+         [P.TBrackets,P.TSprings,P.TBrackets], //can sub any one excess item in the springs position, even 3-tabs which are the heaviest
+      ]
+   })
+}
+
+export const toscaExcess:Named&Trailer&Load = {
+   ...defaultTrailerDimensions,
+   name: "tosca excess",
+   ...toLoad({
+      rows: [
+         [P.TBrackets,P.TBrackets,P.TBrackets],
+         [P.TBrackets,P.TBrackets,P.TBrackets],
+         [P.TBrackets,P.TBrackets,P.TBrackets],
+         [P.TBrackets,P.TBrackets,P.TBrackets],
+         [P.T0Tabs,P.T2Tabs,P.T0Tabs],
+         [P.T0Tabs,P.T2Tabs,P.T0Tabs],
+         [P.T2Tabs,P.T2Tabs,P.T2Tabs],
+         [P.T2Tabs,P.T2Tabs,P.T2Tabs],
+         [P.T3Tabs,P.T3Tabs,P.T3Tabs],
+         [P.T3Tabs,P.T3Tabs,P.T3Tabs],
+         [P.TShortStacks,P.TShortStacks],
+         [P.TShortStacks,P.TShortStacks,P.TShortStacks],
+         [P.TShortStacks,P.TShortStacks],
+         [P.TShortStacks,P.TShortStacks,P.TShortStacks],
+         [P.TBrackets,P.TBrackets,P.TBrackets],
+         [P.TBrackets,P.TBrackets,P.TBrackets],
+         [P.TShortStacks,P.TShortStacks,P.TShortStacks],
+         [P.TShortStacks,P.TShortStacks,P.TShortStacks],
+         [P.TLegs,P.TLegs,P.TLegs],
+         [P.TLegs,P.TLegs,P.TLegs],
       ]
    })
 }
