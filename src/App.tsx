@@ -1,3 +1,24 @@
+/*
+Axle Weight Calculator - A job site specific tool for calculating load weight
+distribution, tailored to the needs of such anonymous company, but also available
+open source under the following AGPL license for any who may also find it useful.
+
+Copyright (C) 2026 Cory Tomlinson
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://gnu.org>.
+*/
+
 import {ChangeEvent,MouseEvent,useEffect,useState} from 'react'
 import './App.css'
 import {
@@ -40,8 +61,8 @@ import {
    defaultTrailerDimensions,
    emptyTrailer,
    minSlideTrailer,
-   minTandCenterSlideLengthFromNose,
-   toscaBoardHeavy,
+   minTandCenterSlideLengthFromNose,toscaBalanced,
+   toscaBoardHeavy,toscaExcess,toscaFrameHeavy,
    toscaOriginal,
 } from "./sampleTrailers.ts";
 import {slideAxleRestrictedStates,SlideAxleRestrictionsDivider,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
@@ -332,7 +353,7 @@ function App() {
    const selectionColor1 = "darkgoldenrod"
    const selectionColor2 = "darkcyan"
 
-   const defaultTrailer:Trailer&Load = toscaBoardHeavy
+   const defaultTrailer:Trailer&Load = emptyTrailer
    const defaultState:State = State.CA
    const defaultRearAxleType:RearAxleTypeCapacity = RearAxleTypeCapacity.Tandem
    const defaultUnloadedWeights:AxleWeights = {
@@ -477,6 +498,18 @@ function App() {
             }
          });
       }
+      else { //load is tosca
+         sampleTrailer.rows.forEach((row,i) => {
+            if (!(row.hasOwnProperty(Side.L) && row.hasOwnProperty(Side.R) && !row.hasOwnProperty(Side.C))) {
+               row = row as Double
+
+               //const l:Position = row.L__
+            }
+            else {
+               row = row as Triple
+            }
+         });
+      }
 
       /* draw kingpin */
       ctx.strokeStyle = "dimgray"
@@ -599,7 +632,9 @@ function App() {
             </div>
             {/* ----------------------------------------------------------------- COLUMN 2 ----------------------------------------------------------------- */}
             <div id={"zoom-container"} style={{gridRow: 1, gridColumn: 2}}>
-               <div style={{color: "red"}}>(Todo: disclaimer/license)</div>
+               <div style={{color: "red"}}>Todo: (mathematical modeling and data disclaimer). LICENSE (AGPLv3): For any entity with some desire to copy, modify, redistribute, etc. this free software,
+                                           such an interested party should be aware that this is licensed under the AGPLv3 license, and should thoroughly understand its terms and conditions before
+                                           interacting with the <a href={"https://github.com/PTLux1517/axle-weight-calculator"} target={"_blank"}>source code</a>.</div>
                <label id={"zoom-label"} htmlFor={"zoom"}>Zoom Diagram</label>
                <hr/>
                <div>
