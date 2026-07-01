@@ -1,3 +1,24 @@
+/*
+Axle Weight Calculator - A job site specific tool for calculating load weight
+distribution, tailored to the needs of such anonymous company, but also available
+open source under the following AGPL license for any who may also find it useful.
+
+Copyright (C) 2026 Cory Tomlinson
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://gnu.org>.
+*/
+
 import {
    AxleReferencePoint,
    AxleWeights,
@@ -438,16 +459,16 @@ export function toLoad(template:LoadTemplate):Load {
       /* current row orientation */
       let currentRowOrien:O = O.ToscaLg;
       switch (tRow[0]) {
-         case P.ToscaBracketedFrames:
-         case P.ToscaLeggedFrames:
-         case P.Tosca3TongueBoards:
+         case P.TBrackets:
+         case P.TLegs:
+         case P.T3Tabs:
             currentRowOrien = O.ToscaLg
             break
-         case P.ToscaShortBoards:
-         case P.ToscaShortDblStackedBoards:
-         case P.Tosca0TongueBoards:
-         case P.Tosca2TongueBoards:
-         case P.ToscaSpringBox:
+         case P.TShortSingle:
+         case P.TShortStacks:
+         case P.T0Tabs:
+         case P.T2Tabs:
+         case P.TSprings:
             currentRowOrien = O.ToscaSm
             break
       }
