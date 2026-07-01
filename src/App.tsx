@@ -632,9 +632,10 @@ function App() {
             </div>
             {/* ----------------------------------------------------------------- COLUMN 2 ----------------------------------------------------------------- */}
             <div id={"zoom-container"} style={{gridRow: 1, gridColumn: 2}}>
-               <div style={{color: "red"}}>Todo: (mathematical modeling and data disclaimer). LICENSE (AGPLv3): For any entity with some desire to copy, modify, redistribute, etc. this free software,
-                                           such an interested party should be aware that this is licensed under the AGPLv3 license, and should thoroughly understand its terms and conditions before
-                                           interacting with the <a href={"https://github.com/PTLux1517/axle-weight-calculator"} target={"_blank"}>source code</a>.</div>
+               <div style={{color: "red"}}>Todo: (mathematical modeling and data disclaimer)</div>
+               <div>LICENSE (AGPLv3): For any entity with some desire to copy, modify, redistribute, etc. this free software,
+                 such an interested party should be aware that this is licensed under the AGPLv3 license, and should thoroughly understand its terms and conditions before
+                 interacting with the <a href={"https://github.com/PTLux1517/axle-weight-calculator"} target={"_blank"}>source code</a>.</div>
                <label id={"zoom-label"} htmlFor={"zoom"}>Zoom Diagram</label>
                <hr/>
                <div>
@@ -765,7 +766,7 @@ function App() {
             </div>
          </main>
          <footer>
-            <div id="copyright-text">&copy; {new Date().getFullYear()} Cory Tomlinson. All rights reserved. [<a href={"https://ptlux1517.github.io"} target={"_blank"}>Portfolio</a> | <a href={"mailto:cory@ptlux1517.mozmail.com?subject=(Axle%20Weight%20Calculator%20Contact)%3A%20*your%20subject%20here*"} target={"_blank"}>Contact</a>]</div>
+            <div id="copyright-text">&copy; {new Date().getFullYear()} Cory Tomlinson. Distributed under the AGPLv3 License. <a href={"https://github.com/PTLux1517/axle-weight-calculator"} target={"_blank"}>View source code</a>. [<a href={"https://ptlux1517.github.io"} target={"_blank"}>Portfolio</a> | <a href={"mailto:cory@ptlux1517.mozmail.com?subject=(Axle%20Weight%20Calculator%20Contact)%3A%20*your%20subject%20here*"} target={"_blank"}>Contact</a>]</div>
          </footer>
       </>
    )
