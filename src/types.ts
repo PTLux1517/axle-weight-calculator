@@ -1,3 +1,24 @@
+/*
+Axle Weight Calculator - A job site specific tool for calculating load weight
+distribution, tailored to the needs of such anonymous company, but also available
+open source under the following AGPL license for any who may also find it useful.
+
+Copyright (C) 2026 Cory Tomlinson
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://gnu.org>.
+*/
+
 /* Orientation of pallet. Values are the corresponding length and width in inches; see https://stackoverflow.com/questions/41179474/use-object-literal-as-typescript-enum-values */
 export class O {
    static readonly Straight = new O('Straight',48,40)
@@ -63,16 +84,16 @@ export interface Pallet {
 
 /* Pallet color. Value is the corresponding weight in pounds */
 export enum P {
-   Chep                       = 60,
-   White                      = 40,
-   ToscaBracketedFrames       = 398, //top irons
-   ToscaLeggedFrames          = 461, //bottom irons
-   ToscaShortBoards           = 378, //pressure plate boards (as single)
-   ToscaShortDblStackedBoards = 756, //pressure plate boards (as stack)
-   Tosca0TongueBoards         = 874, //top and bottom boards
-   ToscaSpringBox             = 981, //springs
-   Tosca2TongueBoards         = 986, //narrow side boards
-   Tosca3TongueBoards         = 1272, //wide side boards
+   Chep         = 60,
+   White        = 40,
+   TBrackets    = 398, //top irons
+   TLegs        = 461, //bottom irons
+   TShortSingle = 378, //pressure plate boards (as single)
+   TShortStacks = 756, //pressure plate boards (as stack)
+   T0Tabs       = 874, //top and bottom boards
+   TSprings     = 981, //springs
+   T2Tabs       = 986, //narrow side boards
+   T3Tabs       = 1272, //wide side boards
 }
 
 export interface LoadTemplate {
