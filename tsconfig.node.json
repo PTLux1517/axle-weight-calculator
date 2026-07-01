@@ -1,4 +1,5 @@
 {
+  "license": "AGPL-3.0-or-later",
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "target": "ES2022",
