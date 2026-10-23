@@ -200,6 +200,7 @@ export const placeholderPosition = {depth: 0, orien: O.Straight, stack: []} as P
 export const fgPalletWeights = [
    0, //tosca
    280,
+   306,
    382,
    393,
    //398, //tosca top irons
@@ -208,9 +209,11 @@ export const fgPalletWeights = [
    //461, //tosca bottom irons
    468,
    472,
+   486,
    500,
    511,
    526,
+   551,
    567,
    585,
    624,
