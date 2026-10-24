@@ -293,6 +293,35 @@ function App() {
       })
    }
 
+   function stackTogetherSelectedStagedPalletsListener(e:MouseEvent) {
+      (e.target as HTMLButtonElement).blur()
+      setStaged(prev => {
+         let nonSelectedStacks = prev.filter((_,idx) => !selectedStaged.includes(idx))
+         let newStack:Pallet[] = []
+         selectedStaged.forEach(selectedIdx => {
+            staged[selectedIdx].forEach(pal => newStack.push(pal))
+         })
+         if (newStack.length>6) {
+            alertWithBlur("This app only supports stacking a maximum of 6 pallets together to keep the UI design simple. To stack some of the pallets you selected, you can use the downstack selected button to split up a selected stack, then try stacking again with 6 or less pallets.")
+            return prev
+         }
+         let newStaged:Pallet[][] = nonSelectedStacks
+         newStaged.push(newStack)
+         deselectAllStagedListener(e)
+         return sortStagedPalletsByStackWeight(newStaged)
+      })
+   }
+
+   function downstackSelectedStagedPalletsListener(e:MouseEvent) {
+      (e.target as HTMLButtonElement).blur()
+      setStaged(prev => {
+         let newStaged:Pallet[][] = prev.filter((_,i) => i!==selectedStaged[0])
+         staged[selectedStaged[0]].forEach(palInStack => newStaged.push([palInStack]))
+         deselectAllStagedListener(e)
+         return sortStagedPalletsByStackWeight(newStaged)
+      })
+   }
+
    function unloadAllPalletsListener(e:MouseEvent) {
       (e.target as HTMLButtonElement).blur()
       setStaged(prev => {
@@ -594,9 +623,12 @@ function App() {
                   <div>use the "Populate Staging Area" section to add pallets</div>
                </div>}
                {staged.length > 0 && <>
-                  <div style={{position: "absolute", left: "10vw"}}>
-                     <button disabled={selectedStaged.length===0} onClick={deselectAllStagedListener}>deselect all</button>&nbsp;
-                     <button disabled={selectedStaged.length<2||6<selectedStaged.length}>stack together</button> {/* TODO: implement stacking selected */}
+                  <div style={{position: "absolute", left: "10vw", display: "grid", gap: "4px"}}>
+                     <button disabled={selectedStaged.length===0} onClick={deselectAllStagedListener}>deselect all</button>
+                     <div>
+                        <button disabled={selectedStaged.length<2||6<selectedStaged.length} title={"pallets will be stacked in the order they were selected"} onClick={stackTogetherSelectedStagedPalletsListener}>stack selected</button>
+                        <button disabled={selectedStaged.length!==1} onClick={downstackSelectedStagedPalletsListener}>downstack selected</button>
+                     </div>
                   </div>
                   <div style={{position: "absolute", right: "10vw"}}>combine material to single: <br/> {/* TODO: implement combining selected to single pallet */}
                      <button disabled={selectedStaged.length<2}>chep</button>&nbsp;
@@ -620,7 +652,18 @@ function App() {
                         fontSize: zoom*7.7,
                         fontWeight: "bold",
                         lineHeight: 1
-                     }} onMouseUp={() => {if (!selectedStaged.includes(idx)) setSelectedStaged(prev => [...prev, idx]); const div = document.getElementById("staged-stack-"+idx) as HTMLDivElement; if (div) div.style.background = selectionColor1;}}>{
+                     }} onMouseUp={() => {
+                        if (!selectedStaged.includes(idx)) {
+                           setSelectedStaged(prev => [...prev,idx]);
+                           const div = document.getElementById("staged-stack-" + idx) as HTMLDivElement;
+                           if (div) div.style.background = selectionColor1;
+                        }
+                        else {
+                           setSelectedStaged(prev => prev.filter(selIdx => idx!==selIdx));
+                           const div = document.getElementById("staged-stack-" + idx) as HTMLDivElement;
+                           if (div) div.style.background = (stack[0].palWt===P.Chep ? "mediumblue" : "burlywood");
+                        }
+                     }}>{
                         stack.map(pallet =>
                            <div>{
                               (pallet.prdWt??0)+""+(pallet.palWt===P.Chep ? "c" : "w")
