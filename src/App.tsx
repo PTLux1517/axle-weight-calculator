@@ -54,7 +54,7 @@ import {
    toInches,
    totalGrossWt,
    totalLoadWt,
-   totalStagedWt,
+   totalStagedWt,totalStagedWtProdOnly,
    toTitleCase
 } from "./calculations.ts";
 import {
@@ -317,6 +317,18 @@ function App() {
       setStaged(prev => {
          let newStaged:Pallet[][] = prev.filter((_,i) => i!==selectedStaged[0])
          staged[selectedStaged[0]].forEach(palInStack => newStaged.push([palInStack]))
+         deselectAllStagedListener(e)
+         return sortStagedPalletsByStackWeight(newStaged)
+      })
+   }
+
+   function combineSelectedStagedMaterialListener(e:MouseEvent, palChosen:P) {
+      (e.target as HTMLButtonElement).blur()
+      setStaged(prev => {
+         let newStaged:Pallet[][] = prev.filter((_,i) => !selectedStaged.includes(i))
+         let combinedProdWt:number = Math.ceil(selectedStaged.map(idx => staged[idx])?.reduce((allSelWtAcc,selStack) => allSelWtAcc+selStack?.reduce((stackWtAcc,currPal) => stackWtAcc+(currPal.prdWt??0),0),0)??0)
+         let newStack:Pallet[] = [{prdWt: combinedProdWt, palWt: palChosen}]
+         newStaged.push(newStack)
          deselectAllStagedListener(e)
          return sortStagedPalletsByStackWeight(newStaged)
       })
@@ -630,9 +642,9 @@ function App() {
                         <button disabled={selectedStaged.length!==1} onClick={downstackSelectedStagedPalletsListener}>downstack selected</button>
                      </div>
                   </div>
-                  <div style={{position: "absolute", right: "10vw"}}>combine material to single: <br/> {/* TODO: implement combining selected to single pallet */}
-                     <button disabled={selectedStaged.length<2}>chep</button>&nbsp;
-                     <button disabled={selectedStaged.length<2}>white</button>
+                  <div style={{position: "absolute", right: "10vw"}}>combine material to single: <br/>
+                     <button disabled={selectedStaged.length<2} onClick={e => combineSelectedStagedMaterialListener(e,P.Chep)}>chep</button>&nbsp;
+                     <button disabled={selectedStaged.length<2} onClick={e => combineSelectedStagedMaterialListener(e,P.White)}>white</button>
                   </div>
                   <div className={"hint"}>
                      <div>sorted by stack weight</div>
@@ -801,10 +813,12 @@ function App() {
             <div id={"staging-info-container"} style={{gridRow: 3, gridColumn: 3}}>
                <h3>Staging Info</h3>
                {staged.length > 0 && <div style={{display: "grid", gridTemplateColumns: "4fr 1fr", textAlign: "right"!}}>
-                  <div style={{gridColumn:1}}>Staged Position Count: </div><div style={{gridColumn:2}}>{staged.length}</div>
-                  <div style={{gridColumn:1}}>Staged lbs w/ Pallets: </div><div style={{gridColumn:2}}>{Math.ceil(totalStagedWt(staged)).toLocaleString()}</div><br/>
-                  <div style={{gridColumn:1}}>Selected Position Count: </div><div style={{gridColumn:2}}>{selectedStaged.length}</div>
-                  <div style={{gridColumn:1}}>Selected lbs w/ Pallets: </div><div style={{gridColumn:2}}>{Math.ceil(selectedStaged.map(idx => staged[idx]).reduce((selWtAcc,currSelStack) => selWtAcc+currSelStack.reduce((stackWtAcc,currPal) => stackWtAcc+(currPal.prdWt??0)+currPal.palWt,0),0)).toLocaleString()}</div>
+                  <div style={{gridColumn:1, fontWeight: "bolder", color: "hsl(0,0%,27%)"}}>Staged Position Count: </div><div style={{gridColumn:2, fontWeight: "bolder", color: "hsl(0,0%,27%)"}}>{staged.length}</div>
+                  <div style={{gridColumn:1}}>Staged lbs (without Pallets): </div><div style={{gridColumn:2}}>{Math.ceil(totalStagedWtProdOnly(staged)).toLocaleString()}</div>
+                  <div style={{gridColumn:1}}>Staged lbs (with Pallets): </div><div style={{gridColumn:2}}>{Math.ceil(totalStagedWt(staged)).toLocaleString()}</div>
+                  <div style={{gridColumn:1, fontWeight: "bolder", color: "hsl(0,0%,27%)"}}>Selected Position Count: </div><div style={{gridColumn:2, fontWeight: "bolder", color: "hsl(0,0%,27%)"}}>{selectedStaged.length}</div>
+                  <div style={{gridColumn:1}}>Selected lbs (without Pallets): </div><div style={{gridColumn:2}}>{Math.ceil(selectedStaged.map(idx => staged[idx])?.reduce((allSelWtAcc,currSelStack) => allSelWtAcc+currSelStack?.reduce((stackWtAcc,currPal) => stackWtAcc+(currPal.prdWt??0),0),0)??0).toLocaleString()}</div>
+                  <div style={{gridColumn:1}}>Selected lbs (with Pallets): </div><div style={{gridColumn:2}}>{Math.ceil(selectedStaged.map(idx => staged[idx])?.reduce((allSelWtAcc,currSelStack) => allSelWtAcc+currSelStack?.reduce((stackWtAcc,currPal) => stackWtAcc+(currPal.prdWt??0)+currPal.palWt,0),0)??0).toLocaleString()}</div>
                </div>}
 
             </div>
