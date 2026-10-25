@@ -32,7 +32,7 @@ import {
    Pallet,
    Position,
    PositionWithMeta,
-   RearAxleTypeCapacity,
+   RearAxleTypeCapacity,Row,
    Side,
    Single,
    State,
@@ -374,6 +374,46 @@ function App() {
       }
    }
 
+   function loadMultipleChimney(e:MouseEvent) { //button will be disabled if less than two staged pallets are selected
+      const chimneyLoadCycle:Array<[Side,O]> = [
+         [Side.L, O.Straight],
+         [Side.R, O.Sideways],
+         [Side.R, O.Straight],
+         [Side.L, O.Sideways]
+      ]
+      let chimneyStepOffset:number = 0
+      let lastRow:Row|null = sampleTrailer.rows[sampleTrailer.rows.length-1] ?? null
+      if (lastRow!==null && !lastRow.hasOwnProperty(Side.C)) { //no need to alter beginning of chimney cycle for empty trailers or loading after a centered single
+         let lastDouble:Double = lastRow as Double
+         if (lastDouble.L__===null || lastDouble.__R===null) {
+            alertWithBlur("Please make the number of rows on the left and right sides of the trailer equal before starting a chimney")
+            return
+         }
+         const lDepth:number = lastDouble.L__?.depth + lastDouble.L__?.orien.L
+         const rDepth:number = lastDouble.__R?.depth + lastDouble.__R?.orien.L
+         if (lDepth>rDepth) {
+            chimneyStepOffset = 2
+         }
+      }
+      let newTrailer:Trailer&Load = sampleTrailer
+      selectedStaged.forEach((selIdx,loadStep) => {
+         let chimneyStep = (loadStep+chimneyStepOffset)%4
+         //loadPalletListener(chimneyLoadCycle[adjustedIdx][0], chimneyLoadCycle[adjustedIdx][1], true)
+         newTrailer = loadStack(newTrailer, staged[selIdx], chimneyLoadCycle[chimneyStep][0], chimneyLoadCycle[chimneyStep][1])
+      })
+      setSampleTrailer(newTrailer)
+      setStaged(prev => prev.filter((_,idx) => !selectedStaged.includes(idx)))
+      deselectAllStagedListener(e)
+   }
+
+   function selectAllStagedListener(e:MouseEvent) {
+      (e.target as HTMLButtonElement).blur();
+      staged.forEach((_,i) => {
+         (document.getElementById("staged-stack-"+i) as HTMLDivElement).style.background = selectionColor1
+         setSelectedStaged(prev => [...prev,i])
+      })
+   }
+
    function deselectAllStagedListener(e:MouseEvent) {
       (e.target as HTMLButtonElement).blur();
       selectedStaged.forEach(stagedIdx =>
@@ -627,7 +667,8 @@ function App() {
                   </div></span>
                   <button id={"add-to-staging-button"} onClick={addPalletToStagingListener}>add</button>
                </div>
-               <button id={"clear-staging-button"} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); if (confirm("Clear all pallets from the staging area?")) {setSelectedStaged([]); setStaged([]);}}} disabled={staged.length===0}>clear staged</button>
+               <button id={"delete-staged-button"} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); if (confirm("'Delete all pallets from the staging area?'")) {setSelectedStaged([]); setStaged([]);}}} disabled={staged.length===0}>delete staged</button>
+               <button id={"delete-selected-staged-button"} disabled={selectedStaged.length===0} onClick={()=>{return}}>delete selected</button>
             </div>
             <div style={{gridRow: 4, gridColumn: "1/4"}} id={"staged-pallets-container"}>
                <h3>Staged Pallets</h3>
@@ -637,7 +678,7 @@ function App() {
                </div>}
                {staged.length > 0 && <>
                   <div style={{position: "absolute", left: "5vw", display: "grid", columnGap: "20px", rowGap: "4px"}}>
-                     <button style={{gridColumn: "1", gridRow: "1", backgroundColor: "red"}} disabled={selectedStaged.length===0} onClick={()=>{return}}>delete selected</button>
+                     <button style={{gridColumn: "1", gridRow: "1"}} disabled={selectedStaged.length===staged.length} onClick={selectAllStagedListener}>select all</button>
                      <button style={{gridColumn: "1", gridRow: "2"}} disabled={selectedStaged.length===0} onClick={deselectAllStagedListener}>deselect all</button>
                      <button style={{gridColumn: "2", gridRow: "1"}} disabled={selectedStaged.length<2||6<selectedStaged.length} title={"pallets will be stacked in the order they were selected"} onClick={stackTogetherSelectedStagedPalletsListener}>stack selected</button>
                      <button style={{gridColumn: "2", gridRow: "2"}} disabled={selectedStaged.length!==1} onClick={downstackSelectedStagedPalletsListener}>downstack selected</button>
@@ -723,8 +764,19 @@ function App() {
                <div style={{color: "orange", fontWeight: "bold"}}>to left</div>
                <div style={{color: "orange", fontWeight: "bold"}}>in center</div>
                <div style={{color: "orange", fontWeight: "bold"}}>to right</div>
-               <button onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); loadPalletListener(Side.L, O.Straight);}}>straight</button> <button onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); loadPalletListener(Side.C, O.Straight);}}>straight</button> <button onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); loadPalletListener(Side.R, O.Straight);}}>straight</button>
-               <button onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); loadPalletListener(Side.L, O.Sideways);}}>sideways</button> <button onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); loadPalletListener(Side.C, O.Sideways);}}>sideways</button> <button onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); loadPalletListener(Side.R, O.Sideways);}}>sideways</button>
+               <button disabled={selectedStaged.length!==1} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); loadPalletListener(Side.L, O.Straight);}}>straight</button>
+               <button disabled={selectedStaged.length!==1} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); loadPalletListener(Side.C, O.Straight);}}>straight</button>
+               <button disabled={selectedStaged.length!==1} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); loadPalletListener(Side.R, O.Straight);}}>straight</button>
+               <button disabled={selectedStaged.length!==1} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); loadPalletListener(Side.L, O.Sideways);}}>sideways</button>
+               <button disabled={selectedStaged.length!==1} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); loadPalletListener(Side.C, O.Sideways);}}>sideways</button>
+               <button disabled={selectedStaged.length!==1} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); loadPalletListener(Side.R, O.Sideways);}}>sideways</button>
+               <h3 style={{gridColumn: "1/4"}}>Bulk Load Selected Staged Pallets</h3>
+               <div style={{gridColumn: "1/4", display: "grid", columnGap: "4px"}}>
+                  <button style={{gridColumn: "1"}} disabled={selectedStaged.length<2} onClick={()=>{return}}>all sideways</button>
+                  <button style={{gridColumn: "2"}} disabled={selectedStaged.length<2} onClick={loadMultipleChimney}>chimney</button>
+                  <button style={{gridColumn: "3"}} disabled={selectedStaged.length<2} onClick={()=>{return}}>all straight</button>
+                  <button style={{gridColumn: "4"}} disabled={selectedStaged.length<2} onClick={()=>{return}}>single-double</button>
+               </div>
             </div>
             {/* ----------------------------------------------------------------- COLUMN 3 ----------------------------------------------------------------- */}
             <div id={"trailer-dimensions-container"} style={{gridRow: 1, gridColumn: 3}}>
@@ -825,7 +877,7 @@ function App() {
             </div>
          </main>
          <footer>
-            <div id="copyright-text">&copy; {new Date().getFullYear()} Cory Tomlinson. Distributed under the AGPLv3 License. <a href={"https://github.com/PTLux1517/axle-weight-calculator"} target={"_blank"}>View source code</a>. [<a href={"https://ptlux1517.github.io"} target={"_blank"}>Portfolio</a> | <a href={"mailto:cory@ptlux1517.mozmail.com?subject=(Axle%20Weight%20Calculator%20Contact)%3A%20*your%20subject%20here*"} target={"_blank"}>Contact</a>]</div>
+            <div id="copyright-text">&copy; {new Date().getFullYear()} Cory Tomlinson. Distributed under the AGPLv3 License. <a href={"https://github.com/PTLux1517/axle-weight-calculator"} target={"_blank"}>View source code</a>. [<a href={"https://ptlux1517.github.io/#/works"} target={"_blank"}>Portfolio</a> | <a href={"mailto:cory@ptlux1517.mozmail.com?subject=(Axle%20Weight%20Calculator%20Contact)%3A%20*your%20subject%20here*"} target={"_blank"}>Contact</a>]</div>
          </footer>
       </>
    )
