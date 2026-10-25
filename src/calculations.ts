@@ -443,6 +443,38 @@ export function totalStagedWt(staged:Pallet[][]):number {
       .reduce((acc,curr) => acc + curr, 0)
 }
 
+export function totalStagedWtProdOnly(staged:Pallet[][]):number {
+   return staged
+      .map(stack =>
+         stack
+            .map(pal => (pal.prdWt??0))
+            .reduce((acc,curr) => acc + curr, 0)
+      )
+      .reduce((acc,curr) => acc + curr, 0)
+}
+
+export function selectedWt(selected:Pallet[][]):number {
+   return selected
+      ?.reduce((allSelWtAcc,currSelStack) =>
+         allSelWtAcc + currSelStack
+            ?.reduce((stackWtAcc,currPal) =>
+               stackWtAcc+(currPal.prdWt??0)+currPal.palWt
+            ,0)
+         ,0)
+      ?? 0
+}
+
+export function selectedWtProdOnly(selected:Pallet[][]):number {
+   return selected
+      ?.reduce((allSelWtAcc,currSelStack) =>
+         allSelWtAcc + currSelStack
+            ?.reduce((stackWtAcc,currPal) =>
+               stackWtAcc+(currPal.prdWt??0)
+            ,0)
+         ,0)
+      ?? 0
+}
+
 export function sortStagedPalletsByStackWeight(stacks:Pallet[][]):Pallet[][] {
    return stacks.sort((stack1:Pallet[],stack2:Pallet[]) => {
       const stack1Wt = stack1.map(pallet => (pallet.prdWt??0)+pallet.palWt).reduce((acc,curr) => acc+curr,0)

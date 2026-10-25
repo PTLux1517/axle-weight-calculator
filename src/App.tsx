@@ -45,7 +45,7 @@ import {
    getStateTandemMaxLength,
    getStateTandemMeasurementReference,
    loadStack,
-   rotatePosition,
+   rotatePosition,selectedWt,selectedWtProdOnly,
    sortStagedPalletsByStackWeight,
    stateRefDistanceToAxleDistanceFromNose,
    swapPositions,
@@ -326,7 +326,7 @@ function App() {
       (e.target as HTMLButtonElement).blur()
       setStaged(prev => {
          let newStaged:Pallet[][] = prev.filter((_,i) => !selectedStaged.includes(i))
-         let combinedProdWt:number = Math.ceil(selectedStaged.map(idx => staged[idx])?.reduce((allSelWtAcc,selStack) => allSelWtAcc+selStack?.reduce((stackWtAcc,currPal) => stackWtAcc+(currPal.prdWt??0),0),0)??0)
+         let combinedProdWt:number = Math.ceil(selectedWtProdOnly(selectedStaged.map(idx => staged[idx])))
          let newStack:Pallet[] = [{prdWt: combinedProdWt, palWt: palChosen}]
          newStaged.push(newStack)
          deselectAllStagedListener(e)
@@ -368,7 +368,7 @@ function App() {
             setSampleTrailer(newTrailer)
             setStaged(prev => prev.filter((_,idx) => idx!==selIdx))
             const div = document.getElementById("staged-stack-" + selIdx) as HTMLDivElement
-            if (div && staged[selIdx][0]) div.style.background = staged[selIdx][0].palWt===P.Chep? "mediumblue" : "burlywood"
+            if (div && staged[selIdx][0]) div.style.background = staged[selIdx][0].palWt===P.Chep? "mediumblue" : darkerKhaki
             setSelectedStaged(prev => prev.slice(1))
          }
       }
@@ -377,12 +377,13 @@ function App() {
    function deselectAllStagedListener(e:MouseEvent) {
       (e.target as HTMLButtonElement).blur();
       selectedStaged.forEach(stagedIdx =>
-         (document.getElementById("staged-stack-"+stagedIdx) as HTMLDivElement).style.background = staged[stagedIdx][0].palWt===P.Chep ? "mediumblue" : "burlywood"
+         (document.getElementById("staged-stack-"+stagedIdx) as HTMLDivElement).style.background = staged[stagedIdx][0].palWt===P.Chep ? "mediumblue" : darkerKhaki
       )
       setSelectedStaged([]);
    }
 
    //const forceUpdate = useReducer(x => x+1, 0, () => 0)[1]
+   const darkerKhaki = "#80764c"
    const defaultZoom = 1.5
    const minZoom = 0.5
    const maxZoom = 6.5
@@ -454,7 +455,7 @@ function App() {
                   const width = zoom * (l.orien.text === O.Straight.text ? O.Straight.W : O.Sideways.W)
                   const length = zoom * (l.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
                   /* draw pallet */
-                  ctx.fillStyle = l.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
+                  ctx.fillStyle = l.stack[0].palWt === P.Chep ? "mediumblue" : darkerKhaki
                   if (i+1===selectedPosition1?.row && selectedPosition1.side===Side.L) ctx.fillStyle = selectionColor1
                   if (i+1===selectedPosition2?.row && selectedPosition2.side===Side.L) ctx.fillStyle = selectionColor2
                   ctx.beginPath()
@@ -481,7 +482,7 @@ function App() {
                   const width = zoom * (r.orien.text === O.Straight.text ? O.Straight.W : O.Sideways.W)
                   const length = zoom * (r.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
                   /* draw pallet */
-                  ctx.fillStyle = r.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
+                  ctx.fillStyle = r.stack[0].palWt === P.Chep ? "mediumblue" : darkerKhaki
                   if (i+1===selectedPosition1?.row && selectedPosition1.side===Side.R) ctx.fillStyle = selectionColor1
                   if (i+1===selectedPosition2?.row && selectedPosition2.side===Side.R) ctx.fillStyle = selectionColor2
                   ctx.beginPath()
@@ -510,7 +511,7 @@ function App() {
                const width = zoom * (c.orien.text === O.Straight.text ? O.Straight.W : O.Sideways.W)
                const length = zoom * (c.orien.text === O.Straight.text ? O.Straight.L : O.Sideways.L)
                /* draw pallet */
-               ctx.fillStyle = c.stack[0] && c.stack[0].palWt === P.Chep ? "mediumblue" : "burlywood"
+               ctx.fillStyle = c.stack[0] && c.stack[0].palWt === P.Chep ? "mediumblue" : darkerKhaki
                if (i+1===selectedPosition1?.row && selectedPosition1.side===Side.C) ctx.fillStyle = selectionColor1
                if (i+1===selectedPosition2?.row && selectedPosition2.side===Side.C) ctx.fillStyle = selectionColor2
                ctx.beginPath()
@@ -635,16 +636,15 @@ function App() {
                   <div>use the "Populate Staging Area" section to add pallets</div>
                </div>}
                {staged.length > 0 && <>
-                  <div style={{position: "absolute", left: "10vw", display: "grid", gap: "4px"}}>
-                     <button disabled={selectedStaged.length===0} onClick={deselectAllStagedListener}>deselect all</button>
-                     <div>
-                        <button disabled={selectedStaged.length<2||6<selectedStaged.length} title={"pallets will be stacked in the order they were selected"} onClick={stackTogetherSelectedStagedPalletsListener}>stack selected</button>
-                        <button disabled={selectedStaged.length!==1} onClick={downstackSelectedStagedPalletsListener}>downstack selected</button>
-                     </div>
+                  <div style={{position: "absolute", left: "5vw", display: "grid", columnGap: "20px", rowGap: "4px"}}>
+                     <button style={{gridColumn: "1", gridRow: "1", backgroundColor: "red"}} disabled={selectedStaged.length===0} onClick={()=>{return}}>delete selected</button>
+                     <button style={{gridColumn: "1", gridRow: "2"}} disabled={selectedStaged.length===0} onClick={deselectAllStagedListener}>deselect all</button>
+                     <button style={{gridColumn: "2", gridRow: "1"}} disabled={selectedStaged.length<2||6<selectedStaged.length} title={"pallets will be stacked in the order they were selected"} onClick={stackTogetherSelectedStagedPalletsListener}>stack selected</button>
+                     <button style={{gridColumn: "2", gridRow: "2"}} disabled={selectedStaged.length!==1} onClick={downstackSelectedStagedPalletsListener}>downstack selected</button>
                   </div>
                   <div style={{position: "absolute", right: "10vw"}}>combine material to single: <br/>
-                     <button disabled={selectedStaged.length<2} onClick={e => combineSelectedStagedMaterialListener(e,P.Chep)}>chep</button>&nbsp;
-                     <button disabled={selectedStaged.length<2} onClick={e => combineSelectedStagedMaterialListener(e,P.White)}>white</button>
+                     <button style={{backgroundColor: "mediumblue", border: "4px solid black"}} disabled={selectedStaged.length<2} onClick={e => combineSelectedStagedMaterialListener(e,P.Chep)}>chep</button>&nbsp;
+                     <button style={{backgroundColor: darkerKhaki, border: "4px solid black"}} disabled={selectedStaged.length<2} onClick={e => combineSelectedStagedMaterialListener(e,P.White)}>white</button>
                   </div>
                   <div className={"hint"}>
                      <div>sorted by stack weight</div>
@@ -656,7 +656,7 @@ function App() {
                      <div id={"staged-stack-"+idx} style={{
                         width: zoom*O.Straight.W,
                         height: zoom*O.Straight.L,
-                        background: (stack[0].palWt===P.Chep ? "mediumblue" : "burlywood"),
+                        background: (stack[0].palWt===P.Chep ? "mediumblue" : darkerKhaki),
                         border: "4px solid black",
                         display: "flex",
                         flexDirection: "column-reverse",
@@ -673,7 +673,7 @@ function App() {
                         else {
                            setSelectedStaged(prev => prev.filter(selIdx => idx!==selIdx));
                            const div = document.getElementById("staged-stack-" + idx) as HTMLDivElement;
-                           if (div) div.style.background = (stack[0].palWt===P.Chep ? "mediumblue" : "burlywood");
+                           if (div) div.style.background = (stack[0].palWt===P.Chep ? "mediumblue" : darkerKhaki);
                         }
                      }}>{
                         stack.map(pallet =>
@@ -813,12 +813,13 @@ function App() {
             <div id={"staging-info-container"} style={{gridRow: 3, gridColumn: 3}}>
                <h3>Staging Info</h3>
                {staged.length > 0 && <div style={{display: "grid", gridTemplateColumns: "4fr 1fr", textAlign: "right"!}}>
+                  <div style={{gridColumn:1, fontWeight: "bolder", color: "orange"}}>Staged Rows: </div><div style={{gridColumn:2, fontWeight: "bolder", color: "orange"}}>{staged.length/2}</div>
                   <div style={{gridColumn:1, fontWeight: "bolder", color: "hsl(0,0%,27%)"}}>Staged Position Count: </div><div style={{gridColumn:2, fontWeight: "bolder", color: "hsl(0,0%,27%)"}}>{staged.length}</div>
                   <div style={{gridColumn:1}}>Staged lbs (without Pallets): </div><div style={{gridColumn:2}}>{Math.ceil(totalStagedWtProdOnly(staged)).toLocaleString()}</div>
                   <div style={{gridColumn:1}}>Staged lbs (with Pallets): </div><div style={{gridColumn:2}}>{Math.ceil(totalStagedWt(staged)).toLocaleString()}</div>
                   <div style={{gridColumn:1, fontWeight: "bolder", color: "hsl(0,0%,27%)"}}>Selected Position Count: </div><div style={{gridColumn:2, fontWeight: "bolder", color: "hsl(0,0%,27%)"}}>{selectedStaged.length}</div>
-                  <div style={{gridColumn:1}}>Selected lbs (without Pallets): </div><div style={{gridColumn:2}}>{Math.ceil(selectedStaged.map(idx => staged[idx])?.reduce((allSelWtAcc,currSelStack) => allSelWtAcc+currSelStack?.reduce((stackWtAcc,currPal) => stackWtAcc+(currPal.prdWt??0),0),0)??0).toLocaleString()}</div>
-                  <div style={{gridColumn:1}}>Selected lbs (with Pallets): </div><div style={{gridColumn:2}}>{Math.ceil(selectedStaged.map(idx => staged[idx])?.reduce((allSelWtAcc,currSelStack) => allSelWtAcc+currSelStack?.reduce((stackWtAcc,currPal) => stackWtAcc+(currPal.prdWt??0)+currPal.palWt,0),0)??0).toLocaleString()}</div>
+                  <div style={{gridColumn:1}}>Selected lbs (without Pallets): </div><div style={{gridColumn:2}}>{Math.ceil(selectedWtProdOnly(selectedStaged.map(idx => staged[idx]))).toLocaleString()}</div>
+                  <div style={{gridColumn:1}}>Selected lbs (with Pallets): </div><div style={{gridColumn:2}}>{Math.ceil(selectedWt(selectedStaged.map(idx => staged[idx]))).toLocaleString()}</div>
                </div>}
 
             </div>
