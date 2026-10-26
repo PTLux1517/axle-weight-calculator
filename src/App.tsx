@@ -32,11 +32,13 @@ import {
    Pallet,
    Position,
    PositionWithMeta,
-   RearAxleTypeCapacity,Row,
+   RearAxleTypeCapacity,
+   Row,
    Side,
    Single,
    State,
-   Trailer,Triple
+   Trailer,
+   Triple
 } from './types.ts'
 import {
    alertWithBlur,
@@ -45,7 +47,9 @@ import {
    getStateTandemMaxLength,
    getStateTandemMeasurementReference,
    loadStack,
-   rotatePosition,selectedWt,selectedWtProdOnly,
+   rotatePosition,
+   selectedWt,
+   selectedWtProdOnly,
    sortStagedPalletsByStackWeight,
    stateRefDistanceToAxleDistanceFromNose,
    swapPositions,
@@ -54,17 +58,11 @@ import {
    toInches,
    totalGrossWt,
    totalLoadWt,
-   totalStagedWt,totalStagedWtProdOnly,
+   totalStagedWt,
+   totalStagedWtProdOnly,
    toTitleCase
 } from "./calculations.ts";
-import {
-   defaultTrailerDimensions,
-   emptyTrailer,
-   minSlideTrailer,
-   minTandCenterSlideLengthFromNose,toscaBalanced,
-   toscaBoardHeavy,toscaExcess,toscaFrameHeavy,
-   toscaOriginal,
-} from "./sampleTrailers.ts";
+import {defaultTrailerDimensions,emptyTrailer,minSlideTrailer,minTandCenterSlideLengthFromNose,} from "./sampleTrailers.ts";
 import {slideAxleRestrictedStates,SlideAxleRestrictionsDivider,unrestrictedLength,unrestrictedReference} from "./slideAxleRestrictedStates.ts";
 
 
@@ -374,36 +372,62 @@ function App() {
       }
    }
 
+   function checkLastRowBeforeBulkLoad():{bulkLoadReady:boolean,shorterSide:Side} {
+      let lastRow:Row|null = sampleTrailer.rows[sampleTrailer.rows.length-1] ?? null
+      if (lastRow!==null && !lastRow.hasOwnProperty(Side.C)) { //no need to alter beginning of bulk load cycle for empty trailers or loading after a centered single
+         let lastDouble:Double = lastRow as Double
+         if (lastDouble.L__===null || lastDouble.__R===null) {
+            alertWithBlur("Please make the number of rows on the left and right sides of the trailer equal before starting a bulk load")
+            return {bulkLoadReady: false, shorterSide: Side.C}
+         }
+         const lDepth:number = lastDouble.L__?.depth??0 + lastDouble.L__?.orien.L??0
+         const rDepth:number = lastDouble.__R?.depth??0 + lastDouble.__R?.orien.L??0
+         if (lDepth>rDepth)
+            return {bulkLoadReady: true, shorterSide: Side.R}
+         else
+            return {bulkLoadReady: true, shorterSide: Side.L}
+      }
+      else return {bulkLoadReady: true, shorterSide: Side.L} //empty trailer
+   }
+
+   function executeBulkLoadCycle(loadCycle:Array<[Side,O]>, e:MouseEvent) {
+      const lastRowState:{bulkLoadReady:boolean, shorterSide:Side} = checkLastRowBeforeBulkLoad()
+      if (lastRowState===undefined || !lastRowState.bulkLoadReady) return
+      let stepOffset:number = lastRowState.shorterSide===Side.L ? 0 : loadCycle.length/2
+      let newTrailer:Trailer&Load = sampleTrailer
+      selectedStaged.forEach((selIdx,loadStep) => {
+         let step = (loadStep+stepOffset) % loadCycle.length
+         newTrailer = loadStack(newTrailer, staged[selIdx], loadCycle[step][0], loadCycle[step][1])
+      })
+      setSampleTrailer(newTrailer)
+      setStaged(prev => prev.filter((_,idx) => !selectedStaged.includes(idx)))
+      deselectAllStagedListener(e)
+   }
+
+   function loadMultipleSideways(e:MouseEvent) { //button will be disabled if less than two staged pallets are selected
+      const loadCycle:Array<[Side,O]> = [
+         [Side.L, O.Sideways],
+         [Side.R, O.Sideways]
+      ]
+      executeBulkLoadCycle(loadCycle, e)
+   }
+
    function loadMultipleChimney(e:MouseEvent) { //button will be disabled if less than two staged pallets are selected
-      const chimneyLoadCycle:Array<[Side,O]> = [
+      const loadCycle:Array<[Side,O]> = [
          [Side.L, O.Straight],
          [Side.R, O.Sideways],
          [Side.R, O.Straight],
          [Side.L, O.Sideways]
       ]
-      let chimneyStepOffset:number = 0
-      let lastRow:Row|null = sampleTrailer.rows[sampleTrailer.rows.length-1] ?? null
-      if (lastRow!==null && !lastRow.hasOwnProperty(Side.C)) { //no need to alter beginning of chimney cycle for empty trailers or loading after a centered single
-         let lastDouble:Double = lastRow as Double
-         if (lastDouble.L__===null || lastDouble.__R===null) {
-            alertWithBlur("Please make the number of rows on the left and right sides of the trailer equal before starting a chimney")
-            return
-         }
-         const lDepth:number = lastDouble.L__?.depth + lastDouble.L__?.orien.L
-         const rDepth:number = lastDouble.__R?.depth + lastDouble.__R?.orien.L
-         if (lDepth>rDepth) {
-            chimneyStepOffset = 2
-         }
-      }
-      let newTrailer:Trailer&Load = sampleTrailer
-      selectedStaged.forEach((selIdx,loadStep) => {
-         let chimneyStep = (loadStep+chimneyStepOffset)%4
-         //loadPalletListener(chimneyLoadCycle[adjustedIdx][0], chimneyLoadCycle[adjustedIdx][1], true)
-         newTrailer = loadStack(newTrailer, staged[selIdx], chimneyLoadCycle[chimneyStep][0], chimneyLoadCycle[chimneyStep][1])
-      })
-      setSampleTrailer(newTrailer)
-      setStaged(prev => prev.filter((_,idx) => !selectedStaged.includes(idx)))
-      deselectAllStagedListener(e)
+      executeBulkLoadCycle(loadCycle, e)
+   }
+
+   function loadMultipleStraight(e:MouseEvent) { //button will be disabled if less than two staged pallets are selected
+      const loadCycle:Array<[Side,O]> = [
+         [Side.L, O.Straight],
+         [Side.R, O.Straight]
+      ]
+      executeBulkLoadCycle(loadCycle, e)
    }
 
    function selectAllStagedListener(e:MouseEvent) {
@@ -667,7 +691,7 @@ function App() {
                   </div></span>
                   <button id={"add-to-staging-button"} onClick={addPalletToStagingListener}>add</button>
                </div>
-               <button id={"delete-staged-button"} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); if (confirm("'Delete all pallets from the staging area?'")) {setSelectedStaged([]); setStaged([]);}}} disabled={staged.length===0}>delete staged</button>
+               <button id={"delete-staged-button"} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); if (confirm("permanently delete all pallets from the staging area?")) {setSelectedStaged([]); setStaged([]);}}} disabled={staged.length===0}>delete staged</button>
                <button id={"delete-selected-staged-button"} disabled={selectedStaged.length===0} onClick={()=>{return}}>delete selected</button>
             </div>
             <div style={{gridRow: 4, gridColumn: "1/4"}} id={"staged-pallets-container"}>
@@ -772,9 +796,9 @@ function App() {
                <button disabled={selectedStaged.length!==1} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); loadPalletListener(Side.R, O.Sideways);}}>sideways</button>
                <h3 style={{gridColumn: "1/4"}}>Bulk Load Selected Staged Pallets</h3>
                <div style={{gridColumn: "1/4", display: "grid", columnGap: "4px"}}>
-                  <button style={{gridColumn: "1"}} disabled={selectedStaged.length<2} onClick={()=>{return}}>all sideways</button>
+                  <button style={{gridColumn: "1"}} disabled={selectedStaged.length<2} onClick={loadMultipleSideways}>all sideways</button>
                   <button style={{gridColumn: "2"}} disabled={selectedStaged.length<2} onClick={loadMultipleChimney}>chimney</button>
-                  <button style={{gridColumn: "3"}} disabled={selectedStaged.length<2} onClick={()=>{return}}>all straight</button>
+                  <button style={{gridColumn: "3"}} disabled={selectedStaged.length<2} onClick={loadMultipleStraight}>all straight</button>
                   <button style={{gridColumn: "4"}} disabled={selectedStaged.length<2} onClick={()=>{return}}>single-double</button>
                </div>
             </div>
@@ -869,6 +893,7 @@ function App() {
                   <div style={{gridColumn:1, fontWeight: "bolder", color: "hsl(0,0%,27%)"}}>Staged Position Count: </div><div style={{gridColumn:2, fontWeight: "bolder", color: "hsl(0,0%,27%)"}}>{staged.length}</div>
                   <div style={{gridColumn:1}}>Staged lbs (without Pallets): </div><div style={{gridColumn:2}}>{Math.ceil(totalStagedWtProdOnly(staged)).toLocaleString()}</div>
                   <div style={{gridColumn:1}}>Staged lbs (with Pallets): </div><div style={{gridColumn:2}}>{Math.ceil(totalStagedWt(staged)).toLocaleString()}</div>
+                  <br/>
                   <div style={{gridColumn:1, fontWeight: "bolder", color: "hsl(0,0%,27%)"}}>Selected Position Count: </div><div style={{gridColumn:2, fontWeight: "bolder", color: "hsl(0,0%,27%)"}}>{selectedStaged.length}</div>
                   <div style={{gridColumn:1}}>Selected lbs (without Pallets): </div><div style={{gridColumn:2}}>{Math.ceil(selectedWtProdOnly(selectedStaged.map(idx => staged[idx]))).toLocaleString()}</div>
                   <div style={{gridColumn:1}}>Selected lbs (with Pallets): </div><div style={{gridColumn:2}}>{Math.ceil(selectedWt(selectedStaged.map(idx => staged[idx]))).toLocaleString()}</div>
