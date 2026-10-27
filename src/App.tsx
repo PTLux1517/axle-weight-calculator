@@ -382,12 +382,12 @@ function App() {
       }
       else { //no need to alter beginning of bulk load cycle for empty trailers or loading after a centered single
          let lastDouble:Double = lastRow as Double
-         const lDepth:number = lastDouble.L__?.depth + lastDouble.L__?.orien.L
-         const rDepth:number = lastDouble.__R?.depth + lastDouble.__R?.orien.L
          if (lastDouble.L__===null || lastDouble.__R===null) {
             alertWithBlur("Please make the number of rows on the left and right sides of the trailer equal before starting a bulk load")
             return {bulkLoadReady: false, shorterSide: Side.C}
          }
+         const lDepth:number = lastDouble.L__?.depth + lastDouble.L__?.orien.L
+         const rDepth:number = lastDouble.__R?.depth + lastDouble.__R?.orien.L
          if (lDepth===rDepth) {
             const pseudoShorterSide:Side = lastDouble.L__.orien===O.Sideways ? Side.L : Side.R
             return {bulkLoadReady: true, shorterSide: pseudoShorterSide}
