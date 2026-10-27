@@ -374,37 +374,41 @@ function App() {
 
    function checkLastRowBeforeBulkLoad():{bulkLoadReady:boolean,shorterSide:Side} {
       let lastRow:Row|null = sampleTrailer.rows[sampleTrailer.rows.length-1] ?? null
-      if (lastRow!==null && !lastRow.hasOwnProperty(Side.C)) { //no need to alter beginning of bulk load cycle for empty trailers or loading after a centered single
+      if (lastRow===null) {
+         return {bulkLoadReady: true, shorterSide: Side.L}
+      }
+      else if (lastRow.hasOwnProperty(Side.C)) {
+         return {bulkLoadReady: true, shorterSide: Side.C}
+      }
+      else { //no need to alter beginning of bulk load cycle for empty trailers or loading after a centered single
          let lastDouble:Double = lastRow as Double
+         const lDepth:number = lastDouble.L__?.depth + lastDouble.L__?.orien.L
+         const rDepth:number = lastDouble.__R?.depth + lastDouble.__R?.orien.L
          if (lastDouble.L__===null || lastDouble.__R===null) {
             alertWithBlur("Please make the number of rows on the left and right sides of the trailer equal before starting a bulk load")
             return {bulkLoadReady: false, shorterSide: Side.C}
          }
-         const lDepth:number = lastDouble.L__?.depth + lastDouble.L__?.orien.L
-         const rDepth:number = lastDouble.__R?.depth + lastDouble.__R?.orien.L
-         if (lDepth>rDepth) {
-            console.log(`shorter right — lDepth:${lDepth} rDepth:${rDepth}`)
-            return {bulkLoadReady: true, shorterSide: Side.R}
-         }
-         else if (lDepth===rDepth) {
+         if (lDepth===rDepth) {
             const pseudoShorterSide:Side = lastDouble.L__.orien===O.Sideways ? Side.L : Side.R
             return {bulkLoadReady: true, shorterSide: pseudoShorterSide}
          }
+         else if (lDepth>rDepth) {
+            return {bulkLoadReady: true, shorterSide: Side.R}
+         }
          else {
-            console.log(`shorter left — lDepth:${lDepth} rDepth:${rDepth}`)
             return {bulkLoadReady: true, shorterSide: Side.L}
          }
-      }
-      else { //empty trailer
-         console.log("empty trailer or last row was single")
-         return {bulkLoadReady: true, shorterSide: Side.L}
       }
    }
 
    function executeBulkLoadCycle(loadCycle:Array<[Side,O]>, e:MouseEvent) {
       const lastRowState:{bulkLoadReady:boolean, shorterSide:Side} = checkLastRowBeforeBulkLoad()
       if (lastRowState===undefined || !lastRowState.bulkLoadReady) return
-      let stepOffset:number = lastRowState.shorterSide===Side.L ? 0 : loadCycle.length/2
+      let stepOffset:number = (lastRowState.shorterSide===Side.C && loadCycle[0][0]===Side.C) //if prev row ended in centered single and load cycle is single-double, make sure to offset to avoid single-single
+         ? 1
+         : (lastRowState.shorterSide===Side.R && loadCycle[0][0]!==Side.C)
+            ? Math.floor(loadCycle.length/2)
+            : 0
       let newTrailer:Trailer&Load = sampleTrailer
       selectedStaged.forEach((selIdx,loadStep) => {
          let step = (loadStep+stepOffset) % loadCycle.length
@@ -435,6 +439,16 @@ function App() {
 
    function loadMultipleStraight(e:MouseEvent) { //button will be disabled if less than two staged pallets are selected
       const loadCycle:Array<[Side,O]> = [
+         [Side.L, O.Straight],
+         [Side.R, O.Straight]
+      ]
+      executeBulkLoadCycle(loadCycle, e)
+   }
+
+   function loadMultipleSingleDouble(e:MouseEvent) { //button will be disabled if less than two staged pallets are selected
+      const singleOrienStraight = document.getElementById("single-straight") as HTMLInputElement
+      const loadCycle:Array<[Side,O]> = [
+         [Side.C, (singleOrienStraight.checked ? O.Straight : O.Sideways)],
          [Side.L, O.Straight],
          [Side.R, O.Straight]
       ]
@@ -806,11 +820,18 @@ function App() {
                <button disabled={selectedStaged.length!==1} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); loadPalletListener(Side.C, O.Sideways);}}>sideways</button>
                <button disabled={selectedStaged.length!==1} onClick={(e:MouseEvent) => {(e.target as HTMLButtonElement).blur(); loadPalletListener(Side.R, O.Sideways);}}>sideways</button>
                <h3 style={{gridColumn: "1/4"}}>Bulk Load Selected Staged Pallets</h3>
-               <div style={{gridColumn: "1/4", display: "grid", columnGap: "4px"}}>
+               <div style={{gridColumn: "1/4", display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", columnGap: "4px"}}>
                   <button style={{gridColumn: "1"}} disabled={selectedStaged.length<2} onClick={loadMultipleSideways}>all sideways</button>
                   <button style={{gridColumn: "2"}} disabled={selectedStaged.length<2} onClick={loadMultipleChimney}>chimney</button>
                   <button style={{gridColumn: "3"}} disabled={selectedStaged.length<2} onClick={loadMultipleStraight}>all straight</button>
-                  <button style={{gridColumn: "4"}} disabled={selectedStaged.length<2} onClick={()=>{return}}>single-double</button>
+                  <div style={{gridColumn: "4/6", display: "grid", border: "3px solid hsl(0,0%,11.5%)", borderRadius: "10px"}}>
+                     <button style={{gridColumn: "1"}} disabled={selectedStaged.length<2} onClick={loadMultipleSingleDouble}>single-double</button>
+                     <div style={{gridColumn: "2", textAlign: "left", paddingLeft: "5px"}}>
+                        <h6 style={{margin: "0px 4px", color: "hsl(0,0%,26%)"}}>single orientation</h6>
+                        <input type={"radio"} id={"single-straight"} name={"single-orien"} value={"straight"} defaultChecked={true}/><label htmlFor="single-straight">straight</label><br/>
+                        <input type={"radio"} id={"single-sideways"} name={"single-orien"} value={"sideways"} /><label htmlFor="single-sideways">sideways</label>
+                     </div>
+                  </div>
                </div>
             </div>
             {/* ----------------------------------------------------------------- COLUMN 3 ----------------------------------------------------------------- */}
