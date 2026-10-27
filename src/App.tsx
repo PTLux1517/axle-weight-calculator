@@ -380,14 +380,25 @@ function App() {
             alertWithBlur("Please make the number of rows on the left and right sides of the trailer equal before starting a bulk load")
             return {bulkLoadReady: false, shorterSide: Side.C}
          }
-         const lDepth:number = lastDouble.L__?.depth??0 + lastDouble.L__?.orien.L??0
-         const rDepth:number = lastDouble.__R?.depth??0 + lastDouble.__R?.orien.L??0
-         if (lDepth>rDepth)
+         const lDepth:number = lastDouble.L__?.depth + lastDouble.L__?.orien.L
+         const rDepth:number = lastDouble.__R?.depth + lastDouble.__R?.orien.L
+         if (lDepth>rDepth) {
+            console.log(`shorter right — lDepth:${lDepth} rDepth:${rDepth}`)
             return {bulkLoadReady: true, shorterSide: Side.R}
-         else
+         }
+         else if (lDepth===rDepth) {
+            const pseudoShorterSide:Side = lastDouble.L__.orien===O.Sideways ? Side.L : Side.R
+            return {bulkLoadReady: true, shorterSide: pseudoShorterSide}
+         }
+         else {
+            console.log(`shorter left — lDepth:${lDepth} rDepth:${rDepth}`)
             return {bulkLoadReady: true, shorterSide: Side.L}
+         }
       }
-      else return {bulkLoadReady: true, shorterSide: Side.L} //empty trailer
+      else { //empty trailer
+         console.log("empty trailer or last row was single")
+         return {bulkLoadReady: true, shorterSide: Side.L}
+      }
    }
 
    function executeBulkLoadCycle(loadCycle:Array<[Side,O]>, e:MouseEvent) {
